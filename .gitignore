@@ -1,8 +1,13 @@
 # Ignore all files by default
 *
 
+# Allow directories so Git can traverse
+!*/
+!**/
+
 # Do not ignore these specific deployment files
-!app.py
-!survey.py
+!Frontend/app.py
+!Backend/survey.py
 !requirements.txt
 !.gitignore
+!README.md

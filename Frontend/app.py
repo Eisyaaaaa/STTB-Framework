@@ -5,6 +5,11 @@ import folium
 from streamlit_folium import st_folium
 import sqlite3
 from datetime import datetime, timedelta
+import sys
+import os
+
+# Dynamic path resolution to import Backend/survey.py
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Backend')))
 import survey  # Import our math scoring engine
 
 # Set page configuration with a premium look
@@ -272,7 +277,7 @@ else:
 # ---------------------------------------------------------
 # 2. PDPA-COMPLIANT DATABASE ARCHITECTURE (SQLite)
 # ---------------------------------------------------------
-DB_FILE = "sttb.db"
+DB_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Backend', 'sttb.db'))
 
 def get_db_connection():
     conn = sqlite3.connect(DB_FILE)
