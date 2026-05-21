@@ -639,8 +639,8 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# 8-column layout: Logo (1.0), 5 Menu Buttons (Overview, Survey, Dashboard, Map, Help), Languages (2.2), Theme Toggle (0.6)
-nav_cols = st.columns([1.0, 1.2, 1.2, 1.4, 1.0, 1.8, 2.2, 0.6], vertical_alignment="center")
+# 8-column layout: Logo (1.0), 5 Menu Buttons (Overview, Survey, Dashboard, Map, Help), Language (1.4), Theme Toggle (0.6)
+nav_cols = st.columns([1.0, 1.2, 1.2, 1.4, 1.0, 1.8, 1.4, 0.6], vertical_alignment="center")
 
 # Column 0: Sarawak State Flag Logo
 with nav_cols[0]:
@@ -663,22 +663,13 @@ for idx, (page_val, label) in enumerate(menu_options):
             st.session_state["page"] = page_val
             st.rerun()
 
-# Column 6: Minimalist Languages inline selector (aligned right side)
+# Column 6: Minimalist Language toggle link
 with nav_cols[6]:
-    lang_cols = st.columns(4)
-    langs = [
-        ("English", "EN"),
-        ("Bahasa Malaysia", "BM"),
-        ("Chinese", "华"),
-        ("Tamil", "தமிழ்")
-    ]
-    for l_idx, (lang_val, lang_label) in enumerate(langs):
-        with lang_cols[l_idx]:
-            is_lang_active = (st.session_state.get("language", "English") == lang_val)
-            btn_kind = "primary" if is_lang_active else "secondary"
-            if st.button(lang_label, key=f"lang_{lang_val}", type=btn_kind, use_container_width=True):
-                st.session_state["language"] = lang_val
-                st.rerun()
+    is_lang_menu_open = st.session_state.get("show_lang_options", False)
+    btn_kind = "primary" if is_lang_menu_open else "secondary"
+    if st.button("Language", key="nav_language_toggle", type=btn_kind, use_container_width=True):
+        st.session_state["show_lang_options"] = not is_lang_menu_open
+        st.rerun()
 
 # Column 7: Theme Selector Symbol (☾ for Dark, ☀ for Light)
 with nav_cols[7]:
@@ -689,6 +680,39 @@ with nav_cols[7]:
         else:
             st.session_state["theme_mode"] = "Dark Mode"
         st.rerun()
+
+# ---------------------------------------------------------
+# DYNAMIC LANGUAGE DROPDOWN SUB-STRIP
+# ---------------------------------------------------------
+if st.session_state.get("show_lang_options", False):
+    # Render language options right-aligned in a clean, non-wrapping thin row
+    st.markdown("<div style='margin-top: -15px;'></div>", unsafe_allow_html=True)
+    sub_cols = st.columns([5.8, 1.2, 1.8, 1.2, 1.2])
+    
+    with sub_cols[1]:
+        if st.button("English", key="lang_opt_English", type="primary" if lang == "English" else "secondary", use_container_width=True):
+            st.session_state["language"] = "English"
+            st.session_state["show_lang_options"] = False
+            st.rerun()
+            
+    with sub_cols[2]:
+        if st.button("Bahasa Malaysia", key="lang_opt_Malay", type="primary" if lang == "Bahasa Malaysia" else "secondary", use_container_width=True):
+            st.session_state["language"] = "Bahasa Malaysia"
+            st.session_state["show_lang_options"] = False
+            st.rerun()
+            
+    with sub_cols[3]:
+        if st.button("中文", key="lang_opt_Chinese", type="primary" if lang == "Chinese" else "secondary", use_container_width=True):
+            st.session_state["language"] = "Chinese"
+            st.session_state["show_lang_options"] = False
+            st.rerun()
+            
+    with sub_cols[4]:
+        if st.button("தமிழ்", key="lang_opt_Tamil", type="primary" if lang == "Tamil" else "secondary", use_container_width=True):
+            st.session_state["language"] = "Tamil"
+            st.session_state["show_lang_options"] = False
+            st.rerun()
+    st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
 
 
 # Get current page selection from session state
