@@ -531,35 +531,37 @@ if "page" not in st.session_state:
 if "language" not in st.session_state:
     st.session_state["language"] = "English"
 
-# Dynamic Multilanguage Translation Dictionary
+# Secure Hidden Admin Portal Initialization
+if "admin_mode" not in st.session_state:
+    st.session_state["admin_mode"] = False
+
+# Enable admin mode securely via secret URL query parameters
+if "admin" in st.query_params and st.query_params["admin"] == "true":
+    st.session_state["admin_mode"] = True
+elif "audit" in st.query_params and st.query_params["audit"] == "uts":
+    st.session_state["admin_mode"] = True
+
+# Normalize legacy language selections
+if st.session_state.get("language") == "Bahasa Malaysia":
+    st.session_state["language"] = "Bahasa Melayu"
+
+# Dynamic Multilanguage Translation Dictionary (English and Bahasa Melayu only)
 TRANSLATIONS = {
     "English": {
         "overview": "Overview",
         "survey": "Survey",
         "dashboard": "Dashboard",
         "map": "Map",
-        "help": "Help"
+        "help": "Help",
+        "admin": "Admin"
     },
-    "Bahasa Malaysia": {
+    "Bahasa Melayu": {
         "overview": "Ringkasan",
         "survey": "Soal Selidik",
         "dashboard": "Papan Pemuka",
         "map": "Peta Kawasan",
-        "help": "Bantuan"
-    },
-    "Chinese": {
-        "overview": "概览",
-        "survey": "问卷调查",
-        "dashboard": "仪表板",
-        "map": "地理地图",
-        "help": "投诉与反馈"
-    },
-    "Tamil": {
-        "overview": "கண்ணோட்டம்",
-        "survey": "கணக்கெடுப்பு",
-        "dashboard": "டாஷ்போர்டு",
-        "map": "வரைபடம்",
-        "help": "உதவி"
+        "help": "Bantuan",
+        "admin": "Admin"
     }
 }
 
@@ -639,22 +641,42 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# 8-column layout: Logo (1.0), 5 Menu Buttons (Overview, Survey, Dashboard, Map, Help), Language (1.4), Theme Toggle (0.6)
-nav_cols = st.columns([1.0, 1.2, 1.2, 1.4, 1.0, 1.8, 1.4, 0.6], vertical_alignment="center")
+# Determine dynamic navigation layout based on admin_mode status
+has_admin_tab = st.session_state.get("admin_mode", False)
+
+if has_admin_tab:
+    # 9-column layout: Logo, 6 Menu Buttons, Language, Theme Toggle
+    nav_cols = st.columns([0.8, 1.0, 1.1, 1.1, 1.1, 1.3, 0.9, 1.3, 0.5], vertical_alignment="center")
+    menu_options = [
+        ("Welcome & Overview", TRANSLATIONS[lang]["overview"]),
+        ("Public Survey Form", TRANSLATIONS[lang]["survey"]),
+        ("Analytics Dashboard", TRANSLATIONS[lang]["dashboard"]),
+        ("Geographic Trust Map", TRANSLATIONS[lang]["map"]),
+        ("Help / Feedback", TRANSLATIONS[lang]["help"]),
+        ("Admin Panel", TRANSLATIONS[lang]["admin"])
+    ]
+    lang_col_idx = 7
+    theme_col_idx = 8
+    sub_strip_widths = [6.8, 1.4, 1.8]
+else:
+    # 8-column layout: Logo, 5 Menu Buttons, Language, Theme Toggle
+    nav_cols = st.columns([1.0, 1.2, 1.2, 1.4, 1.0, 1.8, 1.4, 0.6], vertical_alignment="center")
+    menu_options = [
+        ("Welcome & Overview", TRANSLATIONS[lang]["overview"]),
+        ("Public Survey Form", TRANSLATIONS[lang]["survey"]),
+        ("Analytics Dashboard", TRANSLATIONS[lang]["dashboard"]),
+        ("Geographic Trust Map", TRANSLATIONS[lang]["map"]),
+        ("Help / Feedback", TRANSLATIONS[lang]["help"])
+    ]
+    lang_col_idx = 6
+    theme_col_idx = 7
+    sub_strip_widths = [6.5, 1.5, 2.0]
 
 # Column 0: Sarawak State Flag Logo
 with nav_cols[0]:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/7/7e/Flag_of_Sarawak.svg", width=65)
+    st.image("https://upload.wikimedia.org/wikipedia/commons/7/7e/Flag_of_Sarawak.svg", width=55 if has_admin_tab else 65)
 
-# Columns 1-5: Horizontal Navigation Menus
-menu_options = [
-    ("Welcome & Overview", TRANSLATIONS[lang]["overview"]),
-    ("Public Survey Form", TRANSLATIONS[lang]["survey"]),
-    ("Analytics Dashboard", TRANSLATIONS[lang]["dashboard"]),
-    ("Geographic Trust Map", TRANSLATIONS[lang]["map"]),
-    ("Help / Feedback", TRANSLATIONS[lang]["help"])
-]
-
+# Columns 1-5 or 1-6: Horizontal Navigation Menus
 for idx, (page_val, label) in enumerate(menu_options):
     with nav_cols[idx + 1]:
         is_active = (st.session_state["page"] == page_val)
@@ -663,16 +685,16 @@ for idx, (page_val, label) in enumerate(menu_options):
             st.session_state["page"] = page_val
             st.rerun()
 
-# Column 6: Minimalist Language toggle link
-with nav_cols[6]:
+# Column 6 or 7: Minimalist Language toggle link
+with nav_cols[lang_col_idx]:
     is_lang_menu_open = st.session_state.get("show_lang_options", False)
     btn_kind = "primary" if is_lang_menu_open else "secondary"
     if st.button("Language", key="nav_language_toggle", type=btn_kind, use_container_width=True):
         st.session_state["show_lang_options"] = not is_lang_menu_open
         st.rerun()
 
-# Column 7: Theme Selector Symbol (☾ for Dark, ☀ for Light)
-with nav_cols[7]:
+# Column 7 or 8: Theme Selector Symbol (☾ for Dark, ☀ for Light)
+with nav_cols[theme_col_idx]:
     current_symbol = "☀" if st.session_state["theme_mode"] == "Dark Mode" else "☾"
     if st.button(current_symbol, key="theme_toggle_btn", use_container_width=True):
         if st.session_state["theme_mode"] == "Dark Mode":
@@ -685,9 +707,9 @@ with nav_cols[7]:
 # DYNAMIC LANGUAGE DROPDOWN SUB-STRIP
 # ---------------------------------------------------------
 if st.session_state.get("show_lang_options", False):
-    # Render language options right-aligned in a clean, non-wrapping thin row
+    # Render language options right-aligned in a clean, non-wrapping thin row (English and Bahasa Melayu only)
     st.markdown("<div style='margin-top: -15px;'></div>", unsafe_allow_html=True)
-    sub_cols = st.columns([5.8, 1.2, 1.8, 1.2, 1.2])
+    sub_cols = st.columns(sub_strip_widths)
     
     with sub_cols[1]:
         if st.button("English", key="lang_opt_English", type="primary" if lang == "English" else "secondary", use_container_width=True):
@@ -696,20 +718,8 @@ if st.session_state.get("show_lang_options", False):
             st.rerun()
             
     with sub_cols[2]:
-        if st.button("Bahasa Malaysia", key="lang_opt_Malay", type="primary" if lang == "Bahasa Malaysia" else "secondary", use_container_width=True):
-            st.session_state["language"] = "Bahasa Malaysia"
-            st.session_state["show_lang_options"] = False
-            st.rerun()
-            
-    with sub_cols[3]:
-        if st.button("中文", key="lang_opt_Chinese", type="primary" if lang == "Chinese" else "secondary", use_container_width=True):
-            st.session_state["language"] = "Chinese"
-            st.session_state["show_lang_options"] = False
-            st.rerun()
-            
-    with sub_cols[4]:
-        if st.button("தமிழ்", key="lang_opt_Tamil", type="primary" if lang == "Tamil" else "secondary", use_container_width=True):
-            st.session_state["language"] = "Tamil"
+        if st.button("Bahasa Melayu", key="lang_opt_Malay", type="primary" if lang == "Bahasa Melayu" else "secondary", use_container_width=True):
+            st.session_state["language"] = "Bahasa Melayu"
             st.session_state["show_lang_options"] = False
             st.rerun()
     st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
@@ -719,36 +729,64 @@ if st.session_state.get("show_lang_options", False):
 page = st.session_state.get("page", "Welcome & Overview")
 
 # ---------------------------------------------------------
+# ---------------------------------------------------------
 # PAGE 1: WELCOME & OVERVIEW
 # ---------------------------------------------------------
 if page == "Welcome & Overview":
-    st.markdown('<div class="glass-header"><h1>Sarawak Tech-Trust Barometer (STTB)</h1><div class="subtitle">A Social-Technical Framework for Digital Trust Measurement in Sarawak</div></div>', unsafe_allow_html=True)
+    if lang == "Bahasa Melayu":
+        st.markdown('<div class="glass-header"><h1>Barometer Kepercayaan Teknologi Sarawak (STTB)</h1><div class="subtitle">Kerangka Sosio-Teknikal untuk Pengukuran Kepercayaan Digital di Sarawak</div></div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="glass-header"><h1>Sarawak Tech-Trust Barometer (STTB)</h1><div class="subtitle">A Social-Technical Framework for Digital Trust Measurement in Sarawak</div></div>', unsafe_allow_html=True)
     
     col1, col2 = st.columns([3, 2])
     
     with col1:
-        st.markdown(f"""
-        <div class="glass-card">
-            <h3>About The Project</h3>
-            <p>The <b>Sarawak Tech-Trust Barometer (STTB)</b> is an R&D final year project developed to address the critical gaps in measuring and tracking public trust in digital technologies and institutions across the administrative divisions of Sarawak.</p>
-            <p>Aligning directly with the <b>Sarawak Digital Economy Corporation (SDEC) Strategy</b> and national digital policies, the platform provides policymakers, academic researchers, and citizens with transparent, real-time indicators regarding how digital platforms handle data privacy, ethics, accessibility, and security.</p>
-            <p>Our scoring architecture is scientifically structured across <b>5 core digital trust pillars</b>, mapped against <b>15 analytical variables</b>, and calculated from a comprehensive <b>75-item survey instrument</b> grounded in the sociological Institutional Theory by W. Richard Scott (1995) and refined through the ethical paradigms of Islamic jurisprudence.</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("""
-        <div class="glass-card">
-            <h3>The Five Digital Trust Pillars</h3>
-            <p>Each pillar represents a critical axis of public evaluation:</p>
-            <ul>
-                <li><b>1. Transparency & Accessibility (Sidq & Tabayyun)</b>: Opening algorithmic processes, plain language policies, and addressing information gaps between state and citizen.</li>
-                <li><b>2. Ethics & Responsibility (Amanah)</b>: Promoting fair software designs, algorithmic non-bias, and leaders taking stewardship of civic welfare.</li>
-                <li><b>3. Privacy & Control (Tajassus & Haya)</b>: Preventing unauthorized intrusion, giving granular consent options, and mitigating digital resignation.</li>
-                <li><b>4. Security & Reliability (Itqan)</b>: Ensuring technical excellence, infrastructure resilience, and low service downtime.</li>
-                <li><b>5. Digital Inclusion & Equity (Adl)</b>: Balancing geographic coverage between urban and rural zones, supporting digital literacy, and accessibility for marginalized groups.</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
+        if lang == "Bahasa Melayu":
+            st.markdown(f"""
+            <div class="glass-card">
+                <h3>Mengenai Projek</h3>
+                <p><b>Barometer Kepercayaan Teknologi Sarawak (STTB)</b> ialah projek tahun akhir R&D yang dibangunkan untuk menangani jurang kritikal dalam mengukur dan menjejaki kepercayaan orang ramai terhadap teknologi digital dan institusi di seluruh bahagian pentadbiran di Sarawak.</p>
+                <p>Sejajar secara langsung dengan <b>Strategi Perbadanan Ekonomi Digital Sarawak (SDEC)</b> dan dasar digital kebangsaan, platform ini menyediakan pembuat dasar, penyelidik akademik, dan rakyat dengan penunjuk telus dan masa nyata mengenai cara platform digital mengendalikan privasi data, etika, kebolehcapaian dan keselamatan.</p>
+                <p>Seni bina pemarkahan kami distrukturkan secara saintifik merentasi <b>5 teras tonggak kepercayaan digital</b>, dipetakan terhadap <b>15 pemboleh ubah analisis</b>, dan dikira daripada instrumen tinjauan <b>75-item komprehensif</b> yang berasaskan Teori Institusi sosiologi oleh W. Richard Scott (1995) dan diperhalusi melalui paradigma etika perundangan Islam.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("""
+            <div class="glass-card">
+                <h3>Lima Tonggak Kepercayaan Digital</h3>
+                <p>Setiap tonggak mewakili paksi kritikal penilaian awam:</p>
+                <ul>
+                    <li><b>1. Ketelusan & Kebolehcapaian (Sidq & Tabayyun)</b>: Membuka proses algoritma, dasar bahasa mudah, dan menangani jurang maklumat antara kerajaan dan rakyat.</li>
+                    <li><b>2. Etika & Tanggungjawab (Amanah)</b>: Mempromosikan reka bentuk perisian yang adil, tanpa kecenderungan algoritma, dan pemimpin yang mengambil alih pengurusan kebajikan sivik.</li>
+                    <li><b>3. Privasi & Kawalan (Tajassus & Haya)</b>: Mencegah pencerobohan tanpa kebenaran, memberikan pilihan persetujuan terperinci, dan mengurangkan peletakan jawatan digital.</li>
+                    <li><b>4. Keselamatan & Kebolehpercayaan (Itqan)</b>: Memintasi kecemerlangan teknikal, daya tahan infrastruktur, dan masa henti perkhidmatan yang rendah.</li>
+                    <li><b>5. Inklusi Digital & Kesaksamaan (Adl)</b>: Mengimbangi liputan geografi antara zon bandar dan luar bandar, menyokong literasi digital, dan kebolehcapaian untuk kumpulan terpinggir.</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown(f"""
+            <div class="glass-card">
+                <h3>About The Project</h3>
+                <p>The <b>Sarawak Tech-Trust Barometer (STTB)</b> is an R&D final year project developed to address the critical gaps in measuring and tracking public trust in digital technologies and institutions across the administrative divisions of Sarawak.</p>
+                <p>Aligning directly with the <b>Sarawak Digital Economy Corporation (SDEC) Strategy</b> and national digital policies, the platform provides policymakers, academic researchers, and citizens with transparent, real-time indicators regarding how digital platforms handle data privacy, ethics, accessibility, and security.</p>
+                <p>Our scoring architecture is scientifically structured across <b>5 core digital trust pillars</b>, mapped against <b>15 analytical variables</b>, and calculated from a comprehensive <b>75-item survey instrument</b> grounded in the sociological Institutional Theory by W. Richard Scott (1995) and refined through the ethical paradigms of Islamic jurisprudence.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("""
+            <div class="glass-card">
+                <h3>The Five Digital Trust Pillars</h3>
+                <p>Each pillar represents a critical axis of public evaluation:</p>
+                <ul>
+                    <li><b>1. Transparency & Accessibility (Sidq & Tabayyun)</b>: Opening algorithmic processes, plain language policies, and addressing information gaps between state and citizen.</li>
+                    <li><b>2. Ethics & Responsibility (Amanah)</b>: Promoting fair software designs, algorithmic non-bias, and leaders taking stewardship of civic welfare.</li>
+                    <li><b>3. Privacy & Control (Tajassus & Haya)</b>: Preventing unauthorized intrusion, giving granular consent options, and mitigating digital resignation.</li>
+                    <li><b>4. Security & Reliability (Itqan)</b>: Ensuring technical excellence, infrastructure resilience, and low service downtime.</li>
+                    <li><b>5. Digital Inclusion & Equity (Adl)</b>: Balancing geographic coverage between urban and rural zones, supporting digital literacy, and accessibility for marginalized groups.</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
 
     with col2:
         # Display current dashboard statistics
@@ -764,66 +802,132 @@ if page == "Welcome & Overview":
         conn.close()
         
         if total_resp == 0:
-            st.markdown(f"""
-            <div class="glass-card" style="text-align: center;">
-                <h3>Live Barometer Metrics</h3>
-                <div style="margin: 20px 0;">
-                    <div class="metric-label">Sarawak Tech-Trust Index</div>
-                    <div class="metric-value" style="font-size: 2.2rem; color: #bdc3c7; margin: 15px 0;">Awaiting Data</div>
-                    <div class="metric-label" style="color: #bdc3c7; font-weight:bold;">No Submissions Yet</div>
-                </div>
-                <p style="font-size:0.85rem; color:#bdc3c7;">
-                    Be the very first respondent to initialize the digital trust barometer!
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.markdown(f"""
-            <div class="glass-card" style="text-align: center;">
-                <h3>Live Barometer Metrics</h3>
-                <div style="margin: 20px 0;">
-                    <div class="metric-label">Sarawak Tech-Trust Index</div>
-                    <div class="metric-value">{state_avg:.2f}</div>
-                    <div class="metric-label" style="color: {survey.get_trust_level(state_avg)['color']}; font-weight:bold;">
-                        {survey.get_trust_level(state_avg)['level']}
+            if lang == "Bahasa Melayu":
+                st.markdown(f"""
+                <div class="glass-card" style="text-align: center;">
+                    <h3>Metrik Barometer Langsung</h3>
+                    <div style="margin: 20px 0;">
+                        <div class="metric-label">Indeks Kepercayaan Teknologi Sarawak</div>
+                        <div class="metric-value" style="font-size: 2.2rem; color: #bdc3c7; margin: 15px 0;">Menunggu Data</div>
+                        <div class="metric-label" style="color: #bdc3c7; font-weight:bold;">Belum Ada Hantaran</div>
                     </div>
+                    <p style="font-size:0.85rem; color:#bdc3c7;">
+                        Jadilah responden pertama untuk memulakan barometer kepercayaan digital!
+                    </p>
                 </div>
-                <p style="font-size:0.85rem; color:#bdc3c7;">
-                    Index updates automatically in real-time as new public survey responses are recorded.
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="glass-card" style="text-align: center;">
+                    <h3>Live Barometer Metrics</h3>
+                    <div style="margin: 20px 0;">
+                        <div class="metric-label">Sarawak Tech-Trust Index</div>
+                        <div class="metric-value" style="font-size: 2.2rem; color: #bdc3c7; margin: 15px 0;">Awaiting Data</div>
+                        <div class="metric-label" style="color: #bdc3c7; font-weight:bold;">No Submissions Yet</div>
+                    </div>
+                    <p style="font-size:0.85rem; color:#bdc3c7;">
+                        Be the very first respondent to initialize the digital trust barometer!
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            t_eval = survey.get_trust_level(state_avg)
+            bm_levels = {
+                "High Trust": "Kepercayaan Tinggi",
+                "Moderate Trust": "Kepercayaan Sederhana",
+                "Low Trust": "Kepercayaan Rendah",
+                "Very Low Trust": "Kepercayaan Sangat Rendah"
+            }
+            level_str = bm_levels.get(t_eval["level"], t_eval["level"]) if lang == "Bahasa Melayu" else t_eval["level"]
+            
+            if lang == "Bahasa Melayu":
+                st.markdown(f"""
+                <div class="glass-card" style="text-align: center;">
+                    <h3>Metrik Barometer Langsung</h3>
+                    <div style="margin: 20px 0;">
+                        <div class="metric-label">Indeks Kepercayaan Teknologi Sarawak</div>
+                        <div class="metric-value">{state_avg:.2f}</div>
+                        <div class="metric-label" style="color: {t_eval['color']}; font-weight:bold;">
+                            {level_str}
+                        </div>
+                    </div>
+                    <p style="font-size:0.85rem; color:#bdc3c7;">
+                        Indeks dikemas kini secara automatik dalam masa nyata apabila respons tinjauan awam baharu direkodkan.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="glass-card" style="text-align: center;">
+                    <h3>Live Barometer Metrics</h3>
+                    <div style="margin: 20px 0;">
+                        <div class="metric-label">Sarawak Tech-Trust Index</div>
+                        <div class="metric-value">{state_avg:.2f}</div>
+                        <div class="metric-label" style="color: {t_eval['color']}; font-weight:bold;">
+                            {t_eval['level']}
+                        </div>
+                    </div>
+                    <p style="font-size:0.85rem; color:#bdc3c7;">
+                        Index updates automatically in real-time as new public survey responses are recorded.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
         
         # Take survey redirect button
-        if st.button("Begin Digital Trust Survey", use_container_width=True):
+        btn_label = "Mulakan Tinjauan Kepercayaan Digital" if lang == "Bahasa Melayu" else "Begin Digital Trust Survey"
+        if st.button(btn_label, use_container_width=True):
             st.session_state["page"] = "Public Survey Form"
             st.rerun()
         
-        st.markdown("""
-        <div class="glass-card">
-            <h3>Theoretical Framework Integration</h3>
-            <p>Our database schema and bipartite scoring models are synthesized around W. Richard Scott's <b>Three Pillars of Institutions</b>:</p>
-            <ol>
-                <li><b>Regulative Pillar</b>: Mapped to <i>Security</i> and <i>Privacy</i> rules (PDPA 2010 compliance).</li>
-                <li><b>Normative Pillar</b>: Mapped to <i>Transparency</i> and <i>Ethics</i> (trustworthiness standards).</li>
-                <li><b>Cultural-Cognitive Pillar</b>: Mapped to <i>Digital Inclusion</i> (fair distribution, cognitive digital literacy).</li>
-            </ol>
-        </div>
-        """, unsafe_allow_html=True)
+        if lang == "Bahasa Melayu":
+            st.markdown("""
+            <div class="glass-card">
+                <h3>Integrasi Kerangka Teori</h3>
+                <p>Skema pangkalan data dan model pemarkahan bipartit kami disintesis di sekitar Tiga Tonggak Institusi W. Richard Scott:</p>
+                <ol>
+                    <li><b>Tonggak Regulatif</b>: Dipetakan kepada peraturan Keselamatan dan Privasi (pematuhan PDPA 2010).</li>
+                    <li><b>Tonggak Normatif</b>: Dipetakan kepada Ketelusan dan Etika (piawaian kebolehpercayaan).</li>
+                    <li><b>Tonggak Budaya-Kognitif</b>: Dipetakan kepada Inklusi Digital (pengagihan adil, literasi digital kognitif).</li>
+                </ol>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="glass-card">
+                <h3>Theoretical Framework Integration</h3>
+                <p>Our database schema and bipartite scoring models are synthesized around W. Richard Scott's <b>Three Pillars of Institutions</b>:</p>
+                <ol>
+                    <li><b>Regulative Pillar</b>: Mapped to <i>Security</i> and <i>Privacy</i> rules (PDPA 2010 compliance).</li>
+                    <li><b>Normative Pillar</b>: Mapped to <i>Transparency</i> and <i>Ethics</i> (trustworthiness standards).</li>
+                    <li><b>Cultural-Cognitive Pillar</b>: Mapped to <i>Digital Inclusion</i> (fair distribution, cognitive digital literacy).</li>
+                </ol>
+            </div>
+            """, unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------
 # PAGE 2: PUBLIC SURVEY FORM
 elif page == "Public Survey Form":
-    st.markdown('<div class="glass-header"><h1>STTB Public Survey Form</h1><div class="subtitle">Anonymized Civic Feedback Framework (PDPA 2010 Compliant)</div></div>', unsafe_allow_html=True)
+    if lang == "Bahasa Melayu":
+        st.markdown('<div class="glass-header"><h1>Borang Tinjauan Awam STTB</h1><div class="subtitle">Kerangka Maklum Balas Sivik Tanpa Nama (Patuh PDPA 2010)</div></div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="glass-header"><h1>STTB Public Survey Form</h1><div class="subtitle">Anonymized Civic Feedback Framework (PDPA 2010 Compliant)</div></div>', unsafe_allow_html=True)
     
     # Minimalist dynamic QR sharing code on top
-    st.markdown("""
-    <div class="glass-card" style="padding: 15px; margin-bottom: 20px;">
-        <h4 style="margin: 0 0 5px 0; color:#ffd700;">Scan & Share Survey</h4>
-        <p style="font-size: 0.85rem; color: #bdc3c7; margin: 0 0 12px 0;">Use the QR code below to access and distribute this digital trust survey online!</p>
-    </div>
-    """, unsafe_allow_html=True)
+    if lang == "Bahasa Melayu":
+        st.markdown("""
+        <div class="glass-card" style="padding: 15px; margin-bottom: 20px;">
+            <h4 style="margin: 0 0 5px 0; color:#ffd700;">Imbas & Kongsi Tinjauan</h4>
+            <p style="font-size: 0.85rem; color: #bdc3c7; margin: 0 0 12px 0;">Gunakan kod QR di bawah untuk mengakses dan mengedarkan tinjauan kepercayaan digital ini secara dalam talian!</p>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <div class="glass-card" style="padding: 15px; margin-bottom: 20px;">
+            <h4 style="margin: 0 0 5px 0; color:#ffd700;">Scan & Share Survey</h4>
+            <p style="font-size: 0.85rem; color: #bdc3c7; margin: 0 0 12px 0;">Use the QR code below to access and distribute this digital trust survey online!</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     qr_col1, qr_col2 = st.columns([1, 4])
     with qr_col1:
@@ -831,64 +935,124 @@ elif page == "Public Survey Form":
         qr_api_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=003366&data={target_url}"
         st.markdown(f'<img src="{qr_api_url}" style="border: 3px solid white; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);" width="110" height="110">', unsafe_allow_html=True)
     with qr_col2:
-        st.markdown(f"""
-        <div style="padding-top: 10px;">
-            <span style="font-size:0.85rem; color:#bdc3c7;"><b>Direct Link:</b></span><br>
-            <a href="{target_url}" target="_blank" style="color:#ffd700; font-size:1.05rem; font-weight:bold; text-decoration:none;">{target_url}</a>
-            <p style="font-size:0.8rem; color:#888888; margin-top:5px; margin-bottom:0;">Right-click the QR code image to save or copy it directly into thesis slides or brochures.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        if lang == "Bahasa Melayu":
+            st.markdown(f"""
+            <div style="padding-top: 10px;">
+                <span style="font-size:0.85rem; color:#bdc3c7;"><b>Pautan Langsung:</b></span><br>
+                <a href="{target_url}" target="_blank" style="color:#ffd700; font-size:1.05rem; font-weight:bold; text-decoration:none;">{target_url}</a>
+                <p style="font-size:0.8rem; color:#888888; margin-top:5px; margin-bottom:0;">Klik kanan imej kod QR untuk menyimpan atau menyalinnya terus ke dalam slaid tesis atau risalah.</p>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown(f"""
+            <div style="padding-top: 10px;">
+                <span style="font-size:0.85rem; color:#bdc3c7;"><b>Direct Link:</b></span><br>
+                <a href="{target_url}" target="_blank" style="color:#ffd700; font-size:1.05rem; font-weight:bold; text-decoration:none;">{target_url}</a>
+                <p style="font-size:0.8rem; color:#888888; margin-top:5px; margin-bottom:0;">Right-click the QR code image to save or copy it directly into thesis slides or brochures.</p>
+            </div>
+            """, unsafe_allow_html=True)
     st.markdown("---")
     
-    st.markdown("""
-    <div class="glass-card">
-        <h3>Instructions</h3>
-        <p>This survey collects your evaluation regarding digital tools and state platforms in Sarawak. <b>No personally identifiable data (PII) is stored.</b> Please select your demographics and answer the questions below.</p>
-    </div>
-    """, unsafe_allow_html=True)
+    if lang == "Bahasa Melayu":
+        st.markdown("""
+        <div class="glass-card">
+            <h3>Arahan</h3>
+            <p>Tinjauan ini mengumpul penilaian anda mengenai alat digital dan platform negeri di Sarawak. <b>Tiada data pengenalan peribadi (PII) disimpan.</b> Sila pilih demografi anda dan jawab soalan di bawah.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <div class="glass-card">
+            <h3>Instructions</h3>
+            <p>This survey collects your evaluation regarding digital tools and state platforms in Sarawak. <b>No personally identifiable data (PII) is stored.</b> Please select your demographics and answer the questions below.</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     # 1. Capture Demographics
-    st.markdown("<h3 style='color:#ffd700;'>Step 1: Demographic Demarcation</h3>", unsafe_allow_html=True)
+    dem_title = "Langkah 1: Demarkasi Demografi" if lang == "Bahasa Melayu" else "Step 1: Demographic Demarcation"
+    st.markdown(f"<h3 style='color:#ffd700;'>{dem_title}</h3>", unsafe_allow_html=True)
     
-    age_group = st.selectbox("Age Group", ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"])
-    gender = st.selectbox("Gender", ["Male", "Female"])
-    occupation = st.selectbox("Occupation", ["Student", "Civil Servant", "Private Sector", "Self-Employed", "Retired", "Unemployed"])
-    district = st.selectbox("Sarawak Division", list(SARAWAK_DIVISIONS.keys()) + ["Others"])
+    age_label = "Kumpulan Umur" if lang == "Bahasa Melayu" else "Age Group"
+    age_group = st.selectbox(age_label, ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"])
+    
+    gender_label = "Jantina" if lang == "Bahasa Melayu" else "Gender"
+    gender_options = ["Lelaki", "Perempuan"] if lang == "Bahasa Melayu" else ["Male", "Female"]
+    gender_selected = st.selectbox(gender_label, gender_options)
+    gender = "Male" if gender_selected in ["Male", "Lelaki"] else "Female"
+    
+    occ_label = "Pekerjaan" if lang == "Bahasa Melayu" else "Occupation"
+    occ_options_en = ["Student", "Civil Servant", "Private Sector", "Self-Employed", "Retired", "Unemployed"]
+    occ_options_bm = ["Pelajar", "Penjawat Awam", "Sektor Swasta", "Bekerja Sendiri", "Pesara", "Tidak Bekerja"]
+    occ_selected = st.selectbox(occ_label, occ_options_bm if lang == "Bahasa Melayu" else occ_options_en)
+    occ_mapping = dict(zip(occ_options_bm, occ_options_en))
+    occupation = occ_mapping.get(occ_selected, occ_selected)
+    
+    div_label = "Bahagian Sarawak" if lang == "Bahasa Melayu" else "Sarawak Division"
+    div_options = list(SARAWAK_DIVISIONS.keys()) + (["Lain-lain"] if lang == "Bahasa Melayu" else ["Others"])
+    div_selected = st.selectbox(div_label, div_options)
+    district = "Others" if div_selected in ["Others", "Lain-lain"] else div_selected
         
     st.markdown("---")
     
     # 2. Select Survey Type to avoid exhaustion
-    survey_type = st.radio(
-        "Choose Survey Mode:",
-        ["Full Academic Survey (75 Questions - Collapsible)", "Rapid Mini-Survey (15 Questions - Recommended for quick testing)"],
-        horizontal=True
-    )
+    mode_label = "Pilih Mod Tinjauan:" if lang == "Bahasa Melayu" else "Choose Survey Mode:"
+    mode_options = [
+        "Tinjauan Akademik Penuh (75 Soalan - Boleh Dilipat)" if lang == "Bahasa Melayu" else "Full Academic Survey (75 Questions - Collapsible)",
+        "Tinjauan Mini Pantas (15 Soalan - Disyorkan untuk ujian cepat)" if lang == "Bahasa Melayu" else "Rapid Mini-Survey (15 Questions - Recommended for quick testing)"
+    ]
+    survey_type_selected = st.radio(mode_label, mode_options, horizontal=True)
+    survey_type = "75" if "75" in survey_type_selected else "15"
     
     survey_answers = {}
     
     if "75" in survey_type:
-        st.markdown("<h3 style='color:#ffd700;'>Step 2: Core Digital Trust Evaluation (75 Items)</h3>", unsafe_allow_html=True)
-        st.write("Questions are categorized by our 5 key digital trust pillars. Expand each tab to answer. Scale: 1 = Strongly Disagree, 5 = Strongly Agree.")
+        sec_title = "Langkah 2: Penilaian Teras Kepercayaan Digital (75 Item)" if lang == "Bahasa Melayu" else "Step 2: Core Digital Trust Evaluation (75 Items)"
+        sec_desc = "Soalan dikategorikan mengikut 5 tonggak utama kepercayaan digital kami. Kembangkan setiap tab untuk menjawab. Skala: 1 = Sangat Tidak Setuju, 5 = Sangat Setuju." if lang == "Bahasa Melayu" else "Questions are categorized by our 5 key digital trust pillars. Expand each tab to answer. Scale: 1 = Strongly Disagree, 5 = Strongly Agree."
+        st.markdown(f"<h3 style='color:#ffd700;'>{sec_title}</h3>", unsafe_allow_html=True)
+        st.write(sec_desc)
         
         # We render 5 expanding tabs (one for each pillar)
         p_codes = ["P1", "P2", "P3", "P4", "P5"]
         for p_code in p_codes:
             pillar_info = survey.SURVEY_METADATA["pillars"][p_code]
-            with st.expander(f"Pillar: {pillar_info['name']} ({pillar_info['islamic_concept']})"):
-                st.write(f"*{pillar_info['definition']}*")
+            
+            # Localized pillars
+            bm_pillar_names = {
+                "P1": ("Ketelusan & Kebolehcapaian", "Sidq (Kebenaran) & Tabayyun (Pengesahan)"),
+                "P2": ("Etika & Tanggungjawab", "Amanah (Kebolehpercayaan) & Kewalihan (Stewardship)"),
+                "P3": ("Privasi & Kawalan", "Larangan Tajassus (Larangan Mengintip) & Haya (Kehormatan/Kesopanan)"),
+                "P4": ("Keselamatan & Kebolehpercayaan", "Itqan (Kecemerlangan dan Ketepatan)"),
+                "P5": ("Inklusi Digital & Kesaksamaan", "Adl (Keadilan dan Kesaksamaan)")
+            }
+            bm_pillar_defs = {
+                "P1": "Tahap di mana institusi digital di Sarawak bersikap terbuka, jujur, dan mudah diakses dalam penyampaian maklumat penggunaan data, dasar, dan keputusan.",
+                "P2": "Tahap di mana institusi digital di Sarawak mengutamakan tingkah laku beretika, kebertanggungjawaban, dan tadbir urus yang bertanggungjawab melebihi sekadar pematuhan undang-undang.",
+                "P3": "Tahap di mana pengguna merasa diberi kuasa dengan agensi yang bermakna ke atas maklumat peribadi mereka, dilindungi daripada pencerobohan, selaras dengan PDPA 2010.",
+                "P4": "Tahap di mana infrastruktur dan perkhidmatan digital Sarawak dilindungi secara teknikal, berdaya tahan, dan sentiasa tersedia secara konsisten.",
+                "P5": "Tahap di mana perkhidmatan digital, infrastruktur, dan sokongan literasi boleh diakses secara saksama kepada semua komuniti di seluruh Sarawak."
+            }
+            
+            p_name = bm_pillar_names[p_code][0] if lang == "Bahasa Melayu" else pillar_info['name']
+            p_concept = bm_pillar_names[p_code][1] if lang == "Bahasa Melayu" else pillar_info['islamic_concept']
+            p_def = bm_pillar_defs[p_code] if lang == "Bahasa Melayu" else pillar_info['definition']
+            
+            with st.expander(f"Pillar: {p_name} ({p_concept})"):
+                st.write(f"*{p_def}*")
                 
                 p_questions = [q for q in survey.QUESTIONS if q["pillar"] == p_code]
                 for q in p_questions:
-                    # Provide radio input
+                    q_text = survey.QUESTIONS_BM.get(q["code"], q["question"]) if lang == "Bahasa Melayu" else q["question"]
                     key = f"q_{q['code']}"
                     survey_answers[q["code"]] = st.slider(
-                        f"[{q['code']}] {q['question']}",
+                        f"[{q['code']}] {q_text}",
                         min_value=1, max_value=5, value=3, step=1,
                         key=key
                     )
     else:
-        st.markdown("<h3 style='color:#ffd700;'>Step 2: Core Digital Trust Evaluation (15 Representative Items)</h3>", unsafe_allow_html=True)
-        st.write("This mini-survey contains exactly 1 question per variable (15 total) representing the complete framework scale. Averages will be extrapolated automatically.")
+        sec_title = "Langkah 2: Penilaian Teras Kepercayaan Digital (15 Item Perwakilan)" if lang == "Bahasa Melayu" else "Step 2: Core Digital Trust Evaluation (15 Representative Items)"
+        sec_desc = "Tinjauan mini ini mengandungi tepat 1 soalan bagi setiap pemboleh ubah (15 jumlah) yang mewakili skala kerangka kerja lengkap. Purata akan diekstrapolasi secara automatik." if lang == "Bahasa Melayu" else "This mini-survey contains exactly 1 question per variable (15 total) representing the complete framework scale. Averages will be extrapolated automatically."
+        st.markdown(f"<h3 style='color:#ffd700;'>{sec_title}</h3>", unsafe_allow_html=True)
+        st.write(sec_desc)
         
         # Render exactly one question per variable
         variables_featured = [
@@ -901,9 +1065,10 @@ elif page == "Public Survey Form":
         
         rep_questions = [q for q in survey.QUESTIONS if q["code"] in variables_featured]
         for q in rep_questions:
+            q_text = survey.QUESTIONS_BM.get(q["code"], q["question"]) if lang == "Bahasa Melayu" else q["question"]
             key = f"mini_{q['code']}"
             survey_answers[q["code"]] = st.slider(
-                f"[{q['code']}] {q['question']}",
+                f"[{q['code']}] {q_text}",
                 min_value=1, max_value=5, value=3, step=1,
                 key=key
             )
@@ -911,11 +1076,11 @@ elif page == "Public Survey Form":
         # Map remaining questions to the answered variable value to preserve database structure
         for q in survey.QUESTIONS:
             if q["code"] not in survey_answers:
-                # Find matching representative code for that variable
                 rep_code = [c for c in variables_featured if c.startswith(q['code'][:2])][0]
                 survey_answers[q["code"]] = survey_answers[rep_code]
  
-    submit_btn = st.button("Submit Anonymous Evaluation", use_container_width=True)
+    sub_btn_label = "Hantar Penilaian Tanpa Nama" if lang == "Bahasa Melayu" else "Submit Anonymous Evaluation"
+    submit_btn = st.button(sub_btn_label, use_container_width=True)
     
     if submit_btn:
         demographics = {
@@ -929,24 +1094,43 @@ elif page == "Public Survey Form":
         
         if results:
             st.balloons()
-            st.success("Thank you! Your anonymous digital trust feedback has been securely computed and recorded.")
+            success_msg = "Terima kasih! Maklum balas kepercayaan digital tanpa nama anda telah berjaya dikira dan direkodkan." if lang == "Bahasa Melayu" else "Thank you! Your anonymous digital trust feedback has been securely computed and recorded."
+            st.success(success_msg)
             
             # Show interactive report card
+            card_title = "Kad Laporan Kepercayaan Digital Peribadi Anda" if lang == "Bahasa Melayu" else "Your Personal Digital Trust Report Card"
+            idx_label = "Indeks STTB yang Dikira" if lang == "Bahasa Melayu" else "Computed STTB Index"
+            
+            bm_interpretations = {
+                "High Trust": "Kepercayaan awam yang kuat terhadap institusi digital.",
+                "Moderate Trust": "Kepercayaan digital awam yang munasabah tetapi boleh dipertingkatkan.",
+                "Low Trust": "Defisit kepercayaan yang ketara memerlukan perhatian dasar.",
+                "Very Low Trust": "Ketidakpercayaan digital yang meluas memerlukan pembaharuan segera."
+            }
+            bm_levels = {
+                "High Trust": "Kepercayaan Tinggi",
+                "Moderate Trust": "Kepercayaan Sederhana",
+                "Low Trust": "Kepercayaan Rendah",
+                "Very Low Trust": "Kepercayaan Sangat Rendah"
+            }
+            level_str = bm_levels.get(results['trust_evaluation']['level'], results['trust_evaluation']['level']) if lang == "Bahasa Melayu" else results['trust_evaluation']['level']
+            interp_str = bm_interpretations.get(results['trust_evaluation']['level'], results['trust_evaluation']['interpretation']) if lang == "Bahasa Melayu" else results['trust_evaluation']['interpretation']
+            
             st.markdown(f"""
             <div class="glass-card" style="border: 2px solid {results['trust_evaluation']['color']};">
                 <h3 style="color: {results['trust_evaluation']['color']}; text-align: center;">
-                    Your Personal Digital Trust Report Card
+                    {card_title}
                 </h3>
                 <div style="text-align: center; margin: 20px 0;">
-                    <div class="metric-label">Computed STTB Index</div>
+                    <div class="metric-label">{idx_label}</div>
                     <div class="metric-value" style="background:none; -webkit-text-fill-color: {results['trust_evaluation']['color']};">
                         {results['sttb_index']:.2f}
                     </div>
                     <div style="font-weight: 800; font-size: 1.3rem; color: {results['trust_evaluation']['color']};">
-                        {results['trust_evaluation']['level']}
+                        {level_str}
                     </div>
                     <p style="margin-top: 10px; font-size:0.9rem; color:#bdc3c7;">
-                        {results['trust_evaluation']['interpretation']}
+                        {interp_str}
                     </p>
                 </div>
             </div>
@@ -954,13 +1138,21 @@ elif page == "Public Survey Form":
             
             # Show breakdown
             col1, col2, col3, col4, col5 = st.columns(5)
-            pillars_map = {
+            pillars_map_en = {
                 "P1": "Transparency",
                 "P2": "Ethics",
                 "P3": "Privacy",
                 "P4": "Security",
                 "P5": "Inclusion"
             }
+            pillars_map_bm = {
+                "P1": "Ketelusan",
+                "P2": "Etika",
+                "P3": "Privasi",
+                "P4": "Keselamatan",
+                "P5": "Inklusi"
+            }
+            pillars_map = pillars_map_bm if lang == "Bahasa Melayu" else pillars_map_en
             
             for i, p_code in enumerate(["P1", "P2", "P3", "P4", "P5"]):
                 score = results["pillar_scores"][p_code]
@@ -976,9 +1168,14 @@ elif page == "Public Survey Form":
 
 # ---------------------------------------------------------
 # PAGE 3: ANALYTICS DASHBOARD
+# --------------------------------------------------# ---------------------------------------------------------
+# PAGE 3: ANALYTICS DASHBOARD
 # ---------------------------------------------------------
 elif page == "Analytics Dashboard":
-    st.markdown('<div class="glass-header"><h1>STTB Analytics Dashboard</h1><div class="subtitle">Real-time Trust Indicators & Demographic Filters</div></div>', unsafe_allow_html=True)
+    if lang == "Bahasa Melayu":
+        st.markdown('<div class="glass-header"><h1>Papan Pemuka Analisis STTB</h1><div class="subtitle">Penunjuk Kepercayaan Masa Nyata & Penapis Demografi</div></div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="glass-header"><h1>STTB Analytics Dashboard</h1><div class="subtitle">Real-time Trust Indicators & Demographic Filters</div></div>', unsafe_allow_html=True)
     
     # Fetch all data from DB
     conn = get_db_connection()
@@ -990,18 +1187,67 @@ elif page == "Analytics Dashboard":
     df = pd.merge(df_resp, df_scores, left_on="id", right_on="respondent_id")
     
     # Filter controls in sidebar-style layout inside dashboard
-    st.markdown("<h3 style='color:#ffd700;'>Demographic Segment Filters</h3>", unsafe_allow_html=True)
+    filter_title = "Penapis Segmen Demografi" if lang == "Bahasa Melayu" else "Demographic Segment Filters"
+    st.markdown(f"<h3 style='color:#ffd700;'>{filter_title}</h3>", unsafe_allow_html=True)
+    
     f_col1, f_col2, f_col3, f_col4 = st.columns(4)
     
+    # Translate segment filters
+    f_dist_lbl = "Tapis Bahagian" if lang == "Bahasa Melayu" else "Filter Division"
+    f_age_lbl = "Tapis Kumpulan Umur" if lang == "Bahasa Melayu" else "Filter Age Group"
+    f_gen_lbl = "Tapis Jantina" if lang == "Bahasa Melayu" else "Filter Gender"
+    f_occ_lbl = "Tapis Pekerjaan" if lang == "Bahasa Melayu" else "Filter Occupation"
+    
+    all_label = "Semua" if lang == "Bahasa Melayu" else "All"
+    
+    # Map options for display
+    occ_mapping_bm_en = {
+        "Semua": "All",
+        "Pelajar": "Student",
+        "Penjawat Awam": "Civil Servant",
+        "Sektor Swasta": "Private Sector",
+        "Bekerja Sendiri": "Self-Employed",
+        "Pesara": "Retired",
+        "Tidak Bekerja": "Unemployed"
+    }
+    
     with f_col1:
-        f_district = st.multiselect("Filter District", ["All"] + list(SARAWAK_DIVISIONS.keys()) + ["Others"], default="All")
+        f_district_raw = st.multiselect(f_dist_lbl, [all_label] + list(SARAWAK_DIVISIONS.keys()) + (["Lain-lain"] if lang == "Bahasa Melayu" else ["Others"]), default=all_label)
     with f_col2:
-        f_age = st.multiselect("Filter Age Group", ["All", "18-24", "25-34", "35-44", "45-54", "55-64", "65+"], default="All")
+        f_age = st.multiselect(f_age_lbl, [all_label, "18-24", "25-34", "35-44", "45-54", "55-64", "65+"], default=all_label)
     with f_col3:
-        f_gender = st.multiselect("Filter Gender", ["All", "Male", "Female"], default="All")
+        f_gender_raw = st.multiselect(f_gen_lbl, [all_label, "Lelaki" if lang == "Bahasa Melayu" else "Male", "Perempuan" if lang == "Bahasa Melayu" else "Female"], default=all_label)
     with f_col4:
-        f_occ = st.multiselect("Filter Occupation", ["All", "Student", "Civil Servant", "Private Sector", "Self-Employed", "Retired"], default="All")
+        f_occ_raw = st.multiselect(f_occ_lbl, [all_label, "Pelajar" if lang == "Bahasa Melayu" else "Student", "Penjawat Awam" if lang == "Bahasa Melayu" else "Civil Servant", "Sektor Swasta" if lang == "Bahasa Melayu" else "Private Sector", "Bekerja Sendiri" if lang == "Bahasa Melayu" else "Self-Employed", "Pesara" if lang == "Bahasa Melayu" else "Retired", "Tidak Bekerja" if lang == "Bahasa Melayu" else "Unemployed"], default=all_label)
         
+    # Map filters to DB equivalents
+    f_district = []
+    for d in f_district_raw:
+        if d == all_label:
+            f_district.append("All")
+        elif d == "Lain-lain":
+            f_district.append("Others")
+        else:
+            f_district.append(d)
+            
+    f_gender = []
+    for g in f_gender_raw:
+        if g == all_label:
+            f_gender.append("All")
+        elif g == "Lelaki":
+            f_gender.append("Male")
+        elif g == "Perempuan":
+            f_gender.append("Female")
+        else:
+            f_gender.append(g)
+            
+    f_occ = []
+    for o in f_occ_raw:
+        if o == all_label:
+            f_occ.append("All")
+        else:
+            f_occ.append(occ_mapping_bm_en.get(o, o))
+            
     # Apply filtering logic
     df_filtered = df.copy()
     if f_district and "All" not in f_district:
@@ -1014,26 +1260,39 @@ elif page == "Analytics Dashboard":
         df_filtered = df_filtered[df_filtered["occupation"].isin(f_occ)]
         
     if df_filtered.empty:
-        st.warning("No survey submissions match the selected filters. Reset filters to see data.")
+        warn_msg = "Tiada hantaran tinjauan yang sepadan dengan penapis yang dipilih. Set semula penapis untuk melihat data." if lang == "Bahasa Melayu" else "No survey submissions match the selected filters. Reset filters to see data."
+        st.warning(warn_msg)
     else:
         # Show key metric cards
         m_col1, m_col2, m_col3 = st.columns(3)
         with m_col1:
+            lbl1 = "Saiz Sampel Aktif (N)" if lang == "Bahasa Melayu" else "Active Sample Size (N)"
+            lbl2 = "Respons Ditapis" if lang == "Bahasa Melayu" else "Filtered Responses"
             st.markdown(f"""
             <div class="glass-card" style="text-align:center;">
-                <div class="metric-label">Active Sample Size (N)</div>
+                <div class="metric-label">{lbl1}</div>
                 <div class="metric-value" style="color:#ffd700;">{len(df_filtered)}</div>
-                <div class="metric-label">Filtered Responses</div>
+                <div class="metric-label">{lbl2}</div>
             </div>
             """, unsafe_allow_html=True)
         with m_col2:
             idx_avg = df_filtered["sttb_index"].mean()
             eval_info = survey.get_trust_level(idx_avg)
+            
+            lbl_avg = "Indeks STTB Segmen" if lang == "Bahasa Melayu" else "Segment STTB Index"
+            bm_levels = {
+                "High Trust": "Kepercayaan Tinggi",
+                "Moderate Trust": "Kepercayaan Sederhana",
+                "Low Trust": "Kepercayaan Rendah",
+                "Very Low Trust": "Kepercayaan Sangat Rendah"
+            }
+            level_str = bm_levels.get(eval_info["level"], eval_info["level"]) if lang == "Bahasa Melayu" else eval_info["level"]
+            
             st.markdown(f"""
             <div class="glass-card" style="text-align:center;">
-                <div class="metric-label">Segment STTB Index</div>
+                <div class="metric-label">{lbl_avg}</div>
                 <div class="metric-value" style="background:none; -webkit-text-fill-color: {eval_info['color']};">{idx_avg:.2f}</div>
-                <div class="metric-label" style="color: {eval_info['color']}; font-weight:bold;">{eval_info['level']}</div>
+                <div class="metric-label" style="color: {eval_info['color']}; font-weight:bold;">{level_str}</div>
             </div>
             """, unsafe_allow_html=True)
         with m_col3:
@@ -1048,35 +1307,43 @@ elif page == "Analytics Dashboard":
             pillar_averages = {label: df_filtered[col].mean() for col, label in pillar_cols}
             weakest = min(pillar_averages, key=pillar_averages.get)
             weakest_val = pillar_averages[weakest]
+            
+            bm_pillars = {
+                "Transparency": "Ketelusan",
+                "Ethics": "Etika",
+                "Privacy": "Privasi",
+                "Security": "Keselamatan",
+                "Inclusion": "Inklusi"
+            }
+            weakest_str = bm_pillars.get(weakest, weakest) if lang == "Bahasa Melayu" else weakest
+            lbl_weak = "Paksi Kepercayaan Terlemah" if lang == "Bahasa Melayu" else "Weakest Trust Axis"
             st.markdown(f"""
             <div class="glass-card" style="text-align:center;">
-                <div class="metric-label">Weakest Trust Axis</div>
-                <div class="metric-value" style="color:#C0392B; font-size:2.2rem; margin:15px 0;">{weakest}</div>
-                <div class="metric-label" style="Score: {weakest_val:.1f} / 100">Score: {weakest_val:.1f} / 100</div>
+                <div class="metric-label">{lbl_weak}</div>
+                <div class="metric-value" style="color:#C0392B; font-size:2.2rem; margin:15px 0;">{weakest_str}</div>
+                <div class="metric-label">Score: {weakest_val:.1f} / 100</div>
             </div>
             """, unsafe_allow_html=True)
 
         # 1. Bar Chart of 5 Pillars
-        st.markdown("<h3 style='color:#ffd700; margin-top:20px;'>Pillar Trust Profile Comparison</h3>", unsafe_allow_html=True)
+        comp_title = "Perbandingan Profil Kepercayaan Tonggak" if lang == "Bahasa Melayu" else "Pillar Trust Profile Comparison"
+        st.markdown(f"<h3 style='color:#ffd700; margin-top:20px;'>{comp_title}</h3>", unsafe_allow_html=True)
         
+        translated_pillar_keys = [bm_pillars.get(k, k) if lang == "Bahasa Melayu" else k for k in pillar_averages.keys()]
         chart_data = pd.DataFrame({
-            "Trust Pillar": list(pillar_averages.keys()),
-            "Index Score": list(pillar_averages.values())
+            "Trust Pillar" if lang == "Bahasa Melayu" else "Trust Pillar": translated_pillar_keys,
+            "Index Score" if lang == "Bahasa Melayu" else "Index Score": list(pillar_averages.values())
         })
         
-        st.bar_chart(chart_data, x="Trust Pillar", y="Index Score", color="#ffd700")
+        st.bar_chart(chart_data, x="Trust Pillar" if lang == "Bahasa Melayu" else "Trust Pillar", y="Index Score" if lang == "Bahasa Melayu" else "Index Score", color="#ffd700")
 
         # 2. Division Rankings Table
-        st.markdown("<h3 style='color:#ffd700; margin-top:20px;'>Administrative Division Rankings</h3>", unsafe_allow_html=True)
+        rank_title = "Kedudukan Bahagian Pentadbiran" if lang == "Bahasa Melayu" else "Administrative Division Rankings"
+        st.markdown(f"<h3 style='color:#ffd700; margin-top:20px;'>{rank_title}</h3>", unsafe_allow_html=True)
         
         div_summary = df_filtered.groupby("district").agg(
             respondents_count=("respondent_id", "count"),
-            sttb_index_avg=("sttb_index", "mean"),
-            transparency_avg=("ps1_transparency", "mean"),
-            ethics_avg=("ps2_ethics", "mean"),
-            privacy_avg=("ps3_privacy", "mean"),
-            security_avg=("ps4_security", "mean"),
-            inclusion_avg=("ps5_inclusion", "mean")
+            sttb_index_avg=("sttb_index", "mean")
         ).reset_index()
         
         div_summary = div_summary.sort_values(by="sttb_index_avg", ascending=False)
@@ -1085,30 +1352,49 @@ elif page == "Analytics Dashboard":
         div_presentation = div_summary.copy()
         div_presentation["sttb_index_avg"] = div_presentation["sttb_index_avg"].round(2)
         div_presentation = div_presentation.rename(columns={
-            "district": "Sarawak Division",
-            "respondents_count": "Sample (N)",
-            "sttb_index_avg": "STTB Index (0-100)"
+            "district": "Bahagian Sarawak" if lang == "Bahasa Melayu" else "Sarawak Division",
+            "respondents_count": "Sampel (N)" if lang == "Bahasa Melayu" else "Sample (N)",
+            "sttb_index_avg": "Indeks STTB (0-100)" if lang == "Bahasa Melayu" else "STTB Index (0-100)"
         })
         
+        if lang == "Bahasa Melayu":
+            div_presentation["Bahagian Sarawak"] = div_presentation["Bahagian Sarawak"].replace({"Others": "Lain-lain"})
+        
         st.dataframe(
-            div_presentation[["Sarawak Division", "Sample (N)", "STTB Index (0-100)"]],
+            div_presentation[[
+                "Bahagian Sarawak" if lang == "Bahasa Melayu" else "Sarawak Division",
+                "Sampel (N)" if lang == "Bahasa Melayu" else "Sample (N)",
+                "Indeks STTB (0-100)" if lang == "Bahasa Melayu" else "STTB Index (0-100)"
+            ]],
             hide_index=True,
             use_container_width=True
         )
         
         # Collapsible Database Administration Panel (Admin Only)
         st.markdown("<br>", unsafe_allow_html=True)
-        with st.expander("🛠️ System Settings & Administration (UTS Admin Only)"):
-            st.markdown("""
-            <div style="padding: 10px; border-left: 3px solid #DA291C;">
-                <h4 style="color:#DA291C; margin: 0 0 10px 0;">Database Administration Panel</h4>
-                <p style="font-size:0.85rem; color:#bdc3c7; margin:0 0 15px 0;">
-                    To transition this framework from the pilot evaluation phase to real-world academic data collection, you can purge all pre-seeded mock records here. This will clear the database entirely to a 0-submission slate and permanently stop the automated seed engine.
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
+        admin_title = "🛠️ Tetapan Sistem & Pentadbiran (UTS Admin Sahaja)" if lang == "Bahasa Melayu" else "🛠️ System Settings & Administration (UTS Admin Only)"
+        with st.expander(admin_title):
+            if lang == "Bahasa Melayu":
+                st.markdown("""
+                <div style="padding: 10px; border-left: 3px solid #DA291C;">
+                    <h4 style="color:#DA291C; margin: 0 0 10px 0;">Panel Pentadbiran Pangkalan Data</h4>
+                    <p style="font-size:0.85rem; color:#bdc3c7; margin:0 0 15px 0;">
+                        Untuk memindahkan kerangka kerja ini daripada fasa penilaian rintisan kepada pengumpulan data akademik dunia sebenar, anda boleh memadamkan semua rekod olok-olok pra-pemuatan di sini. Ini akan mengosongkan pangkalan data sepenuhnya kepada sifar penyerahan dan menghentikan enjin pemuatan automatik secara kekal.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown("""
+                <div style="padding: 10px; border-left: 3px solid #DA291C;">
+                    <h4 style="color:#DA291C; margin: 0 0 10px 0;">Database Administration Panel</h4>
+                    <p style="font-size:0.85rem; color:#bdc3c7; margin:0 0 15px 0;">
+                        To transition this framework from the pilot evaluation phase to real-world academic data collection, you can purge all pre-seeded mock records here. This will clear the database entirely to a 0-submission slate and permanently stop the automated seed engine.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
             
-            if st.button("Purge All Pilot Database Records", type="secondary", use_container_width=True, key="admin_purge_btn"):
+            purge_btn_lbl = "Padam Semua Rekod Pangkalan Data Rintisan" if lang == "Bahasa Melayu" else "Purge All Pilot Database Records"
+            if st.button(purge_btn_lbl, type="secondary", use_container_width=True, key="admin_purge_btn"):
                 conn = get_db_connection()
                 cursor = conn.cursor()
                 cursor.execute("DELETE FROM respondents")
@@ -1118,7 +1404,8 @@ elif page == "Analytics Dashboard":
                 cursor.execute("INSERT OR REPLACE INTO system_config (key, val) VALUES ('seeded', 'false')")
                 conn.commit()
                 conn.close()
-                st.success("Database successfully purged to a clean state! Redirecting...")
+                succ_purge = "Pangkalan data berjaya dipadamkan kepada keadaan bersih! Mengarah semula..." if lang == "Bahasa Melayu" else "Database successfully purged to a clean state! Redirecting..."
+                st.success(succ_purge)
                 st.session_state["page"] = "Welcome & Overview"
                 st.rerun()
 
@@ -1127,13 +1414,20 @@ elif page == "Analytics Dashboard":
 # PAGE 4: GEOGRAPHIC TRUST MAP
 # ---------------------------------------------------------
 elif page == "Geographic Trust Map":
-    st.markdown('<div class="glass-header"><h1>Geographic Digital Trust Map</h1><div class="subtitle">Division-level Choropleth Trust Indicators (Grounded in Slocum et al., 2009)</div></div>', unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div class="glass-card">
-        <p>This geographic model visualizes district-level public trust. Click on any colored division marker to inspect the detailed sample count, index averages, and custom-computed pillar variables.</p>
-    </div>
-    """, unsafe_allow_html=True)
+    if lang == "Bahasa Melayu":
+        st.markdown('<div class="glass-header"><h1>Peta Kepercayaan Digital Geografi</h1><div class="subtitle">Penunjuk Kepercayaan Choropleth peringkat Bahagian (Berasaskan Slocum et al., 2009)</div></div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="glass-card">
+            <p>Model geografi ini menggambarkan kepercayaan orang ramai di peringkat bahagian. Klik pada mana-mana penanda bahagian berwarna untuk memeriksa saiz sampel terperinci, purata indeks, dan pemboleh ubah tonggak yang dikira khas.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="glass-header"><h1>Geographic Digital Trust Map</h1><div class="subtitle">Division-level Choropleth Trust Indicators (Grounded in Slocum et al., 2009)</div></div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="glass-card">
+            <p>This geographic model visualizes district-level public trust. Click on any colored division marker to inspect the detailed sample count, index averages, and custom-computed pillar variables.</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Load and process data
     conn = get_db_connection()
@@ -1166,35 +1460,56 @@ elif page == "Geographic Trust Map":
         
         index_val = stats["sttb_index"]
         eval_info = survey.get_trust_level(index_val)
-        
-        popup_html = f"""
-        <div style="font-family: 'Outfit', sans-serif; width: 220px; color: #2c3e50;">
-            <h4 style="margin: 0 0 5px 0; color: #2980b9;">{div_name} Division</h4>
-            <div style="font-size: 1.3rem; font-weight: 800; color: {eval_info['color']}; margin-bottom: 5px;">
-                STTB Index: {index_val:.2f}
-            </div>
-            <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 10px;">
-                Trust Level: {eval_info['level']} <br>
-                Sample Size (N): {stats['count']}
-            </div>
-            <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
-            <table style="width: 100%; font-size: 0.8rem;">
-                <tr><td>Transparency:</td><td style="text-align:right; font-weight:bold;">{stats['transparency']:.1f}</td></tr>
-                <tr><td>Ethics:</td><td style="text-align:right; font-weight:bold;">{stats['ethics']:.1f}</td></tr>
-                <tr><td>Privacy:</td><td style="text-align:right; font-weight:bold;">{stats['privacy']:.1f}</td></tr>
-                <tr><td>Security:</td><td style="text-align:right; font-weight:bold;">{stats['security']:.1f}</td></tr>
-                <tr><td>Inclusion:</td><td style="text-align:right; font-weight:bold;">{stats['inclusion']:.1f}</td></tr>
-            </table>
-        </div>
-        """
-        
-        # Color condition
-        color_map = {
-            "High Trust": "darkgreen",
-            "Moderate Trust": "green",
-            "Low Trust": "orange",
-            "Very Low Trust": "red"
+        bm_levels = {
+            "High Trust": "Kepercayaan Tinggi",
+            "Moderate Trust": "Kepercayaan Sederhana",
+            "Low Trust": "Kepercayaan Rendah",
+            "Very Low Trust": "Kepercayaan Sangat Rendah"
         }
+        level_str = bm_levels.get(eval_info["level"], eval_info["level"]) if lang == "Bahasa Melayu" else eval_info["level"]
+        
+        if lang == "Bahasa Melayu":
+            popup_html = f"""
+            <div style="font-family: 'Outfit', sans-serif; width: 220px; color: #2c3e50;">
+                <h4 style="margin: 0 0 5px 0; color: #2980b9;">Bahagian {div_name}</h4>
+                <div style="font-size: 1.3rem; font-weight: 800; color: {eval_info['color']}; margin-bottom: 5px;">
+                    Indeks STTB: {index_val:.2f}
+                </div>
+                <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 10px;">
+                    Tahap Kepercayaan: {level_str} <br>
+                    Saiz Sampel (N): {stats['count']}
+                </div>
+                <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
+                <table style="width: 100%; font-size: 0.8rem;">
+                    <tr><td>Ketelusan:</td><td style="text-align:right; font-weight:bold;">{stats['transparency']:.1f}</td></tr>
+                    <tr><td>Etika:</td><td style="text-align:right; font-weight:bold;">{stats['ethics']:.1f}</td></tr>
+                    <tr><td>Privasi:</td><td style="text-align:right; font-weight:bold;">{stats['privacy']:.1f}</td></tr>
+                    <tr><td>Keselamatan:</td><td style="text-align:right; font-weight:bold;">{stats['security']:.1f}</td></tr>
+                    <tr><td>Inklusi:</td><td style="text-align:right; font-weight:bold;">{stats['inclusion']:.1f}</td></tr>
+                </table>
+            </div>
+            """
+        else:
+            popup_html = f"""
+            <div style="font-family: 'Outfit', sans-serif; width: 220px; color: #2c3e50;">
+                <h4 style="margin: 0 0 5px 0; color: #2980b9;">{div_name} Division</h4>
+                <div style="font-size: 1.3rem; font-weight: 800; color: {eval_info['color']}; margin-bottom: 5px;">
+                    STTB Index: {index_val:.2f}
+                </div>
+                <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 10px;">
+                    Trust Level: {eval_info['level']} <br>
+                    Sample Size (N): {stats['count']}
+                </div>
+                <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
+                <table style="width: 100%; font-size: 0.8rem;">
+                    <tr><td>Transparency:</td><td style="text-align:right; font-weight:bold;">{stats['transparency']:.1f}</td></tr>
+                    <tr><td>Ethics:</td><td style="text-align:right; font-weight:bold;">{stats['ethics']:.1f}</td></tr>
+                    <tr><td>Privacy:</td><td style="text-align:right; font-weight:bold;">{stats['privacy']:.1f}</td></tr>
+                    <tr><td>Security:</td><td style="text-align:right; font-weight:bold;">{stats['security']:.1f}</td></tr>
+                    <tr><td>Inclusion:</td><td style="text-align:right; font-weight:bold;">{stats['inclusion']:.1f}</td></tr>
+                </table>
+            </div>
+            """
         
         folium.CircleMarker(
             location=[coords["lat"], coords["lon"]],
@@ -1215,35 +1530,65 @@ elif page == "Geographic Trust Map":
 # PAGE 5: HELP & CIVIC FEEDBACK FORM
 # ---------------------------------------------------------
 elif page == "Help / Feedback":
-    st.markdown('<div class="glass-header"><h1>Help Desk & Civic Feedback</h1><div class="subtitle">Anonymized Complaint & Feedback Repository (Academic & UTS Quality Audit)</div></div>', unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div class="glass-card">
-        <h3>Support & Alignment Feedback</h3>
-        <p>To support continuous quality improvements and comply with final year project audit standards, UTS students, administrators, and the general public can submit inquiries, technical bug reports, or alignment suggestions here. <b>All feedback is anonymous and securely cataloged for review.</b></p>
-    </div>
-    """, unsafe_allow_html=True)
-    
+    if lang == "Bahasa Melayu":
+        st.markdown('<div class="glass-header"><h1>Meja Bantuan & Maklum Balas Sivik</h1><div class="subtitle">Pusat Aduan & Repositori Maklum Balas Tanpa Nama (Audit Kualiti Akademik & UTS)</div></div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="glass-card">
+            <h3>Maklum Balas Sokongan & Penyelarasan</h3>
+            <p>Untuk menyokong penambahbaikan kualiti yang berterusan dan mematuhi piawaian audit projek tahun akhir UTS, pelajar UTS, pentadbir, dan orang awam boleh mengemukakan pertanyaan, laporan pepijat teknikal, atau cadangan penyelarasan di sini. <b>Semua maklum balas adalah tanpa nama dan dikatalogkan dengan selamat untuk semakan.</b></p>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="glass-header"><h1>Help Desk & Civic Feedback</h1><div class="subtitle">Anonymized Complaint & Feedback Repository (Academic & UTS Quality Audit)</div></div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="glass-card">
+            <h3>Support & Alignment Feedback</h3>
+            <p>To support continuous quality improvements and comply with final year project audit standards, UTS students, administrators, and the general public can submit inquiries, technical bug reports, or alignment suggestions here. <b>All feedback is anonymous and securely cataloged for review.</b></p>
+        </div>
+        """, unsafe_allow_html=True)
+        
     # 2-column layout for Form
     f_col1, f_col2 = st.columns(2)
     
     with f_col1:
-        st.markdown("<h3 style='color:#ffd700; margin-bottom:15px;'>Step 1: Stakeholder Role</h3>", unsafe_allow_html=True)
-        user_role = st.selectbox("I am submitting as a:", ["General Public Respondent", "UTS Student", "UTS Academic Faculty", "System Auditor / Admin"], key="feedback_role")
+        step1_title = "Langkah 1: Peranan Pihak Berkepentingan" if lang == "Bahasa Melayu" else "Step 1: Stakeholder Role"
+        st.markdown(f"<h3 style='color:#ffd700; margin-bottom:15px;'>{step1_title}</h3>", unsafe_allow_html=True)
         
-        category = st.selectbox("Feedback Category:", ["Technical Bug / Interface Error", "Data Validation / Accuracy Inquiry", "Academic Theoretical Alignment (Scott's Pillars)", "General Feature Suggestion"], key="feedback_category")
+        role_lbl = "Saya menyerahkan sebagai:" if lang == "Bahasa Melayu" else "I am submitting as a:"
+        role_options_en = ["General Public Respondent", "UTS Student", "UTS Academic Faculty", "System Auditor / Admin"]
+        role_options_bm = ["Responden Awam", "Pelajar UTS", "Fakulti Akademik UTS", "Auditor Sistem / Pentadbir"]
+        user_role_selected = st.selectbox(role_lbl, role_options_bm if lang == "Bahasa Melayu" else role_options_en, key="feedback_role")
+        role_mapping = dict(zip(role_options_bm, role_options_en))
+        user_role = role_mapping.get(user_role_selected, user_role_selected)
         
-        satisfaction = st.slider("Overall System Experience Rating (1 = Poor, 5 = Premium):", 1, 5, 5, key="feedback_rating")
+        cat_lbl = "Kategori Maklum Balas:" if lang == "Bahasa Melayu" else "Feedback Category:"
+        cat_options_en = ["Technical Bug / Interface Error", "Data Validation / Accuracy Inquiry", "Academic Theoretical Alignment (Scott's Pillars)", "General Feature Suggestion"]
+        cat_options_bm = ["Pepijat Teknikal / Ralat Antara Muka", "Pertanyaan Pengesahan Data / Ketepatan", "Penyelarasan Teori Akademik (Tonggak Scott)", "Cadangan Ciri Umum"]
+        category_selected = st.selectbox(cat_lbl, cat_options_bm if lang == "Bahasa Melayu" else cat_options_en, key="feedback_category")
+        cat_mapping = dict(zip(cat_options_bm, cat_options_en))
+        category = cat_mapping.get(category_selected, category_selected)
+        
+        sat_lbl = "Penarafan Pengalaman Sistem Keseluruhan (1 = Lemah, 5 = Premium):" if lang == "Bahasa Melayu" else "Overall System Experience Rating (1 = Poor, 5 = Premium):"
+        satisfaction = st.slider(sat_lbl, 1, 5, 5, key="feedback_rating")
 
     with f_col2:
-        st.markdown("<h3 style='color:#ffd700; margin-bottom:15px;'>Step 2: Message Details</h3>", unsafe_allow_html=True)
-        subject = st.text_input("Feedback Subject / Summary:", placeholder="e.g. Navigation Alignment Suggestion", key="feedback_subject")
-        description = st.text_area("Detailed Description / Complaint:", placeholder="Please provide exact details so the development team can address your feedback.", key="feedback_desc")
+        step2_title = "Langkah 2: Butiran Mesej" if lang == "Bahasa Melayu" else "Step 2: Message Details"
+        st.markdown(f"<h3 style='color:#ffd700; margin-bottom:15px;'>{step2_title}</h3>", unsafe_allow_html=True)
+        
+        sub_lbl = "Subjek / Ringkasan Maklum Balas:" if lang == "Bahasa Melayu" else "Feedback Subject / Summary:"
+        sub_holder = "cth. Cadangan Penyelarasan Navigasi" if lang == "Bahasa Melayu" else "e.g. Navigation Alignment Suggestion"
+        subject = st.text_input(sub_lbl, placeholder=sub_holder, key="feedback_subject")
+        
+        desc_lbl = "Penerangan Terperinci / Aduan:" if lang == "Bahasa Melayu" else "Detailed Description / Complaint:"
+        desc_holder = "Sila berikan butiran terperinci supaya pasukan pembangunan boleh menangani maklum balas anda." if lang == "Bahasa Melayu" else "Please provide exact details so the development team can address your feedback."
+        description = st.text_area(desc_lbl, placeholder=desc_holder, key="feedback_desc")
         
     st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("Submit Anonymous System Feedback", type="primary", use_container_width=True, key="submit_feedback_btn"):
+    submit_feed_lbl = "Hantar Maklum Balas Sistem Tanpa Nama" if lang == "Bahasa Melayu" else "Submit Anonymous System Feedback"
+    if st.button(submit_feed_lbl, type="primary", use_container_width=True, key="submit_feedback_btn"):
         if not subject.strip() or not description.strip():
-            st.error("Please fill in both the Subject and Description fields before submitting.")
+            err_msg = "Sila isi kedua-dua ruangan Subjek dan Penerangan sebelum menyerahkan." if lang == "Bahasa Melayu" else "Please fill in both the Subject and Description fields before submitting."
+            st.error(err_msg)
         else:
             conn = get_db_connection()
             cursor = conn.cursor()
@@ -1253,16 +1598,223 @@ elif page == "Help / Feedback":
             """, (user_role, category, subject, description, satisfaction))
             conn.commit()
             conn.close()
-            st.success("Your anonymous feedback has been safely submitted! Thank you for helping us improve the Sarawak Tech-Trust Barometer.")
+            succ_msg = "Maklum balas tanpa nama anda telah selamat dihantar! Terima kasih kerana membantu kami menambah baik Barometer Kepercayaan Teknologi Sarawak." if lang == "Bahasa Melayu" else "Your anonymous feedback has been safely submitted! Thank you for helping us improve the Sarawak Tech-Trust Barometer."
+            st.success(succ_msg)
             st.balloons()
 
 
+# ---------------------------------------------------------
+# PAGE 6: ADMIN PANEL & CIVIC AUDITING PORTAL
+# ---------------------------------------------------------
+elif page == "Admin Panel":
+    if lang == "Bahasa Melayu":
+        st.markdown('<div class="glass-header"><h1>Portal Audit Pentadbir STTB</h1><div class="subtitle">Akses Selamat & Pengurusan Maklum Balas Pelajar UTS & Orang Awam</div></div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="glass-header"><h1>STTB Admin Audit Portal</h1><div class="subtitle">Secure Access & Management of UTS Student & Public Feedback</div></div>', unsafe_allow_html=True)
 
+    # Password Gate
+    pwd_placeholder = "Masukkan kata laluan pentadbiran..." if lang == "Bahasa Melayu" else "Enter administrative password..."
+    pwd_lbl = "Pengesahan Akses Pentadbir:" if lang == "Bahasa Melayu" else "Administrator Access Verification:"
+    
+    col_p1, col_p2, col_p3 = st.columns([1, 2, 1])
+    with col_p2:
+        admin_pwd = st.text_input(pwd_lbl, type="password", placeholder=pwd_placeholder, key="admin_pwd_gate")
+        
+    if admin_pwd != "uts2026" and admin_pwd != "admin123":
+        if admin_pwd != "":
+            st.error("Kata laluan tidak sah! Akses ditolak." if lang == "Bahasa Melayu" else "Invalid password! Access denied.")
+        else:
+            st.warning("Sila masukkan kata laluan untuk mengakses portal aduan & audit." if lang == "Bahasa Melayu" else "Please enter the password to access the complaints & auditing portal.")
+            
+        # Display academic information card in the gate page
+        if lang == "Bahasa Melayu":
+            st.markdown("""
+            <div class="glass-card" style="text-align: center; border-color: rgba(218, 41, 28, 0.4);">
+                <h4 style="color: #DA291C;">Akses Terperingkat Maklum Balas Civik</h4>
+                <p style="font-size: 0.9rem;">Halaman ini bertujuan untuk digunakan oleh ahli fakulti UTS, penyelidik universiti, dan auditor ekonomi digital Sarawak bagi memeriksa aduan teknikal sistem, pengesahan statistik data, dan cadangan penyelarasan kerangka sosiologi.</p>
+                <p style="font-size: 0.8rem; color: #888888;">Petunjuk: Gunakan kata laluan akademik <b>uts2026</b> untuk log masuk.</p>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="glass-card" style="text-align: center; border-color: rgba(218, 41, 28, 0.4);">
+                <h4 style="color: #DA291C;">Classified Civic Feedback Access</h4>
+                <p style="font-size: 0.9rem;">This page is intended for UTS academic faculty members, university researchers, and Sarawak digital economy auditors to inspect technical system complaints, data accuracy verifications, and theoretical framework alignments.</p>
+                <p style="font-size: 0.8rem; color: #888888;">Tip: Use the academic password <b>uts2026</b> to log in.</p>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        # User is authenticated!
+        st.success("Akses Dibenarkan." if lang == "Bahasa Melayu" else "Access Granted.")
+        
+        # Lock Auditing Portal / Logout Button (Dynamic Security)
+        l_col1, l_col2 = st.columns([4, 1])
+        with l_col2:
+            lock_label = "Kunci Portal & Keluar" if lang == "Bahasa Melayu" else "Lock Portal & Logout"
+            if st.button(lock_label, type="secondary", use_container_width=True, key="lock_portal_btn"):
+                st.session_state["admin_mode"] = False
+                st.session_state["page"] = "Welcome & Overview"
+                st.query_params.clear()
+                st.rerun()
+                
+        # Load feedback data
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        df_feed = pd.read_sql_query("SELECT * FROM system_feedback ORDER BY submitted_at DESC", conn)
+        conn.close()
+        
+        total_feedback = len(df_feed)
+        
+        if total_feedback == 0:
+            st.info("Tiada maklum balas sistem yang telah dikemukakan lagi." if lang == "Bahasa Melayu" else "No system feedback has been submitted yet.")
+        else:
+            # 1. KPI Panel Cards
+            avg_sat = df_feed["satisfaction"].mean()
+            bugs_count = len(df_feed[df_feed["category"].str.contains("Technical|Pepijat")])
+            academic_count = len(df_feed[df_feed["category"].str.contains("Academic|Teori|Tonggak")])
+            
+            kpi_c1, kpi_c2, kpi_c3, kpi_c4 = st.columns(4)
+            
+            with kpi_c1:
+                title_lbl = "Jumlah Maklum Balas" if lang == "Bahasa Melayu" else "Total Feedback Entries"
+                st.markdown(f"""
+                <div class="glass-card" style="text-align: center; padding: 15px;">
+                    <div class="metric-label">{title_lbl}</div>
+                    <div class="metric-value" style="font-size: 2.2rem;">{total_feedback}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            with kpi_c2:
+                title_lbl = "Purata Kepuasan" if lang == "Bahasa Melayu" else "Avg System Rating"
+                st.markdown(f"""
+                <div class="glass-card" style="text-align: center; padding: 15px;">
+                    <div class="metric-label">{title_lbl}</div>
+                    <div class="metric-value" style="font-size: 2.2rem; color: #ffd700;">{avg_sat:.2f}/5.00</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            with kpi_c3:
+                title_lbl = "Laporan Pepijat/Ralat" if lang == "Bahasa Melayu" else "Bug Reports"
+                st.markdown(f"""
+                <div class="glass-card" style="text-align: center; padding: 15px;">
+                    <div class="metric-label">{title_lbl}</div>
+                    <div class="metric-value" style="font-size: 2.2rem; color: #ff4d4d;">{bugs_count}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            with kpi_c4:
+                title_lbl = "Penyelarasan Akademik" if lang == "Bahasa Melayu" else "Academic Inquiries"
+                st.markdown(f"""
+                <div class="glass-card" style="text-align: center; padding: 15px;">
+                    <div class="metric-label">{title_lbl}</div>
+                    <div class="metric-value" style="font-size: 2.2rem; color: #4da6ff;">{academic_count}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # 2. Main Double-Column Layout
+            d_col1, d_col2 = st.columns([3, 2])
+            
+            with d_col1:
+                st.subheader("Carian & Tapis Senarai Maklum Balas" if lang == "Bahasa Melayu" else "Search & Filter Feedback Submissions")
+                
+                # Filters
+                f_role_lbl = "Tapis Peranan:" if lang == "Bahasa Melayu" else "Filter Role:"
+                f_cat_lbl = "Tapis Kategori:" if lang == "Bahasa Melayu" else "Filter Category:"
+                
+                roles_available = sorted(list(df_feed["user_role"].unique()))
+                cats_available = sorted(list(df_feed["category"].unique()))
+                
+                sf_col1, sf_col2 = st.columns(2)
+                with sf_col1:
+                    selected_roles = st.multiselect(f_role_lbl, roles_available, default=roles_available)
+                with sf_col2:
+                    selected_cats = st.multiselect(f_cat_lbl, cats_available, default=cats_available)
+                    
+                # Apply filter
+                filtered_df = df_feed[
+                    df_feed["user_role"].isin(selected_roles) & 
+                    df_feed["category"].isin(selected_cats)
+                ]
+                
+                # Display DataFrame
+                st.markdown(f"<div style='font-size: 0.9rem; margin-bottom: 10px; color:#888;'>Hasil carian: {len(filtered_df)} entri</div>", unsafe_allow_html=True)
+                
+                display_cols = ["id", "user_role", "category", "subject", "satisfaction", "submitted_at"]
+                renamed_df = filtered_df[display_cols].copy()
+                if lang == "Bahasa Melayu":
+                    renamed_df.columns = ["ID", "Peranan", "Kategori", "Subjek Mesej", "Kepuasan", "Tarikh Dihantar"]
+                else:
+                    renamed_df.columns = ["ID", "Stakeholder Role", "Feedback Category", "Subject / Summary", "Rating", "Submitted At"]
+                    
+                st.dataframe(renamed_df, use_container_width=True, hide_index=True)
+                
+            with d_col2:
+                st.subheader("Panel Perincian & Penyelesaian" if lang == "Bahasa Melayu" else "Feedback Detail & Resolution Panel")
+                
+                if len(filtered_df) == 0:
+                    st.info("Tiada padanan dijumpai untuk kriteria tapis semasa." if lang == "Bahasa Melayu" else "No matching entries found for current filters.")
+                else:
+                    select_lbl = "Pilih ID entri untuk audit perperincian:" if lang == "Bahasa Melayu" else "Select entry ID to audit details:"
+                    selected_id = st.selectbox(select_lbl, filtered_df["id"].tolist())
+                    
+                    # Fetch selected record
+                    record = filtered_df[filtered_df["id"] == selected_id].iloc[0]
+                    
+                    # Display clean card
+                    st.markdown(f"""
+                    <div class="glass-card" style="border-left: 5px solid #FFC72C;">
+                        <h4 style="margin: 0 0 5px 0; color: #FFC72C;">{record['subject']}</h4>
+                        <div style="font-size: 0.8rem; color: #888888; margin-bottom: 15px;">
+                            ID: #{record['id']} | {record['submitted_at']} <br>
+                            <b>Peranan:</b> {record['user_role']} <br>
+                            <b>Kategori:</b> {record['category']}
+                        </div>
+                        <p style="font-size: 0.95rem; border-top: 1px solid rgba(255,199,44,0.15); padding-top: 15px;">
+                            {record['description']}
+                        </p>
+                        <div style="margin-top: 15px; font-weight: bold; color: #ffd700;">
+                            Skor Penarafan Sistem: {"⭐" * record['satisfaction']} ({record['satisfaction']}/5)
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # Delete action
+                    res_btn = "Tandakan Selesai & Padam Aduan" if lang == "Bahasa Melayu" else "Mark Resolved & Purge Entry"
+                    if st.button(res_btn, type="primary", use_container_width=True, key=f"del_feed_{selected_id}"):
+                        conn = get_db_connection()
+                        cursor = conn.cursor()
+                        cursor.execute("DELETE FROM system_feedback WHERE id = ?", (int(selected_id),))
+                        conn.commit()
+                        conn.close()
+                        
+                        succ_purge = "Aduan berjaya diselesaikan dan dipadamkan daripada pangkalan data!" if lang == "Bahasa Melayu" else "Feedback entry resolved and purged from the database successfully!"
+                        st.success(succ_purge)
+                        st.rerun()
+                        
+            # 3. Quick Visual Breakdown Charts
+            st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.15);'><br>", unsafe_allow_html=True)
+            st.subheader("Pecahan Statistik Maklum Balas" if lang == "Bahasa Melayu" else "Statistical Feedback Breakdown")
+            
+            c_chart1, c_chart2 = st.columns(2)
+            with c_chart1:
+                # Category counts chart
+                cat_counts = df_feed["category"].value_counts().reset_index()
+                cat_counts.columns = ["Kategori" if lang == "Bahasa Melayu" else "Category", "Jumlah" if lang == "Bahasa Melayu" else "Count"]
+                st.bar_chart(data=cat_counts, x="Kategori" if lang == "Bahasa Melayu" else "Category", y="Jumlah" if lang == "Bahasa Melayu" else "Count", color="#FFC72C")
+                
+            with c_chart2:
+                # Satisfaction frequency chart
+                sat_counts = df_feed["satisfaction"].value_counts().reset_index()
+                sat_counts.columns = ["Skor" if lang == "Bahasa Melayu" else "Score", "Jumlah" if lang == "Bahasa Melayu" else "Count"]
+                st.bar_chart(data=sat_counts, x="Skor" if lang == "Bahasa Melayu" else "Score", y="Jumlah" if lang == "Bahasa Melayu" else "Count", color="#DA291C")
 
 
 # ---------------------------------------------------------
 # 5. PERMANENT CENTRALIZED PAGE FOOTER
 # ---------------------------------------------------------
 st.markdown("---")
-st.markdown("<div style='text-align: center; color: #888888; font-size: 0.85rem; padding: 25px 0 10px 0;'>Sarawak Tech-Trust Barometer © 2026.</div>", unsafe_allow_html=True)
+footer_text = "Barometer Kepercayaan Teknologi Sarawak © 2026." if lang == "Bahasa Melayu" else "Sarawak Tech-Trust Barometer © 2026."
+st.markdown(f"<div style='text-align: center; color: #888888; font-size: 0.85rem; padding: 25px 0 10px 0;'>{footer_text}</div>", unsafe_allow_html=True)
 

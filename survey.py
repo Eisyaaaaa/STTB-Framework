@@ -182,8 +182,103 @@ QUESTIONS = [
     {"code": "DI3.2", "pillar": "P5", "variable": "V5.3", "question": "I feel that digital platforms in Sarawak are designed with consideration for users of varying digital literacy levels."},
     {"code": "DI3.3", "pillar": "P5", "variable": "V5.3", "question": "I trust that the principle of Adl (justice and fairness) guides the equitable distribution of digital services across all communities in Sarawak."},
     {"code": "DI3.4", "pillar": "P5", "variable": "V5.3", "question": "I believe that no Sarawakian should be excluded from the benefits of digital transformation due to their location, age, ability, or income."},
-    {"code": "DI3.5", "pillar": "P5", "variable": "V5.3", "question": "Overall, I am satisfied that Sarawak's digital initiatives genuinely aim to leave no community behind."}
 ]
+
+
+# ---------------------------------------------------------
+# 1.5. SURVEY QUESTIONS TRANSLATIONS (BAHASA MELAYU)
+# ---------------------------------------------------------
+QUESTIONS_BM = {
+    "TA1.1": "Saya berkeyakinan bahawa platform digital di Sarawak dapat mengesahkan identiti saya dengan tepat untuk mencegah ralat atau penipuan.",
+    "TA1.2": "Saya percaya tiada 'Asimetri Maklumat' (jurang) antara laporan rasmi kerajaan dengan sumber data bebas.",
+    "TA1.3": "Saya rasa saya boleh mengesahkan ketepatan dan etika inisiatif digital pimpinan negeri dengan mudah tanpa bergantung kepada sumber luar.",
+    "TA1.4": "Saya percaya bahawa organisasi menyediakan maklumat tentang rancangan utama (cth., penempatan semula atau perubahan projek) lebih awal.",
+    "TA1.5": "Saya percaya bahawa data alam sekitar dan guna tanah harus diakses secara terbuka di bawah piawaian antarabangsa.",
+    
+    "TA2.1": "Saya melihat inisiatif kerajaan digital semasa di Sarawak sebagai benar-benar 'berpusatkan rakyat'.",
+    "TA2.2": "Saya percaya perkhidmatan digital di Sarawak boleh diakses oleh semua orang, memastikan tiada siapa yang ketinggalan kerana kekurangan maklumat.",
+    "TA2.3": "Terma dan syarat digital yang saya temui ditulis dalam bahasa mudah yang membolehkan saya membuat keputusan termaklum.",
+    "TA2.4": "Saya percaya bahawa Sarawak kini berada di 'saat penentu' tentang cara ia mengendalikan kepercayaan dan inklusi digital.",
+    "TA2.5": "Pada pendapat saya, kepercayaan digital lebih terbina melalui pelaksanaan dasar yang berkesan berbanding peraturan kerajaan yang ketat semata-mata.",
+    
+    "TA3.1": "Saya percaya bahawa Sarawak berjaya beralih daripada sekadar 'menggunakan teknologi' kepada membina persekitaran 'kepercayaan digital sistemik'.",
+    "TA3.2": "Sejauh manakah anda bersetuju bahawa organisasi bersikap berterus-terang tentang amalan perniagaan mereka dan cara data anda digunakan?",
+    "TA3.3": "Saya percaya penyedia perkhidmatan harus mematuhi prinsip Sidq (kebenaran) dengan tidak menyembunyikan maklumat penting.",
+    "TA3.4": "Saya sedar tentang kerentanan peribadi saya terhadap jurang maklumat dan kecurian identiti apabila menggunakan perkhidmatan digital di Sarawak.",
+    "TA3.5": "Saya yakin bahawa saya boleh bergantung pada platform digital rasmi di Sarawak untuk maklumat yang tepat dan lengkap.",
+    
+    "ER1.1": "Saya percaya reka bentuk dan penggunaan teknologi digital di Sarawak dipandu oleh prinsip moral dan bukannya keuntungan semata-mata.",
+    "ER1.2": "Sejauh manakah anda bersetuju bahawa platform digital di Sarawak menyumbang secara positif kepada kesaksamaan sosial dan kesejahteraan komuniti?",
+    "ER1.3": "Saya percaya bahawa AI dan automasi yang digunakan dalam sistem digital Sarawak kekal adil dan tidak berat sebelah dalam membuat keputusan.",
+    "ER1.4": "Saya percaya bahawa bakat tempatan (ahli teknologi berkelayakan) sedang dibangunkan secukupnya untuk melindungi kedaulatan digital Sarawak.",
+    "ER1.5": "Saya rasa risiko digital di Sarawak sedang ditangani dengan tindakan yang sengaja dan diselaraskan oleh institusi.",
+    
+    "ER2.1": "Saya rasa organisasi mengutamakan tingkah laku etika dalam operasi digital mereka, walaupun ia tidak diperlukan oleh undang-undang.",
+    "ER2.2": "Saya yakin bahawa kerangka 'Tadbir Urus Baik' yang sedia ada berkesan memantau operasi platform digital di Sarawak.",
+    "ER2.3": "Saya percaya para pemimpin (pembangun dan penyedia) sistem digital di Sarawak berasa bertanggungjawab terhadap kebajikan digital saya.",
+    "ER2.4": "Saya yakin bahawa tanggungjawab untuk perlindungan data diterapkan di semua peringkat organisasi yang saya berinteraksi dengannya.",
+    "ER2.5": "Saya percaya bahawa institusi Sarawak mengambil tindakan sengaja untuk menangani risiko digital semasa daripada menunggu insiden berlaku.",
+    
+    "ER3.1": "Saya melihat pembangun teknologi digital di Sarawak mempunyai Amanah (kebolehpercayaan dan tanggungjawab) yang tinggi terhadap pengguna mereka.",
+    "ER3.2": "Saya mempercayai organisasi yang menguruskan platform digital Sarawak untuk bertindak sebagai pentadbir yang bertanggungjawab bagi kesejahteraan digital komuniti.",
+    "ER3.3": "Saya percaya bahawa pengurusan teknologi yang beretika di Sarawak mencerminkan kewajipan penjagaan yang tulen terhadap rakyat.",
+    "ER3.4": "Saya berpuas hati dengan tahap ketelusan yang ditunjukkan oleh institusi digital dalam menyampaikan keputusan tadbir urus mereka kepada orang ramai.",
+    "ER3.5": "Saya percaya bahawa tingkah laku beretika penyedia perkhidmatan digital di Sarawak memupuk hubungan baik komuniti jangka panjang.",
+    
+    "PC1.1": "Saya rasa saya mempunyai tahap agensi (kuasa) yang tinggi terhadap bagaimana maklumat peribadi saya digunakan oleh platform digital di Sarawak.",
+    "PC1.2": "Saya berkongsi data saya kerana saya benar-benar mahu, dan bukannya merasakan 'peletakan jawatan digital' (merasa saya tiada pilihan sebenar).",
+    "PC1.3": "Saya lebih cenderung untuk terlibat dengan perkhidmatan digital Sarawak kerana saya percaya data saya dikendalikan secara bertanggungjawab.",
+    "PC1.4": "Saya rasa data peribadi saya mewakili identiti peribadi saya, dan bukannya sekadar maklumat yang disimpan di dalam platform.",
+    "PC1.5": "Saya percaya bahawa institusi digital Sarawak mengambil tindakan sengaja untuk mengelakkan 'peletakan jawatan digital' dalam kalangan pengguna.",
+    
+    "PC2.1": "Saya percaya platform digital di Sarawak menghormati larangan Tajassus (mengintip atau pencerobohan tanpa kebenaran) ke dalam kehidupan peribadi saya.",
+    "PC2.2": "Saya rasa maruah dan kesopanan (Haya) saya dihormati dalam cara data peribadi saya dikendalikan oleh platform digital.",
+    "PC2.3": "Saya percaya bahawa organisasi di Sarawak tidak mengumpul data melebihi apa yang diperlukan untuk perkhidmatan yang saya gunakan.",
+    "PC2.4": "Saya merasa selamat mengetahui bahawa organisasi tidak berkongsi data saya dengan pihak ketiga tanpa persetujuan jelas saya.",
+    "PC2.5": "Saya percaya platform digital di Sarawak memberikan saya kawalan terperinci terhadap apa yang saya pilih untuk didedahkan berbanding apa yang saya simpan sebagai rahsia.",
+    
+    "PC3.1": "Saya yakin bahawa data sensitif saya dilindungi mengikut Akta Perlindungan Data Peribadi (PDPA) 2010 Malaysia.",
+    "PC3.2": "Saya merasa lebih selamat mengetahui bahawa organisasi di Sarawak menggunakan langkah strategik seperti penyulitan dan audit untuk mencegah pelanggaran data.",
+    "PC3.3": "Saya bimbang tentang risiko kecurian identiti apabila menggunakan perkhidmatan digital di Sarawak.",
+    "PC3.4": "Saya percaya penyedia perkhidmatan digital di Sarawak berusaha secara proaktif untuk mencegah pemalsuan data dan pengubahan tanpa kebenaran pada rekod saya.",
+    "PC3.5": "Saya percaya infrastruktur digital sedia ada di Sarawak adalah cukup dipercayai dan selamat untuk melindungi data peribadi saya daripada eksploitasi.",
+    
+    "SR1.1": "Saya percaya infrastruktur sistem digital di Sarawak cukup teguh untuk kekal berdaya tahan terhadap ancaman siber moden.",
+    "SR1.2": "Saya bimbang tentang peningkatan bilangan insiden siber (seperti penipuan, pencerobohan dan kod berniat jahat) dalam landskap digital Malaysia.",
+    "SR1.3": "Saya percaya bahawa 'kod berniat jahat' dan 'pencerobohan tanpa kebenaran' menimbulkan ancaman ketara kepada keselamatan digital saya di Sarawak.",
+    "SR1.4": "Saya merasa lebih yakin menggunakan platform digital yang dipantau secara aktif oleh agensi seperti CyberSecurity Malaysia.",
+    "SR1.5": "Saya percaya bahawa 'Persekitaran yang Selamat dan Dipercayai' adalah penting untuk mengekalkan keyakinan saya terhadap inisiatif digital Sarawak.",
+    
+    "SR2.1": "Saya mengharapkan perkhidmatan digital di Sarawak tersedia bila-bila masa saya memerlukannya, tanpa gangguan atau terputus yang kerap.",
+    "SR2.2": "Saya berpuas hati dengan ketersambungan berkelajuan tinggi dan infrastruktur yang menyokong ekosistem digital Sarawak.",
+    "SR2.3": "Saya merasa yakin bahawa saya secara peribadi mempunyai kemahiran digital yang diperlukan untuk menggunakan dan menilai perkhidmatan digital di Sarawak secara selamat.",
+    "SR2.4": "Saya percaya bahawa risiko digital di Sarawak adalah realiti semasa yang memerlukan pertahanan teknikal dan pelaburan segera.",
+    "SR2.5": "Saya percaya infrastruktur digital Sarawak dapat menyokong matlamat transformasi digital keseluruhan negeri secara dipercayai.",
+    
+    "SR3.1": "Saya percaya platform digital ini mempunyai langkah-langkah yang memadai untuk melindungi saya daripada risiko kewangan tinggi berkaitan jenayah siber di Malaysia.",
+    "SR3.2": "Saya berasa selamat mengetahui bahawa alat termaju seperti penyulitan, dinding api, dan pengesahan pelbagai faktor (MFA) dilaksanakan untuk melindungi maklumat saya.",
+    "SR3.3": "Saya mempercayai organisasi untuk mengenal pasti dan memperbetulkan kelemahan perisian secara proaktif sebelum ia dieksploitasi.",
+    "SR3.4": "Saya melihat keselamatan sistem digital di Sarawak sebagai cerminan Itqan (menuntut kecemerlangan dan kesempurnaan) dalam pembangunannya.",
+    "SR3.5": "Melihat pensijilan seperti ISO 27001 (untuk keselamatan maklumat) memberikan keyakinan yang lebih besar kepada saya tentang keselamatan data saya.",
+    
+    "DI1.1": "Saya percaya akses internet yang boleh dipercayai tersedia untuk semua komuniti di seluruh Sarawak, termasuk kawasan luar bandar dan pedalaman.",
+    "DI1.2": "Saya percaya pembangunan infrastruktur digital di Sarawak diagihkan secara adil ke seluruh daerah dan tidak terhad kepada pusat bandar utama sahaja.",
+    "DI1.3": "Saya rasa kos peranti digital dan perkhidmatan internet di Sarawak adalah berpatutan untuk semua peringkat pendapatan.",
+    "DI1.4": "Saya percaya jurang dalam akses digital antara kawasan bandar dan luar bandar Sarawak sedang ditangani secara aktif oleh kerajaan.",
+    "DI1.5": "Saya yakin pertumbuhan ekonomi digital Sarawak memberi manfaat kepada semua komuniti secara saksama, bukan sahaja di pusat bandar.",
+    
+    "DI2.1": "Saya menyedari program atau inisiatif di Sarawak yang membantu orang ramai mengembangkan kemahiran digital yang diperlukan untuk menggunakan perkhidmatan dalam talian secara selamat dan berkesan.",
+    "DI2.2": "Saya percaya program literasi digital di Sarawak menjangkau komuniti yang paling memerlukan, termasuk warga emas dan kumpulan peribumi.",
+    "DI2.3": "Saya merasa yakin bahawa saya secara peribadi mempunyai kemahiran digital yang diperlukan untuk menggunakan dan menilai perkhidmatan digital di Sarawak secara selamat.",
+    "DI2.4": "Saya percaya kempen pendidikan digital di Sarawak menyediakan rakyat dengan mencukupi untuk melindungi diri mereka secara dalam talian.",
+    "DI2.5": "Saya percaya pelaburan dalam literasi digital di Sarawak akan membawa kepada keyakinan awam yang lebih besar terhadap institusi digital dari semasa ke semasa.",
+    
+    "DI3.1": "Saya percaya perkhidmatan digital di Sarawak direka bentuk supaya boleh diakses dan digunakan oleh semua kumpulan, termasuk warga emas, orang kurang upaya, dan komuniti peribumi.",
+    "DI3.2": "Saya rasa platform digital di Sarawak direka dengan mengambil kira pengguna pelbagai tahap literasi digital.",
+    "DI3.3": "Saya percaya prinsip Adl (keadilan dan kesaksamaan) membimbing pengagihan perkhidmatan digital secara saksama kepada semua komuniti di Sarawak.",
+    "DI3.4": "Saya percaya tiada rakyat Sarawak yang harus dikecualikan daripada manfaat transformasi digital kerana lokasi, umur, keupayaan, atau pendapatan mereka.",
+    "DI3.5": "Secara keseluruhan, saya berpuas hati bahawa inisiatif digital Sarawak benar-benar bertujuan untuk memastikan tiada komuniti yang ketinggalan."
+}
 
 
 # ---------------------------------------------------------
