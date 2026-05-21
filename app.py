@@ -12,7 +12,7 @@ st.set_page_config(
     page_title="Sarawak Tech-Trust Barometer (STTB)",
     page_icon="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Flag_of_Sarawak.svg/200px-Flag_of_Sarawak.svg.png",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # ---------------------------------------------------------
@@ -516,40 +516,55 @@ if "page" not in st.session_state:
     st.session_state["page"] = "Welcome & Overview"
 
 # ---------------------------------------------------------
-# 4. APP SIDEBAR & NAVIGATION
+# 4. TOP NAVIGATION BAR & THEME SYMBOL
 # ---------------------------------------------------------
-with st.sidebar:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/7/7e/Flag_of_Sarawak.svg", width=120)
-    st.markdown("<h2 style='color:#ffd700; margin-top:10px;'>STTB Navigation</h2>", unsafe_allow_html=True)
-    
-    # Theme Selection Switcher (Professional Unicode Icons)
-    theme_selection = st.selectbox(
-        "Interface Theme:",
-        ["☾ Dark Mode", "☀ Light Mode"],
-        index=0 if st.session_state.get("theme_mode", "Dark Mode") == "Dark Mode" else 1
-    )
-    theme_mapped = "Dark Mode" if "Dark" in theme_selection else "Light Mode"
-    if theme_mapped != st.session_state.get("theme_mode", "Dark Mode"):
-        st.session_state["theme_mode"] = theme_mapped
+# Container/styling for top menu buttons
+st.markdown("""
+<style>
+    /* Styling for Streamlit buttons inside the top navigation bar to look like premium nav elements */
+    div.stButton > button {
+        border-radius: 8px !important;
+        font-family: 'Outfit', sans-serif !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# 7-column layout for top navbar: Logo (1.2), 5 Navigation Buttons (2 each), and Theme Toggle Symbol (0.8)
+nav_cols = st.columns([1.2, 2, 2, 2, 2, 2, 0.8], vertical_alignment="center")
+
+# Column 0: Sarawak State Flag Logo
+with nav_cols[0]:
+    st.image("https://upload.wikimedia.org/wikipedia/commons/7/7e/Flag_of_Sarawak.svg", width=65)
+
+# Columns 1-5: Horizontal Navigation Menus
+menu_options = [
+    ("Welcome & Overview", "Welcome & Overview"),
+    ("Public Survey Form", "Public Survey"),
+    ("Analytics Dashboard", "Analytics Dashboard"),
+    ("Geographic Trust Map", "Geographic Map"),
+    ("QR Code & Deployment", "QR & Deployment")
+]
+
+for idx, (page_val, label) in enumerate(menu_options):
+    with nav_cols[idx + 1]:
+        # Style active page with primary format, and others with secondary format
+        is_active = (st.session_state["page"] == page_val)
+        btn_type = "primary" if is_active else "secondary"
+        if st.button(label, key=f"nav_{page_val}", type=btn_type, use_container_width=True):
+            st.session_state["page"] = page_val
+            st.rerun()
+
+# Column 6: Theme Selector Symbol (☾ for Dark, ☀ for Light)
+with nav_cols[6]:
+    current_symbol = "☀" if st.session_state["theme_mode"] == "Dark Mode" else "☾"
+    if st.button(current_symbol, key="theme_toggle_btn", use_container_width=True):
+        if st.session_state["theme_mode"] == "Dark Mode":
+            st.session_state["theme_mode"] = "Light Mode"
+        else:
+            st.session_state["theme_mode"] = "Dark Mode"
         st.rerun()
-        
-    menu_options = ["Welcome & Overview", "Public Survey Form", "Analytics Dashboard", "Geographic Trust Map", "QR Code & Deployment"]
-    if st.session_state["page"] not in menu_options:
-        st.session_state["page"] = "Welcome & Overview"
-    default_idx = menu_options.index(st.session_state["page"])
-    
-    page = st.radio(
-        "Explore Framework:",
-        menu_options,
-        index=default_idx
-    )
-    
-    if page != st.session_state["page"]:
-        st.session_state["page"] = page
-        st.rerun()
-    
-    st.markdown("---")
-    st.caption("Sarawak Tech-Trust Barometer © 2026.")
 
 
 # ---------------------------------------------------------
@@ -1086,4 +1101,11 @@ elif page == "QR Code & Deployment":
         st.success("Database successfully purged to a clean state! Redirecting...")
         st.session_state["page"] = "Welcome & Overview"
         st.rerun()
+
+
+# ---------------------------------------------------------
+# 5. PERMANENT CENTRALIZED PAGE FOOTER
+# ---------------------------------------------------------
+st.markdown("---")
+st.markdown("<div style='text-align: center; color: #888888; font-size: 0.85rem; padding: 25px 0 10px 0;'>Sarawak Tech-Trust Barometer © 2026.</div>", unsafe_allow_html=True)
 
