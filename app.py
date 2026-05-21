@@ -322,6 +322,19 @@ def init_db():
     )
     """)
     
+    # 4. Feedback & Complaints Table (Anonymized Audit Repository)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS system_feedback (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_role TEXT NOT NULL,
+        category TEXT NOT NULL,
+        subject TEXT NOT NULL,
+        description TEXT NOT NULL,
+        satisfaction INTEGER,
+        submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    
     conn.commit()
     conn.close()
 
@@ -515,6 +528,43 @@ init_db()
 if "page" not in st.session_state:
     st.session_state["page"] = "Welcome & Overview"
 
+if "language" not in st.session_state:
+    st.session_state["language"] = "English"
+
+# Dynamic Multilanguage Translation Dictionary
+TRANSLATIONS = {
+    "English": {
+        "overview": "Overview",
+        "survey": "Survey",
+        "dashboard": "Dashboard",
+        "map": "Map",
+        "help": "Help"
+    },
+    "Bahasa Malaysia": {
+        "overview": "Ringkasan",
+        "survey": "Soal Selidik",
+        "dashboard": "Papan Pemuka",
+        "map": "Peta Kawasan",
+        "help": "Bantuan"
+    },
+    "Chinese": {
+        "overview": "概览",
+        "survey": "问卷调查",
+        "dashboard": "仪表板",
+        "map": "地理地图",
+        "help": "投诉与反馈"
+    },
+    "Tamil": {
+        "overview": "கண்ணோட்டம்",
+        "survey": "கணக்கெடுப்பு",
+        "dashboard": "டாஷ்போர்டு",
+        "map": "வரைபடம்",
+        "help": "உதவி"
+    }
+}
+
+lang = st.session_state.get("language", "English")
+
 # ---------------------------------------------------------
 # 4. TOP NAVIGATION BAR & THEME SYMBOL
 # ---------------------------------------------------------
@@ -554,7 +604,7 @@ st.markdown(f"""
         justify-content: center !important;
     }}
     
-    /* Override standard button styling specifically inside the top navbar strip */
+    /* Override standard button styling inside the top navbar block to look like premium text links */
     div[data-testid="stHorizontalBlock"]:first-of-type div.stButton > button {{
         background: transparent !important;
         color: {nav_text} !important;
@@ -562,45 +612,47 @@ st.markdown(f"""
         box-shadow: none !important;
         font-family: 'Outfit', sans-serif !important;
         font-weight: 500 !important;
-        font-size: 1.05rem !important;
-        border-radius: 8px !important;
-        padding: 8px 16px !important;
+        font-size: 1.02rem !important;
+        border-radius: 0px !important;
+        padding: 4px 0px !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         height: auto !important;
         margin: 0 !important;
+        border-bottom: 2px solid transparent !important;
     }}
     
-    /* Highlight the active page button inside the top navbar strip */
+    /* Highlight the active page/language selection with dynamic word color and a clean underline */
     div[data-testid="stHorizontalBlock"]:first-of-type div.stButton > button[kind="primary"] {{
-        background: linear-gradient(135deg, #DA291C 0%, #FFC72C 100%) !important;
-        color: #ffffff !important;
+        background: transparent !important;
+        color: #FFC72C !important;
         font-weight: 700 !important;
-        box-shadow: 0 4px 12px rgba(218, 41, 28, 0.35) !important;
-        border: 1px solid rgba(255, 199, 44, 0.3) !important;
+        box-shadow: none !important;
+        border-bottom: 2px solid #DA291C !important;
     }}
     
-    /* Hover effect for navbar buttons */
+    /* Hover effect: text turns yellow/gold and shows a faint bottom underline */
     div[data-testid="stHorizontalBlock"]:first-of-type div.stButton > button:hover {{
-        background: rgba(255, 255, 255, 0.08) !important;
-        color: #ffd700 !important;
-        transform: translateY(-1px) !important;
+        background: transparent !important;
+        color: #FFC72C !important;
+        border-bottom: 2px solid rgba(255, 199, 44, 0.5) !important;
     }}
 </style>
 """, unsafe_allow_html=True)
 
-# 6-column layout for top navbar: Logo (1.2), 4 Navigation Buttons (2 each), and Theme Toggle Symbol (0.8)
-nav_cols = st.columns([1.2, 2, 2, 2, 2, 0.8], vertical_alignment="center")
+# 8-column layout: Logo (1.0), 5 Menu Buttons (Overview, Survey, Dashboard, Map, Help), Languages (2.2), Theme Toggle (0.6)
+nav_cols = st.columns([1.0, 1.2, 1.2, 1.4, 1.0, 1.8, 2.2, 0.6], vertical_alignment="center")
 
 # Column 0: Sarawak State Flag Logo
 with nav_cols[0]:
     st.image("https://upload.wikimedia.org/wikipedia/commons/7/7e/Flag_of_Sarawak.svg", width=65)
 
-# Columns 1-4: Horizontal Navigation Menus
+# Columns 1-5: Horizontal Navigation Menus
 menu_options = [
-    ("Welcome & Overview", "Overview"),
-    ("Public Survey Form", "Survey"),
-    ("Analytics Dashboard", "Dashboard"),
-    ("Geographic Trust Map", "Map")
+    ("Welcome & Overview", TRANSLATIONS[lang]["overview"]),
+    ("Public Survey Form", TRANSLATIONS[lang]["survey"]),
+    ("Analytics Dashboard", TRANSLATIONS[lang]["dashboard"]),
+    ("Geographic Trust Map", TRANSLATIONS[lang]["map"]),
+    ("Help / Feedback", TRANSLATIONS[lang]["help"])
 ]
 
 for idx, (page_val, label) in enumerate(menu_options):
@@ -611,8 +663,25 @@ for idx, (page_val, label) in enumerate(menu_options):
             st.session_state["page"] = page_val
             st.rerun()
 
-# Column 5: Theme Selector Symbol (☾ for Dark, ☀ for Light)
-with nav_cols[5]:
+# Column 6: Minimalist Languages inline selector (aligned right side)
+with nav_cols[6]:
+    lang_cols = st.columns(4)
+    langs = [
+        ("English", "EN"),
+        ("Bahasa Malaysia", "BM"),
+        ("Chinese", "华"),
+        ("Tamil", "தமிழ்")
+    ]
+    for l_idx, (lang_val, lang_label) in enumerate(langs):
+        with lang_cols[l_idx]:
+            is_lang_active = (st.session_state.get("language", "English") == lang_val)
+            btn_kind = "primary" if is_lang_active else "secondary"
+            if st.button(lang_label, key=f"lang_{lang_val}", type=btn_kind, use_container_width=True):
+                st.session_state["language"] = lang_val
+                st.rerun()
+
+# Column 7: Theme Selector Symbol (☾ for Dark, ☀ for Light)
+with nav_cols[7]:
     current_symbol = "☀" if st.session_state["theme_mode"] == "Dark Mode" else "☾"
     if st.button(current_symbol, key="theme_toggle_btn", use_container_width=True):
         if st.session_state["theme_mode"] == "Dark Mode":
@@ -1116,6 +1185,52 @@ elif page == "Geographic Trust Map":
         
     # Render folium map in Streamlit
     st_folium(m, width=1200, height=600)
+
+
+# ---------------------------------------------------------
+# PAGE 5: HELP & CIVIC FEEDBACK FORM
+# ---------------------------------------------------------
+elif page == "Help / Feedback":
+    st.markdown('<div class="glass-header"><h1>Help Desk & Civic Feedback</h1><div class="subtitle">Anonymized Complaint & Feedback Repository (Academic & UTS Quality Audit)</div></div>', unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="glass-card">
+        <h3>Support & Alignment Feedback</h3>
+        <p>To support continuous quality improvements and comply with final year project audit standards, UTS students, administrators, and the general public can submit inquiries, technical bug reports, or alignment suggestions here. <b>All feedback is anonymous and securely cataloged for review.</b></p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 2-column layout for Form
+    f_col1, f_col2 = st.columns(2)
+    
+    with f_col1:
+        st.markdown("<h3 style='color:#ffd700; margin-bottom:15px;'>Step 1: Stakeholder Role</h3>", unsafe_allow_html=True)
+        user_role = st.selectbox("I am submitting as a:", ["General Public Respondent", "UTS Student", "UTS Academic Faculty", "System Auditor / Admin"], key="feedback_role")
+        
+        category = st.selectbox("Feedback Category:", ["Technical Bug / Interface Error", "Data Validation / Accuracy Inquiry", "Academic Theoretical Alignment (Scott's Pillars)", "General Feature Suggestion"], key="feedback_category")
+        
+        satisfaction = st.slider("Overall System Experience Rating (1 = Poor, 5 = Premium):", 1, 5, 5, key="feedback_rating")
+
+    with f_col2:
+        st.markdown("<h3 style='color:#ffd700; margin-bottom:15px;'>Step 2: Message Details</h3>", unsafe_allow_html=True)
+        subject = st.text_input("Feedback Subject / Summary:", placeholder="e.g. Navigation Alignment Suggestion", key="feedback_subject")
+        description = st.text_area("Detailed Description / Complaint:", placeholder="Please provide exact details so the development team can address your feedback.", key="feedback_desc")
+        
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("Submit Anonymous System Feedback", type="primary", use_container_width=True, key="submit_feedback_btn"):
+        if not subject.strip() or not description.strip():
+            st.error("Please fill in both the Subject and Description fields before submitting.")
+        else:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT INTO system_feedback (user_role, category, subject, description, satisfaction)
+            VALUES (?, ?, ?, ?, ?)
+            """, (user_role, category, subject, description, satisfaction))
+            conn.commit()
+            conn.close()
+            st.success("Your anonymous feedback has been safely submitted! Thank you for helping us improve the Sarawak Tech-Trust Barometer.")
+            st.balloons()
 
 
 
