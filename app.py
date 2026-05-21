@@ -519,7 +519,7 @@ if "page" not in st.session_state:
 # 4. APP SIDEBAR & NAVIGATION
 # ---------------------------------------------------------
 with st.sidebar:
-    st.image("sarawak_flag.svg", width=120)
+    st.image("https://upload.wikimedia.org/wikipedia/commons/7/7e/Flag_of_Sarawak.svg", width=120)
     st.markdown("<h2 style='color:#ffd700; margin-top:10px;'>STTB Navigation</h2>", unsafe_allow_html=True)
     
     # Theme Selection Switcher (Professional Unicode Icons)
