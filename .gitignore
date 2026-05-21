@@ -1,0 +1,9 @@
+# Ignore all files by default
+*
+
+# Do not ignore these specific deployment files
+!app.py
+!survey.py
+!requirements.txt
+!sarawak_flag.svg
+!.gitignore
