@@ -34,15 +34,7 @@ STTB-Framework/
 * Fully localizes the 75 framework questions, live metrics, interactive maps, database collection drop-downs, and automatically computed personal digital trust report cards.
 * Secure translation mapping ensures submissions are translated to standardized English categories before insertion into SQLite to maintain visualization pipeline consistency.
 
-### 🔒 2. Secure Administrative Audit Portal
-A dual-layered (Obscurity + Authentication) hidden portal built to comply with academic quality and final year project audits:
-1. **Security by Obscurity (Hidden Entry)**: The "Admin" tab is completely invisible to public respondents. It is dynamically revealed only when accessing a secret query parameter:
-   * `http://localhost:8501/?admin=true` or `http://localhost:8501/?audit=uts`
-2. **Access Verification Gate**: Once the tab is revealed, access requires typing the academic passcode: **`uts2026`** (or `admin123`).
-3. **Auditing Dashboard**: Provides live KPI summaries, interactive multi-select filtering datatables, deep-dive detail cards, SQLite entry purging commands, and visual categories/ratings charts.
-4. **One-Click Instant Lock**: Clicking "Lock Portal & Logout" immediately resets administrative flags, purges URL query parameters, and redirects back to the public Overview page.
 
----
 
 ## 🚀 Getting Started
 
