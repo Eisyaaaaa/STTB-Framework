@@ -531,20 +531,19 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 7-column layout for top navbar: Logo (1.2), 5 Navigation Buttons (2 each), and Theme Toggle Symbol (0.8)
-nav_cols = st.columns([1.2, 2, 2, 2, 2, 2, 0.8], vertical_alignment="center")
+# 6-column layout for top navbar: Logo (1.2), 4 Navigation Buttons (2 each), and Theme Toggle Symbol (0.8)
+nav_cols = st.columns([1.2, 2, 2, 2, 2, 0.8], vertical_alignment="center")
 
 # Column 0: Sarawak State Flag Logo
 with nav_cols[0]:
     st.image("https://upload.wikimedia.org/wikipedia/commons/7/7e/Flag_of_Sarawak.svg", width=65)
 
-# Columns 1-5: Horizontal Navigation Menus
+# Columns 1-4: Horizontal Navigation Menus
 menu_options = [
-    ("Welcome & Overview", "Welcome & Overview"),
-    ("Public Survey Form", "Public Survey"),
-    ("Analytics Dashboard", "Analytics Dashboard"),
-    ("Geographic Trust Map", "Geographic Map"),
-    ("QR Code & Deployment", "QR & Deployment")
+    ("Welcome & Overview", "Overview"),
+    ("Public Survey Form", "Survey"),
+    ("Analytics Dashboard", "Dashboard"),
+    ("Geographic Trust Map", "Map")
 ]
 
 for idx, (page_val, label) in enumerate(menu_options):
@@ -556,8 +555,8 @@ for idx, (page_val, label) in enumerate(menu_options):
             st.session_state["page"] = page_val
             st.rerun()
 
-# Column 6: Theme Selector Symbol (☾ for Dark, ☀ for Light)
-with nav_cols[6]:
+# Column 5: Theme Selector Symbol (☾ for Dark, ☀ for Light)
+with nav_cols[5]:
     current_symbol = "☀" if st.session_state["theme_mode"] == "Dark Mode" else "☾"
     if st.button(current_symbol, key="theme_toggle_btn", use_container_width=True):
         if st.session_state["theme_mode"] == "Dark Mode":
@@ -668,6 +667,29 @@ if page == "Welcome & Overview":
 # PAGE 2: PUBLIC SURVEY FORM
 elif page == "Public Survey Form":
     st.markdown('<div class="glass-header"><h1>STTB Public Survey Form</h1><div class="subtitle">Anonymized Civic Feedback Framework (PDPA 2010 Compliant)</div></div>', unsafe_allow_html=True)
+    
+    # Minimalist dynamic QR sharing code on top
+    st.markdown("""
+    <div class="glass-card" style="padding: 15px; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 5px 0; color:#ffd700;">Scan & Share Survey</h4>
+        <p style="font-size: 0.85rem; color: #bdc3c7; margin: 0 0 12px 0;">Use the QR code below to access and distribute this digital trust survey online!</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    qr_col1, qr_col2 = st.columns([1, 4])
+    with qr_col1:
+        target_url = "https://sarawak-tech-trust.streamlit.app"
+        qr_api_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=003366&data={target_url}"
+        st.markdown(f'<img src="{qr_api_url}" style="border: 3px solid white; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);" width="110" height="110">', unsafe_allow_html=True)
+    with qr_col2:
+        st.markdown(f"""
+        <div style="padding-top: 10px;">
+            <span style="font-size:0.85rem; color:#bdc3c7;"><b>Direct Link:</b></span><br>
+            <a href="{target_url}" target="_blank" style="color:#ffd700; font-size:1.05rem; font-weight:bold; text-decoration:none;">{target_url}</a>
+            <p style="font-size:0.8rem; color:#888888; margin-top:5px; margin-bottom:0;">Right-click the QR code image to save or copy it directly into thesis slides or brochures.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    st.markdown("---")
     
     st.markdown("""
     <div class="glass-card">
@@ -924,6 +946,32 @@ elif page == "Analytics Dashboard":
             hide_index=True,
             use_container_width=True
         )
+        
+        # Collapsible Database Administration Panel (Admin Only)
+        st.markdown("<br>", unsafe_allow_html=True)
+        with st.expander("🛠️ System Settings & Administration (UTS Admin Only)"):
+            st.markdown("""
+            <div style="padding: 10px; border-left: 3px solid #DA291C;">
+                <h4 style="color:#DA291C; margin: 0 0 10px 0;">Database Administration Panel</h4>
+                <p style="font-size:0.85rem; color:#bdc3c7; margin:0 0 15px 0;">
+                    To transition this framework from the pilot evaluation phase to real-world academic data collection, you can purge all pre-seeded mock records here. This will clear the database entirely to a 0-submission slate and permanently stop the automated seed engine.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            if st.button("Purge All Pilot Database Records", type="secondary", use_container_width=True, key="admin_purge_btn"):
+                conn = get_db_connection()
+                cursor = conn.cursor()
+                cursor.execute("DELETE FROM respondents")
+                cursor.execute("DELETE FROM responses")
+                cursor.execute("DELETE FROM computed_scores")
+                cursor.execute("CREATE TABLE IF NOT EXISTS system_config (key TEXT UNIQUE, val TEXT)")
+                cursor.execute("INSERT OR REPLACE INTO system_config (key, val) VALUES ('seeded', 'false')")
+                conn.commit()
+                conn.close()
+                st.success("Database successfully purged to a clean state! Redirecting...")
+                st.session_state["page"] = "Welcome & Overview"
+                st.rerun()
 
 
 # ---------------------------------------------------------
@@ -1014,96 +1062,7 @@ elif page == "Geographic Trust Map":
     st_folium(m, width=1200, height=600)
 
 
-# ---------------------------------------------------------
-# PAGE 5: QR CODE & DEPLOYMENT
-# ---------------------------------------------------------
-elif page == "QR Code & Deployment":
-    st.markdown('<div class="glass-header"><h1>Reachable via QR Code</h1><div class="subtitle">Generate Public Codes & Deploy the Barometer Web System</div></div>', unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div class="glass-card">
-        <h3>QR Code Sharing Integration</h3>
-        <p>To successfully fulfill your final year project requirements and let respondents access your survey online, we can use a dynamic QR code connected directly to your public web link.</p>
-        <p>Type your final deployed application address (e.g. your URL on Streamlit Cloud) into the box below to instantly render your premium high-res sharing code. You can right-click the QR code image to save it directly into your thesis presentation or flyers!</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Dynamic QR generator box
-    target_url = st.text_input("Enter Deployed Project URL:", value="https://sarawak-tech-trust.streamlit.app")
-    
-    # Use open-source QR code generator API (QRServer) to render dynamically as an HTML image
-    # This is extremely clean, loads instantly, and has zero python dependencies!
-    qr_api_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=003366&data={target_url}"
-    
-    st.markdown(f"""
-    <div class="glass-card" style="text-align: center;">
-        <h4>Scan to Visit Sarawak Tech-Trust Barometer</h4>
-        <img src="{qr_api_url}" style="border: 5px solid white; border-radius: 12px; margin: 20px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.5);" width="200" height="200">
-        <p style="font-size: 0.9rem; color: #bdc3c7;">
-            <b>QR Target:</b> <a href="{target_url}" target="_blank" style="color:#ffd700;">{target_url}</a>
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
 
-    st.markdown("""
-    <div class="glass-card">
-        <h3>Streamlit Cloud Deployment Guide</h3>
-        <p>Follow these quick instructions to publish this app live on the internet for free:</p>
-        <ol>
-            <li><b>Push Code to GitHub</b>:
-                <ul>
-                    <li>Initialize a local Git repo in your project folder.</li>
-                    <li>Commit <code>app.py</code> and <code>survey.py</code>.</li>
-                    <li>Create a public repository on <a href="https://github.com" target="_blank" style="color:#ffd700;">GitHub</a> and push your files.</li>
-                </ul>
-            </li>
-            <li style="margin-top: 10px;"><b>Connect to Streamlit Cloud</b>:
-                <ul>
-                    <li>Sign up for a free developer account at <a href="https://share.streamlit.io" target="_blank" style="color:#ffd700;">share.streamlit.io</a>.</li>
-                    <li>Click "New App" and connect your GitHub repository.</li>
-                </ul>
-            </li>
-            <li style="margin-top: 10px;"><b>Launch Live</b>:
-                <ul>
-                    <li>Set the Main File Path to <code>app.py</code>.</li>
-                    <li>Click <b>Deploy!</b>. Streamlit will assign a permanent URL (e.g. <code>https://yourname-sttb.streamlit.app</code>).</li>
-                </ul>
-            </li>
-        </ol>
-        <p style="font-size:0.85rem; color:#bdc3c7; border-top:1px solid rgba(255,255,255,0.08); padding-top:10px; margin-top:15px;">
-            Note: SQLite databases created on free hosting environments are temporary and reset on restarts. For permanent academic data collection, you can easily switch the DB connection string to a free PostgreSQL database on Render or Supabase.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Database Administration Admin Panel
-    st.markdown("""
-    <div class="glass-card" style="border: 1px solid rgba(218, 41, 28, 0.45);">
-        <h3 style="color:#DA291C;">Database Administration</h3>
-        <p>To successfully transition your system from the development phase to real-world academic data collection, you can clear all pre-seeded pilot database records here.</p>
-        <p>Clearing the database will reset the system to a <b>completely clean slate (0 submissions)</b>. Auto-seeding will be permanently disabled, and your welcome barometer will instantly show <i>Awaiting Data</i>.</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    if st.button("Purge All Pilot Database Records", type="secondary", use_container_width=True):
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # Wipes all tables
-        cursor.execute("DELETE FROM respondents")
-        cursor.execute("DELETE FROM responses")
-        cursor.execute("DELETE FROM computed_scores")
-        
-        # Creates config table and marks flag so auto-seeding stops
-        cursor.execute("CREATE TABLE IF NOT EXISTS system_config (key TEXT UNIQUE, val TEXT)")
-        cursor.execute("INSERT OR REPLACE INTO system_config (key, val) VALUES ('seeded', 'false')")
-        
-        conn.commit()
-        conn.close()
-        
-        st.success("Database successfully purged to a clean state! Redirecting...")
-        st.session_state["page"] = "Welcome & Overview"
-        st.rerun()
 
 
 # ---------------------------------------------------------
