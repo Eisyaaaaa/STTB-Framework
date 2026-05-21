@@ -518,16 +518,73 @@ if "page" not in st.session_state:
 # ---------------------------------------------------------
 # 4. TOP NAVIGATION BAR & THEME SYMBOL
 # ---------------------------------------------------------
-# Container/styling for top menu buttons
-st.markdown("""
+# Determine theme variables for navbar styling
+if st.session_state.get("theme_mode", "Dark Mode") == "Dark Mode":
+    nav_bg = "rgba(22, 22, 26, 0.85)"
+    nav_border = "rgba(255, 199, 44, 0.2)"
+    nav_text = "#ffffff"
+    nav_shadow = "0 8px 32px 0 rgba(0, 0, 0, 0.4)"
+else:
+    nav_bg = "rgba(255, 255, 255, 0.85)"
+    nav_border = "rgba(0, 0, 0, 0.08)"
+    nav_text = "#1a1a24"
+    nav_shadow = "0 8px 32px 0 rgba(0, 0, 0, 0.08)"
+
+# Container/styling for unified horizontal navbar strip
+st.markdown(f"""
 <style>
-    /* Styling for Streamlit buttons inside the top navigation bar to look like premium nav elements */
-    div.stButton > button {
-        border-radius: 8px !important;
+    /* Styling to make the first stHorizontalBlock a premium unified navbar strip */
+    div[data-testid="stHorizontalBlock"]:first-of-type {{
+        background: {nav_bg} !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid {nav_border} !important;
+        border-radius: 12px !important;
+        padding: 10px 25px !important;
+        margin-bottom: 30px !important;
+        box-shadow: {nav_shadow} !important;
+        display: flex !important;
+        align-items: center !important;
+    }}
+    
+    /* Center columns vertically in the nav container */
+    div[data-testid="stHorizontalBlock"]:first-of-type > div {{
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }}
+    
+    /* Override standard button styling specifically inside the top navbar strip */
+    div[data-testid="stHorizontalBlock"]:first-of-type div.stButton > button {{
+        background: transparent !important;
+        color: {nav_text} !important;
+        border: none !important;
+        box-shadow: none !important;
         font-family: 'Outfit', sans-serif !important;
-        font-weight: 600 !important;
-        transition: all 0.3s ease !important;
-    }
+        font-weight: 500 !important;
+        font-size: 1.05rem !important;
+        border-radius: 8px !important;
+        padding: 8px 16px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        height: auto !important;
+        margin: 0 !important;
+    }}
+    
+    /* Highlight the active page button inside the top navbar strip */
+    div[data-testid="stHorizontalBlock"]:first-of-type div.stButton > button[kind="primary"] {{
+        background: linear-gradient(135deg, #DA291C 0%, #FFC72C 100%) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 12px rgba(218, 41, 28, 0.35) !important;
+        border: 1px solid rgba(255, 199, 44, 0.3) !important;
+    }}
+    
+    /* Hover effect for navbar buttons */
+    div[data-testid="stHorizontalBlock"]:first-of-type div.stButton > button:hover {{
+        background: rgba(255, 255, 255, 0.08) !important;
+        color: #ffd700 !important;
+        transform: translateY(-1px) !important;
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -548,7 +605,6 @@ menu_options = [
 
 for idx, (page_val, label) in enumerate(menu_options):
     with nav_cols[idx + 1]:
-        # Style active page with primary format, and others with secondary format
         is_active = (st.session_state["page"] == page_val)
         btn_type = "primary" if is_active else "secondary"
         if st.button(label, key=f"nav_{page_val}", type=btn_type, use_container_width=True):
