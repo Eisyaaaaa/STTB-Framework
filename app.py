@@ -567,6 +567,9 @@ with nav_cols[6]:
         st.rerun()
 
 
+# Get current page selection from session state
+page = st.session_state.get("page", "Welcome & Overview")
+
 # ---------------------------------------------------------
 # PAGE 1: WELCOME & OVERVIEW
 # ---------------------------------------------------------
