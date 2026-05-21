@@ -549,13 +549,7 @@ with st.sidebar:
         st.rerun()
     
     st.markdown("---")
-    st.markdown("""
-    **Academic Framework Alignment:**
-    *   **Methodology**: Agile SDLC
-    *   **Ethics Context**: Islamic Dimensions (Sidq, Amanah, Tajassus, Itqan, Adl)
-    *   **Institution Core**: Scott's 3 Pillars (Regulative, Normative, Cultural-Cognitive)
-    """)
-    st.caption("Sarawak Tech-Trust Barometer © 2026. Designed for University of Technology Sarawak (UTS).")
+    st.caption("Sarawak Tech-Trust Barometer © 2026.")
 
 
 # ---------------------------------------------------------
