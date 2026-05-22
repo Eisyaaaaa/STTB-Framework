@@ -26,6 +26,8 @@ st.set_page_config(
 if "theme_mode" not in st.session_state:
     st.session_state["theme_mode"] = "Dark Mode"
 
+gold_color = "#A87C00" if st.session_state.get("theme_mode") == "Light Mode" else "#ffd700"
+
 if st.session_state["theme_mode"] == "Dark Mode":
     st.markdown("""
     <style>
@@ -920,16 +922,16 @@ elif page == "Public Survey Form":
     
     # Minimalist dynamic QR sharing code on top
     if lang == "Bahasa Melayu":
-        st.markdown("""
+        st.markdown(f"""
         <div class="glass-card" style="padding: 15px; margin-bottom: 20px;">
-            <h4 style="margin: 0 0 5px 0; color:#ffd700;">Imbas & Kongsi Tinjauan</h4>
+            <h4 style="margin: 0 0 5px 0; color:{gold_color};">Imbas & Kongsi Tinjauan</h4>
             <p style="font-size: 0.85rem; color: #bdc3c7; margin: 0 0 12px 0;">Gunakan kod QR di bawah untuk mengakses dan mengedarkan tinjauan kepercayaan digital ini secara dalam talian!</p>
         </div>
         """, unsafe_allow_html=True)
     else:
-        st.markdown("""
+        st.markdown(f"""
         <div class="glass-card" style="padding: 15px; margin-bottom: 20px;">
-            <h4 style="margin: 0 0 5px 0; color:#ffd700;">Scan & Share Survey</h4>
+            <h4 style="margin: 0 0 5px 0; color:{gold_color};">Scan & Share Survey</h4>
             <p style="font-size: 0.85rem; color: #bdc3c7; margin: 0 0 12px 0;">Use the QR code below to access and distribute this digital trust survey online!</p>
         </div>
         """, unsafe_allow_html=True)
@@ -944,7 +946,7 @@ elif page == "Public Survey Form":
             st.markdown(f"""
             <div style="padding-top: 10px;">
                 <span style="font-size:0.85rem; color:#bdc3c7;"><b>Pautan Langsung:</b></span><br>
-                <a href="{target_url}" target="_blank" style="color:#ffd700; font-size:1.05rem; font-weight:bold; text-decoration:none;">{target_url}</a>
+                <a href="{target_url}" target="_blank" style="color:{gold_color}; font-size:1.05rem; font-weight:bold; text-decoration:none;">{target_url}</a>
                 <p style="font-size:0.8rem; color:#888888; margin-top:5px; margin-bottom:0;">Klik kanan imej kod QR untuk menyimpan atau menyalinnya terus ke dalam slaid tesis atau risalah.</p>
             </div>
             """, unsafe_allow_html=True)
@@ -952,7 +954,7 @@ elif page == "Public Survey Form":
             st.markdown(f"""
             <div style="padding-top: 10px;">
                 <span style="font-size:0.85rem; color:#bdc3c7;"><b>Direct Link:</b></span><br>
-                <a href="{target_url}" target="_blank" style="color:#ffd700; font-size:1.05rem; font-weight:bold; text-decoration:none;">{target_url}</a>
+                <a href="{target_url}" target="_blank" style="color:{gold_color}; font-size:1.05rem; font-weight:bold; text-decoration:none;">{target_url}</a>
                 <p style="font-size:0.8rem; color:#888888; margin-top:5px; margin-bottom:0;">Right-click the QR code image to save or copy it directly into thesis slides or brochures.</p>
             </div>
             """, unsafe_allow_html=True)
@@ -975,7 +977,7 @@ elif page == "Public Survey Form":
     
     # 1. Capture Demographics
     dem_title = "Langkah 1: Demarkasi Demografi" if lang == "Bahasa Melayu" else "Step 1: Demographic Demarcation"
-    st.markdown(f"<h3 style='color:#ffd700;'>{dem_title}</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='color:{gold_color};'>{dem_title}</h3>", unsafe_allow_html=True)
     
     age_label = "Kumpulan Umur" if lang == "Bahasa Melayu" else "Age Group"
     age_group = st.selectbox(age_label, ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"])
@@ -1013,7 +1015,7 @@ elif page == "Public Survey Form":
     if "75" in survey_type:
         sec_title = "Langkah 2: Penilaian Teras Kepercayaan Digital (75 Item)" if lang == "Bahasa Melayu" else "Step 2: Core Digital Trust Evaluation (75 Items)"
         sec_desc = "Soalan dikategorikan mengikut 5 tonggak utama kepercayaan digital kami. Kembangkan setiap tab untuk menjawab. Skala: 1 = Sangat Tidak Setuju, 5 = Sangat Setuju." if lang == "Bahasa Melayu" else "Questions are categorized by our 5 key digital trust pillars. Expand each tab to answer. Scale: 1 = Strongly Disagree, 5 = Strongly Agree."
-        st.markdown(f"<h3 style='color:#ffd700;'>{sec_title}</h3>", unsafe_allow_html=True)
+        st.markdown(f"<h3 style='color:{gold_color};'>{sec_title}</h3>", unsafe_allow_html=True)
         st.write(sec_desc)
         
         # We render 5 expanding tabs (one for each pillar)
@@ -1067,7 +1069,7 @@ elif page == "Public Survey Form":
                 for var_code, var_name_en in pillar_info["variables"].items():
                     var_display_name = bm_var_names[var_code] if lang == "Bahasa Melayu" else var_name_en
                     var_prefix = "Pemboleh Ubah:" if lang == "Bahasa Melayu" else "Variable:"
-                    st.markdown(f"<h4 style='color:#ffd700; margin-top:20px; margin-bottom:10px;'>📌 {var_prefix} {var_display_name}</h4>", unsafe_allow_html=True)
+                    st.markdown(f"<h4 style='color:{gold_color}; margin-top:20px; margin-bottom:10px;'>Pillar: {p_name} — {var_prefix} {var_display_name}</h4>", unsafe_allow_html=True)
                     
                     var_questions = [q for q in survey.QUESTIONS if q["pillar"] == p_code and q["variable"] == var_code]
                     for q in var_questions:
@@ -1093,7 +1095,7 @@ elif page == "Public Survey Form":
     else:
         sec_title = "Langkah 2: Penilaian Teras Kepercayaan Digital (15 Item Perwakilan)" if lang == "Bahasa Melayu" else "Step 2: Core Digital Trust Evaluation (15 Representative Items)"
         sec_desc = "Tinjauan mini ini mengandungi tepat 1 soalan bagi setiap pemboleh ubah (15 jumlah) yang mewakili skala kerangka kerja lengkap. Purata akan diekstrapolasi secara automatik." if lang == "Bahasa Melayu" else "This mini-survey contains exactly 1 question per variable (15 total) representing the complete framework scale. Averages will be extrapolated automatically."
-        st.markdown(f"<h3 style='color:#ffd700;'>{sec_title}</h3>", unsafe_allow_html=True)
+        st.markdown(f"<h3 style='color:{gold_color};'>{sec_title}</h3>", unsafe_allow_html=True)
         st.write(sec_desc)
         
         # Render exactly one question per variable
@@ -1128,14 +1130,24 @@ elif page == "Public Survey Form":
             q_text = survey.QUESTIONS_BM.get(q["code"], q["question"]) if lang == "Bahasa Melayu" else q["question"]
             key = f"mini_{q['code']}"
             
-            # Retrieve variable name dynamically
+            # Retrieve variable name and pillar name dynamically
             p_code = q["pillar"]
             v_code = q["variable"]
-            var_name_en = survey.SURVEY_METADATA["pillars"][p_code]["variables"][v_code]
+            bm_pillar_names = {
+                "P1": "Ketelusan & Kebolehcapaian",
+                "P2": "Etika & Tanggungjawab",
+                "P3": "Privasi & Kawalan",
+                "P4": "Keselamatan & Kebolehkenyamanan",
+                "P5": "Inklusi Digital & Kesaksamaan"
+            }
+            pillar_info = survey.SURVEY_METADATA["pillars"][p_code]
+            p_name = bm_pillar_names[p_code] if lang == "Bahasa Melayu" else pillar_info['name']
+            
+            var_name_en = pillar_info["variables"][v_code]
             var_display_name = bm_var_names[v_code] if lang == "Bahasa Melayu" else var_name_en
             var_prefix = "Pemboleh Ubah:" if lang == "Bahasa Melayu" else "Variable:"
             
-            st.markdown(f"<h4 style='color:#ffd700; margin-top:20px; margin-bottom:5px;'>📌 {var_prefix} {var_display_name}</h4>", unsafe_allow_html=True)
+            st.markdown(f"<h4 style='color:{gold_color}; margin-top:20px; margin-bottom:5px;'>Pillar: {p_name} — {var_prefix} {var_display_name}</h4>", unsafe_allow_html=True)
             
             options_list = [
                 "Sangat Tidak Setuju" if lang == "Bahasa Melayu" else "Strongly Disagree",
