@@ -1044,27 +1044,52 @@ elif page == "Public Survey Form":
             with st.expander(f"Pillar: {p_name} ({p_concept})"):
                 st.write(f"*{p_def}*")
                 
-                p_questions = [q for q in survey.QUESTIONS if q["pillar"] == p_code]
-                for q in p_questions:
-                    q_text = survey.QUESTIONS_BM.get(q["code"], q["question"]) if lang == "Bahasa Melayu" else q["question"]
-                    key = f"q_{q['code']}"
+                # Variables translations mapping for BM
+                bm_var_names = {
+                    "V1.1": "Asimetri Maklumat",
+                    "V1.2": "Pengecualian Digital",
+                    "V1.3": "Penyembunyian Kebenaran",
+                    "V2.1": "Bias Algoritma",
+                    "V2.2": "Kekurangan Kebertanggungjawaban",
+                    "V2.3": "Pecah Amanah",
+                    "V3.1": "Kepasrahan Digital",
+                    "V3.2": "Pencerobohan Tanpa Kebenaran (Tajassus)",
+                    "V3.3": "Kecurian Identiti & Pemalsuan Data",
+                    "V4.1": "Kerapuhan Sistemik",
+                    "V4.2": "Gangguan Perkhidmatan Kerap",
+                    "V4.3": "Jurang Integriti Perisian",
+                    "V5.1": "Liputan Geografi",
+                    "V5.2": "Sokongan Literasi Digital",
+                    "V5.3": "Inklusiviti untuk Kumpulan Terpinggir"
+                }
+                
+                # Group questions by variable inside the expander
+                for var_code, var_name_en in pillar_info["variables"].items():
+                    var_display_name = bm_var_names[var_code] if lang == "Bahasa Melayu" else var_name_en
+                    var_prefix = "Pemboleh Ubah:" if lang == "Bahasa Melayu" else "Variable:"
+                    st.markdown(f"<h4 style='color:#ffd700; margin-top:20px; margin-bottom:10px;'>📌 {var_prefix} {var_display_name}</h4>", unsafe_allow_html=True)
                     
-                    options_list = [
-                        "Sangat Tidak Setuju" if lang == "Bahasa Melayu" else "Strongly Disagree",
-                        "Tidak Setuju" if lang == "Bahasa Melayu" else "Disagree",
-                        "Neutral" if lang == "Bahasa Melayu" else "Neutral",
-                        "Setuju" if lang == "Bahasa Melayu" else "Agree",
-                        "Sangat Setuju" if lang == "Bahasa Melayu" else "Strongly Agree"
-                    ]
-                    
-                    selected_ans = st.radio(
-                        f"[{q['code']}] {q_text}",
-                        options=options_list,
-                        index=2,
-                        horizontal=True,
-                        key=key
-                    )
-                    survey_answers[q["code"]] = options_list.index(selected_ans) + 1
+                    var_questions = [q for q in survey.QUESTIONS if q["pillar"] == p_code and q["variable"] == var_code]
+                    for q in var_questions:
+                        q_text = survey.QUESTIONS_BM.get(q["code"], q["question"]) if lang == "Bahasa Melayu" else q["question"]
+                        key = f"q_{q['code']}"
+                        
+                        options_list = [
+                            "Sangat Tidak Setuju" if lang == "Bahasa Melayu" else "Strongly Disagree",
+                            "Tidak Setuju" if lang == "Bahasa Melayu" else "Disagree",
+                            "Neutral" if lang == "Bahasa Melayu" else "Neutral",
+                            "Setuju" if lang == "Bahasa Melayu" else "Agree",
+                            "Sangat Setuju" if lang == "Bahasa Melayu" else "Strongly Agree"
+                        ]
+                        
+                        selected_ans = st.radio(
+                            q_text,
+                            options=options_list,
+                            index=2,
+                            horizontal=True,
+                            key=key
+                        )
+                        survey_answers[q["code"]] = options_list.index(selected_ans) + 1
     else:
         sec_title = "Langkah 2: Penilaian Teras Kepercayaan Digital (15 Item Perwakilan)" if lang == "Bahasa Melayu" else "Step 2: Core Digital Trust Evaluation (15 Representative Items)"
         sec_desc = "Tinjauan mini ini mengandungi tepat 1 soalan bagi setiap pemboleh ubah (15 jumlah) yang mewakili skala kerangka kerja lengkap. Purata akan diekstrapolasi secara automatik." if lang == "Bahasa Melayu" else "This mini-survey contains exactly 1 question per variable (15 total) representing the complete framework scale. Averages will be extrapolated automatically."
@@ -1080,10 +1105,37 @@ elif page == "Public Survey Form":
             "DI1.1", "DI2.3", "DI3.3",  # Pillar 5
         ]
         
+        bm_var_names = {
+            "V1.1": "Asimetri Maklumat",
+            "V1.2": "Pengecualian Digital",
+            "V1.3": "Penyembunyian Kebenaran",
+            "V2.1": "Bias Algoritma",
+            "V2.2": "Kekurangan Kebertanggungjawaban",
+            "V2.3": "Pecah Amanah",
+            "V3.1": "Kepasrahan Digital",
+            "V3.2": "Pencerobohan Tanpa Kebenaran (Tajassus)",
+            "V3.3": "Kecurian Identiti & Pemalsuan Data",
+            "V4.1": "Kerapuhan Sistemik",
+            "V4.2": "Gangguan Perkhidmatan Kerap",
+            "V4.3": "Jurang Integriti Perisian",
+            "V5.1": "Liputan Geografi",
+            "V5.2": "Sokongan Literasi Digital",
+            "V5.3": "Inklusiviti untuk Kumpulan Terpinggir"
+        }
+        
         rep_questions = [q for q in survey.QUESTIONS if q["code"] in variables_featured]
         for q in rep_questions:
             q_text = survey.QUESTIONS_BM.get(q["code"], q["question"]) if lang == "Bahasa Melayu" else q["question"]
             key = f"mini_{q['code']}"
+            
+            # Retrieve variable name dynamically
+            p_code = q["pillar"]
+            v_code = q["variable"]
+            var_name_en = survey.SURVEY_METADATA["pillars"][p_code]["variables"][v_code]
+            var_display_name = bm_var_names[v_code] if lang == "Bahasa Melayu" else var_name_en
+            var_prefix = "Pemboleh Ubah:" if lang == "Bahasa Melayu" else "Variable:"
+            
+            st.markdown(f"<h4 style='color:#ffd700; margin-top:20px; margin-bottom:5px;'>📌 {var_prefix} {var_display_name}</h4>", unsafe_allow_html=True)
             
             options_list = [
                 "Sangat Tidak Setuju" if lang == "Bahasa Melayu" else "Strongly Disagree",
@@ -1094,7 +1146,7 @@ elif page == "Public Survey Form":
             ]
             
             selected_ans = st.radio(
-                f"[{q['code']}] {q_text}",
+                q_text,
                 options=options_list,
                 index=2,
                 horizontal=True,
