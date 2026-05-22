@@ -1048,11 +1048,23 @@ elif page == "Public Survey Form":
                 for q in p_questions:
                     q_text = survey.QUESTIONS_BM.get(q["code"], q["question"]) if lang == "Bahasa Melayu" else q["question"]
                     key = f"q_{q['code']}"
-                    survey_answers[q["code"]] = st.slider(
+                    
+                    options_list = [
+                        "Sangat Tidak Setuju" if lang == "Bahasa Melayu" else "Strongly Disagree",
+                        "Tidak Setuju" if lang == "Bahasa Melayu" else "Disagree",
+                        "Neutral" if lang == "Bahasa Melayu" else "Neutral",
+                        "Setuju" if lang == "Bahasa Melayu" else "Agree",
+                        "Sangat Setuju" if lang == "Bahasa Melayu" else "Strongly Agree"
+                    ]
+                    
+                    selected_ans = st.radio(
                         f"[{q['code']}] {q_text}",
-                        min_value=1, max_value=5, value=3, step=1,
+                        options=options_list,
+                        index=2,
+                        horizontal=True,
                         key=key
                     )
+                    survey_answers[q["code"]] = options_list.index(selected_ans) + 1
     else:
         sec_title = "Langkah 2: Penilaian Teras Kepercayaan Digital (15 Item Perwakilan)" if lang == "Bahasa Melayu" else "Step 2: Core Digital Trust Evaluation (15 Representative Items)"
         sec_desc = "Tinjauan mini ini mengandungi tepat 1 soalan bagi setiap pemboleh ubah (15 jumlah) yang mewakili skala kerangka kerja lengkap. Purata akan diekstrapolasi secara automatik." if lang == "Bahasa Melayu" else "This mini-survey contains exactly 1 question per variable (15 total) representing the complete framework scale. Averages will be extrapolated automatically."
@@ -1072,11 +1084,23 @@ elif page == "Public Survey Form":
         for q in rep_questions:
             q_text = survey.QUESTIONS_BM.get(q["code"], q["question"]) if lang == "Bahasa Melayu" else q["question"]
             key = f"mini_{q['code']}"
-            survey_answers[q["code"]] = st.slider(
+            
+            options_list = [
+                "Sangat Tidak Setuju" if lang == "Bahasa Melayu" else "Strongly Disagree",
+                "Tidak Setuju" if lang == "Bahasa Melayu" else "Disagree",
+                "Neutral" if lang == "Bahasa Melayu" else "Neutral",
+                "Setuju" if lang == "Bahasa Melayu" else "Agree",
+                "Sangat Setuju" if lang == "Bahasa Melayu" else "Strongly Agree"
+            ]
+            
+            selected_ans = st.radio(
                 f"[{q['code']}] {q_text}",
-                min_value=1, max_value=5, value=3, step=1,
+                options=options_list,
+                index=2,
+                horizontal=True,
                 key=key
             )
+            survey_answers[q["code"]] = options_list.index(selected_ans) + 1
             
         # Map remaining questions to the answered variable value to preserve database structure
         for q in survey.QUESTIONS:
