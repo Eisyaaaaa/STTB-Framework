@@ -71,6 +71,15 @@ The app will automatically launch in your default web browser at `http://localho
 
 ---
 
+## Future Milestones (Scheduled for June/July)
+
+- **Supabase Cloud Database Migration**: 
+  - Transition from local SQLite storage (`Backend/sttb.db`) to secure **Supabase PostgreSQL Cloud** hosting.
+  - A step-by-step developer integration blueprint is pre-configured and saved at [supabase_integration_guide.md](file:///Users/muizzatuleisya/.gemini/antigravity/brain/8048ec51-8308-4864-a5c9-ab6632ca0f7a/supabase_integration_guide.md).
+  - Integrate a hybrid-fallback Python database client in `Frontend/app.py` to sync anonymous surveys and civic feedback submissions.
+
+---
+
 ## License & Credits
 
 Developed as an academic R&D Final Year Project for UTS.
