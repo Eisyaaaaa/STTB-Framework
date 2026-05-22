@@ -750,7 +750,7 @@ if page == "Welcome & Overview":
             st.markdown(f"""
             <div class="glass-card">
                 <h3>Mengenai Projek</h3>
-                <p><b>Barometer Kepercayaan Teknologi Sarawak (STTB)</b> ialah projek tahun akhir R&D yang dibangunkan untuk menangani jurang kritikal dalam mengukur dan menjejaki kepercayaan orang ramai terhadap teknologi digital dan institusi di seluruh bahagian pentadbiran di Sarawak.</p>
+                <p><b>Barometer Kepercayaan Teknologi Sarawak (STTB)</b> ialah projek tahun akhir Research and Development(R&D) yang dibangunkan untuk menangani jurang kritikal dalam mengukur dan menjejaki kepercayaan orang ramai terhadap teknologi digital dan institusi di seluruh bahagian pentadbiran di Sarawak.</p>
                 <p>Sejajar secara langsung dengan <b>Strategi Perbadanan Ekonomi Digital Sarawak (SDEC)</b> dan dasar digital kebangsaan, platform ini menyediakan pembuat dasar, penyelidik akademik, dan rakyat dengan penunjuk telus dan masa nyata mengenai cara platform digital mengendalikan privasi data, etika, kebolehcapaian dan keselamatan.</p>
                 <p>Seni bina pemarkahan kami distrukturkan secara saintifik merentasi <b>5 teras tonggak kepercayaan digital</b>, dipetakan terhadap <b>15 pemboleh ubah analisis</b>, dan dikira daripada instrumen tinjauan <b>75-item komprehensif</b> yang berasaskan Teori Institusi sosiologi oleh W. Richard Scott (1995) dan diperhalusi melalui paradigma etika perundangan Islam.</p>
             </div>
@@ -1536,7 +1536,7 @@ elif page == "Geographic Trust Map":
 # ---------------------------------------------------------
 elif page == "Help / Feedback":
     if lang == "Bahasa Melayu":
-        st.markdown('<div class="glass-header"><h1>Meja Bantuan & Maklum Balas Sivik</h1><div class="subtitle">Pusat Aduan & Repositori Maklum Balas Tanpa Nama (Audit Kualiti Akademik & UTS)</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="glass-header"><h1>Meja Bantuan & Maklum Balas Sivik</h1><div class="subtitle">Pusat Aduan & Repositori Maklum Balas Tanpa Nama</div></div>', unsafe_allow_html=True)
         st.markdown("""
         <div class="glass-card">
             <h3>Maklum Balas Sokongan & Penyelarasan</h3>
@@ -1544,7 +1544,7 @@ elif page == "Help / Feedback":
         </div>
         """, unsafe_allow_html=True)
     else:
-        st.markdown('<div class="glass-header"><h1>Help Desk & Civic Feedback</h1><div class="subtitle">Anonymized Complaint & Feedback Repository (Academic & UTS Quality Audit)</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="glass-header"><h1>Help Desk & Civic Feedback</h1><div class="subtitle">Anonymized Complaint & Feedback Repository</div></div>', unsafe_allow_html=True)
         st.markdown("""
         <div class="glass-card">
             <h3>Support & Alignment Feedback</h3>

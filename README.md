@@ -1,6 +1,6 @@
 # Sarawak Tech-Trust Barometer (STTB) 🛡️
 
-A state-of-the-art social-technical research and data analytics platform designed to measure, visualize, and analyze public trust in digital technologies and institutions across the administrative divisions of Sarawak. 
+A state-of-the-art social-technical research and data analytics platform designed to measure, visualize, and analyze public trust in digital technologies and institutions across the administrative divisions of Sarawak.
 
 Grounded in sociological Institutional Theory by **W. Richard Scott (1995)** and refined with the ethical paradigms of Islamic jurisprudence, the platform maps civic evaluations across **5 core pillars** of digital trust and **15 variables** using a comprehensive **75-item survey instrument**.
 
@@ -30,28 +30,33 @@ STTB-Framework/
 ## 🌐 Key Integrated Systems
 
 ### 1. 👥 Real-Time Bilingual Engine (English ↔ Bahasa Melayu)
-* Switch between **English** and **Bahasa Melayu** instantly from the top-right header link without state loss or page reload.
-* Fully localizes the 75 framework questions, live metrics, interactive maps, database collection drop-downs, and automatically computed personal digital trust report cards.
-* Secure translation mapping ensures submissions are translated to standardized English categories before insertion into SQLite to maintain visualization pipeline consistency.
 
-
+- Switch between **English** and **Bahasa Melayu** instantly from the top-right header link without state loss or page reload.
+- Fully localizes the 75 framework questions, live metrics, interactive maps, database collection drop-downs, and automatically computed personal digital trust report cards.
+- Secure translation mapping ensures submissions are translated to standardized English categories before insertion into SQLite to maintain visualization pipeline consistency.
 
 ## 🚀 Getting Started
 
 ### 📋 Prerequisites
+
 Ensure Python 3.9+ is installed on your local machine.
 
 ### 1. Installation
+
 Clone the repository and install all required python libraries listed in `requirements.txt`:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 2. Execution
+
 Run the local Streamlit application:
+
 ```bash
 streamlit run Frontend/app.py
 ```
+
 The app will automatically launch in your default web browser at `http://localhost:8501/`.
 
 ---
@@ -67,5 +72,6 @@ The app will automatically launch in your default web browser at `http://localho
 ---
 
 ## ⚖️ License & Credits
+
 Developed as an academic R&D Final Year Project for UTS.
 **Sarawak Tech-Trust Barometer © 2026.**
