@@ -1910,6 +1910,268 @@ elif page == "Admin Panel":
                 sat_counts = df_feed["satisfaction"].value_counts().reset_index()
                 sat_counts.columns = ["Skor" if lang == "Bahasa Melayu" else "Score", "Jumlah" if lang == "Bahasa Melayu" else "Count"]
                 st.bar_chart(data=sat_counts, x="Skor" if lang == "Bahasa Melayu" else "Score", y="Jumlah" if lang == "Bahasa Melayu" else "Count", color="#DA291C")
+                
+            # 4. External Data Import Panel (Google Form CSV Loader)
+            st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.15);'><br>", unsafe_allow_html=True)
+            csv_import_title = "Pemuat Data Tinjauan Luaran (.csv)" if lang == "Bahasa Melayu" else "External CSV Survey Data Loader (.csv)"
+            st.subheader(csv_import_title)
+            
+            if lang == "Bahasa Melayu":
+                st.markdown("""
+                <div class="glass-card" style="border-left: 3px solid #FFC72C;">
+                    <p><b>Muat Naik Data Tinjauan Google Form:</b> Jika anda mengumpul data menggunakan Google Form luar, anda boleh mengimport entri di sini. Pemuat menyokong pemetaan lajur automatik atau manual untuk disesuaikan dengan soalan mini-tinjauan anda.</p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown("""
+                <div class="glass-card" style="border-left: 3px solid #FFC72C;">
+                    <p><b>Upload Google Form Survey Data:</b> If you collected responses via an external Google Form, you can import them here. The loader supports automatic detection or manual column mapping for the 15 mini-survey questions.</p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            uploaded_file = st.file_uploader(
+                "Pilih fail CSV tinjauan..." if lang == "Bahasa Melayu" else "Choose survey CSV file...", 
+                type=["csv"],
+                key="survey_csv_uploader"
+            )
+            
+            if uploaded_file is not None:
+                try:
+                    import pandas as pd
+                    import io
+                    import json
+                    import re
+                    
+                    df_upload = pd.read_csv(uploaded_file)
+                    st.success("Fail berjaya dimuat naik!" if lang == "Bahasa Melayu" else "File uploaded successfully!")
+                    
+                    # Display preview
+                    st.write("Pratonton Data (5 Baris Pertama):" if lang == "Bahasa Melayu" else "Data Preview (First 5 Rows):")
+                    st.dataframe(df_upload.head(), use_container_width=True)
+                    
+                    # Mapping Column Options
+                    all_columns = df_upload.columns.tolist()
+                    
+                    # Auto-detect defaults
+                    def auto_detect(keywords, default):
+                        for col in all_columns:
+                            col_l = col.lower()
+                            if any(k in col_l for k in keywords):
+                                return col
+                        return default
+                        
+                    age_col_detected = auto_detect(["age", "umur", "kumpulan"], all_columns[0] if all_columns else None)
+                    gender_col_detected = auto_detect(["gender", "jantina", "sex"], all_columns[1] if len(all_columns) > 1 else None)
+                    occ_col_detected = auto_detect(["occup", "pekerj", "role"], all_columns[2] if len(all_columns) > 2 else None)
+                    dist_col_detected = auto_detect(["dist", "divis", "bahag", "kawasa"], all_columns[3] if len(all_columns) > 3 else None)
+                    
+                    # Show mapping controls
+                    st.markdown("---")
+                    st.markdown("#### Pemetaan Lajur Demografi" if lang == "Bahasa Melayu" else "#### Demographic Column Mapping")
+                    
+                    col_dm1, col_dm2, col_dm3, col_dm4 = st.columns(4)
+                    with col_dm1:
+                        age_col = st.selectbox("Umur / Age Group:" if lang == "Bahasa Melayu" else "Age Group:", all_columns, index=all_columns.index(age_col_detected) if age_col_detected in all_columns else 0)
+                    with col_dm2:
+                        gender_col = st.selectbox("Jantina / Gender:" if lang == "Bahasa Melayu" else "Gender:", all_columns, index=all_columns.index(gender_col_detected) if gender_col_detected in all_columns else 0)
+                    with col_dm3:
+                        occ_col = st.selectbox("Pekerjaan / Occupation:" if lang == "Bahasa Melayu" else "Occupation:", all_columns, index=all_columns.index(occ_col_detected) if occ_col_detected in all_columns else 0)
+                    with col_dm4:
+                        dist_col = st.selectbox("Bahagian / Division:" if lang == "Bahasa Melayu" else "Division:", all_columns, index=all_columns.index(dist_col_detected) if dist_col_detected in all_columns else 0)
+                        
+                    st.markdown("---")
+                    st.markdown("#### Pemetaan 15 Soalan Mini-Tinjauan" if lang == "Bahasa Melayu" else "#### 15 Mini-Survey Questions Mapping")
+                    
+                    mini_q_codes = [
+                        "TA1.2", "TA2.2", "TA3.3",  # P1
+                        "ER1.3", "ER2.1", "ER3.1",  # P2
+                        "PC1.2", "PC2.1", "PC3.1",  # P3
+                        "SR1.1", "SR2.2", "SR3.4",  # P4
+                        "DI1.1", "DI2.3", "DI3.3"   # P5
+                    ]
+                    
+                    mapped_q_cols = {}
+                    
+                    q_hints = {
+                        "TA1.2": "P1-Ketelusan (Information Transparency)",
+                        "TA2.2": "P1-Kebolehcapaian (Accessibility of Platforms)",
+                        "TA3.3": "P1-Sidq (Truthfulness of Channels)",
+                        "ER1.3": "P2-Algorithmic Bias (Bias Algoritma)",
+                        "ER2.1": "P2-Accountability (Kewalihan/Stewardship)",
+                        "ER3.1": "P2-Amanah (Trustworthiness of Intent)",
+                        "PC1.2": "P3-Privacy Resignation (Kepasrahan Privasi)",
+                        "PC2.1": "P3-Tajassus (Unauthorized Surveillance)",
+                        "PC3.1": "P3-Haya (Identity Theft Protection)",
+                        "SR1.1": "P4-System Vulnerability (Kerapuhan Sistem)",
+                        "SR2.2": "P4-Service Disruption (Gangguan Perkhidmatan)",
+                        "SR3.4": "P4-Itqan (Software Integration Integrity)",
+                        "DI1.1": "P5-Geographic Coverage (Liputan Geografi)",
+                        "DI2.3": "P5-Digital Literacy (Sokongan Literasi)",
+                        "DI3.3": "P5-Adl (Inclusivity for Marginalized)"
+                    }
+                    
+                    st.info("Penyelaras lajur automatik telah dijalankan berdasarkan nama soalan." if lang == "Bahasa Melayu" else "Automated column mapping performed based on question codes/texts.")
+                    
+                    q_cols_layout = st.columns(3)
+                    
+                    for idx, q_code in enumerate(mini_q_codes):
+                        col_idx = idx % 3
+                        q_detected = None
+                        for col in all_columns:
+                            if q_code.lower() in col.lower() or f"q{idx+1}" in col.lower():
+                                q_detected = col
+                                break
+                        if not q_detected and len(all_columns) > 4 + idx:
+                            q_detected = all_columns[4 + idx]
+                            
+                        with q_cols_layout[col_idx]:
+                            mapped_q_cols[q_code] = st.selectbox(
+                                f"{q_code} - {q_hints[q_code]}:", 
+                                all_columns, 
+                                index=all_columns.index(q_detected) if q_detected in all_columns else (4 + idx if 4 + idx < len(all_columns) else 0),
+                                key=f"csv_map_{q_code}"
+                            )
+                            
+                    st.markdown("---")
+                    import_btn_lbl = f"Import {len(df_upload)} Entri Tinjauan ke Pangkalan Data" if lang == "Bahasa Melayu" else f"Import {len(df_upload)} Survey Entries into Database"
+                    
+                    if st.button(import_btn_lbl, type="primary", use_container_width=True, key="process_csv_import"):
+                        conn = get_db_connection()
+                        cursor = conn.cursor()
+                        
+                        success_count = 0
+                        error_count = 0
+                        
+                        for idx_row, row in df_upload.iterrows():
+                            try:
+                                raw_age = str(row[age_col]).strip()
+                                raw_gender = str(row[gender_col]).strip()
+                                raw_occ = str(row[occ_col]).strip()
+                                raw_dist = str(row[dist_col]).strip()
+                                
+                                age_val = "18-24"
+                                if "25" in raw_age or "30" in raw_age:
+                                    age_val = "25-34"
+                                elif "35" in raw_age or "40" in raw_age:
+                                    age_val = "35-44"
+                                elif "45" in raw_age or "50" in raw_age:
+                                    age_val = "45-54"
+                                elif "55" in raw_age or "60" in raw_age:
+                                    age_val = "55-64"
+                                elif "65" in raw_age or "+" in raw_age:
+                                    age_val = "65+"
+                                    
+                                gender_val = "Male"
+                                if "fem" in raw_gender.lower() or "peremp" in raw_gender.lower() or "wita" in raw_gender.lower():
+                                    gender_val = "Female"
+                                    
+                                occ_val = "Student"
+                                occ_lower = raw_occ.lower()
+                                if "civil" in occ_lower or "kerajaan" in occ_lower or "awam" in occ_lower:
+                                    occ_val = "Civil Servant"
+                                elif "swasta" in occ_lower or "private" in occ_lower or "corpor" in occ_lower:
+                                    occ_val = "Private Sector"
+                                elif "self" in occ_lower or "sendiri" in occ_lower or "freelance" in occ_lower:
+                                    occ_val = "Self-Employed"
+                                elif "retired" in occ_lower or "pesara" in occ_lower:
+                                    occ_val = "Retired"
+                                elif "unemploy" in occ_lower or "tidak bekerja" in occ_lower or "penganggur" in occ_lower:
+                                    occ_val = "Unemployed"
+                                    
+                                dist_val = "Others"
+                                for d_name in SARAWAK_DIVISIONS.keys():
+                                    if d_name.lower() in raw_dist.lower():
+                                        dist_val = d_name
+                                        break
+                                        
+                                mini_answers = {}
+                                for q_code, csv_col in mapped_q_cols.items():
+                                    raw_val = row[csv_col]
+                                    try:
+                                        if isinstance(raw_val, str):
+                                            digits = re.findall(r'\d', raw_val)
+                                            if digits:
+                                                val = int(digits[0])
+                                            else:
+                                                val_l = raw_val.lower()
+                                                if "strongly disagree" in val_l or "sangat tidak" in val_l:
+                                                    val = 1
+                                                elif "strongly agree" in val_l or "sangat setuju" in val_l:
+                                                    val = 5
+                                                elif "disagree" in val_l or "tidak setuju" in val_l:
+                                                    val = 2
+                                                elif "agree" in val_l or "setuju" in val_l:
+                                                    val = 4
+                                                else:
+                                                    val = 3
+                                        else:
+                                            val = int(raw_val)
+                                            
+                                        val = max(1, min(5, val))
+                                    except Exception:
+                                        val = 3
+                                    mini_answers[q_code] = val
+                                    
+                                survey_answers = {}
+                                variables_featured = [
+                                    "TA1.2", "TA2.2", "TA3.3",
+                                    "ER1.3", "ER2.1", "ER3.1",
+                                    "PC1.2", "PC2.1", "PC3.1",
+                                    "SR1.1", "SR2.2", "SR3.4",
+                                    "DI1.1", "DI2.3", "DI3.3"
+                                ]
+                                for q in survey.QUESTIONS:
+                                    q_code = q["code"]
+                                    if q_code in mini_answers:
+                                        survey_answers[q_code] = mini_answers[q_code]
+                                    else:
+                                        rep_code = [c for c in variables_featured if c.startswith(q_code[:2])][0]
+                                        survey_answers[q_code] = mini_answers[rep_code]
+                                        
+                                cursor.execute("""
+                                INSERT INTO respondents (age_group, gender, occupation, district)
+                                VALUES (?, ?, ?, ?)
+                                """, (age_val, gender_val, occ_val, dist_val))
+                                resp_id = cursor.lastrowid
+                                
+                                results = survey.calculate_sttb_index(survey_answers)
+                                
+                                cursor.execute("""
+                                INSERT INTO survey_responses (respondent_id, responses_json)
+                                VALUES (?, ?)
+                                """, (resp_id, json.dumps(survey_answers)))
+                                
+                                cursor.execute("""
+                                INSERT INTO computed_scores (
+                                    respondent_id, ps1_transparency, ps2_ethics, ps3_privacy, ps4_security, ps5_inclusion, sttb_index, trust_level
+                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                """, (
+                                    resp_id,
+                                    results["pillar_scores"]["P1"],
+                                    results["pillar_scores"]["P2"],
+                                    results["pillar_scores"]["P3"],
+                                    results["pillar_scores"]["P4"],
+                                    results["pillar_scores"]["P5"],
+                                    results["sttb_index"],
+                                    results["trust_evaluation"]["level"]
+                                ))
+                                success_count += 1
+                            except Exception as e:
+                                error_count += 1
+                                continue
+                                
+                        conn.commit()
+                        conn.close()
+                        
+                        st.success(
+                            f"Proses import CSV selesai! {success_count} rekod berjaya diimport. {error_count} ralat dikesan." 
+                            if lang == "Bahasa Melayu" else 
+                            f"CSV import completed! {success_count} records successfully imported. {error_count} errors encountered."
+                        )
+                        st.rerun()
+                        
+                except Exception as e:
+                    st.error(f"Gagal memproses fail CSV: {str(e)}" if lang == "Bahasa Melayu" else f"Failed to process CSV file: {str(e)}")
 
 
 # ---------------------------------------------------------
