@@ -1,4 +1,4 @@
-# Sarawak Tech-Trust Barometer (STTB) 🛡️
+# Sarawak Tech-Trust Barometer (STTB)
 
 A state-of-the-art social-technical research and data analytics platform designed to measure, visualize, and analyze public trust in digital technologies and institutions across the administrative divisions of Sarawak.
 
@@ -6,7 +6,7 @@ Grounded in sociological Institutional Theory by **W. Richard Scott (1995)** and
 
 ---
 
-## 📂 Project Organization
+## Project Organization
 
 The repository has been organized into modular layers to cleanly decouple user interface concerns from backend mathematical scoring models and persistence mechanisms:
 
@@ -27,17 +27,17 @@ STTB-Framework/
 
 ---
 
-## 🌐 Key Integrated Systems
+## Key Integrated Systems
 
-### 1. 👥 Real-Time Bilingual Engine (English ↔ Bahasa Melayu)
+### 1. Real-Time Bilingual Engine (English ↔ Bahasa Melayu)
 
 - Switch between **English** and **Bahasa Melayu** instantly from the top-right header link without state loss or page reload.
 - Fully localizes the 75 framework questions, live metrics, interactive maps, database collection drop-downs, and automatically computed personal digital trust report cards.
 - Secure translation mapping ensures submissions are translated to standardized English categories before insertion into SQLite to maintain visualization pipeline consistency.
 
-## 🚀 Getting Started
+## Getting Started
 
-### 📋 Prerequisites
+### Prerequisites
 
 Ensure Python 3.9+ is installed on your local machine.
 
@@ -61,7 +61,7 @@ The app will automatically launch in your default web browser at `http://localho
 
 ---
 
-## 🏛️ The Five Trust Pillars of the Framework
+## The Five Trust Pillars of the Framework
 
 1. **Transparency & Accessibility (Sidq & Tabayyun)**: Algorithmic openness, plain-language digital terms, and state-citizen information symmetry.
 2. **Ethics & Responsibility (Amanah)**: Algorithmic fairness, lack of bias, and proactive digital stewardship.
@@ -71,7 +71,7 @@ The app will automatically launch in your default web browser at `http://localho
 
 ---
 
-## ⚖️ License & Credits
+## License & Credits
 
 Developed as an academic R&D Final Year Project for UTS.
 **Sarawak Tech-Trust Barometer © 2026.**
