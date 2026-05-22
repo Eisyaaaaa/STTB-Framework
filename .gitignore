@@ -7,7 +7,9 @@
 
 # Do not ignore these specific deployment files
 !Frontend/app.py
+!Frontend/sttb_rapid_survey.pdf
 !Backend/survey.py
+!Backend/generate_pdf.py
 !requirements.txt
 !.gitignore
 !README.md

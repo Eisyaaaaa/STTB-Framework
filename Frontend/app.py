@@ -1098,6 +1098,20 @@ elif page == "Public Survey Form":
         st.markdown(f"<h3 style='color:{gold_color};'>{sec_title}</h3>", unsafe_allow_html=True)
         st.write(sec_desc)
         
+        # Interactive printable survey PDF download (Emoji-free)
+        pdf_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'sttb_rapid_survey.pdf'))
+        if os.path.exists(pdf_path):
+            with open(pdf_path, "rb") as f:
+                pdf_bytes = f.read()
+            dl_label = "Muat Turun Borang Tinjauan PDF (Boleh Dicetak)" if lang == "Bahasa Melayu" else "Download Printable Survey PDF"
+            st.download_button(
+                label=dl_label,
+                data=pdf_bytes,
+                file_name="sttb_rapid_survey.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
+        
         # Render exactly one question per variable
         variables_featured = [
             "TA1.2", "TA2.2", "TA3.3",  # Pillar 1
