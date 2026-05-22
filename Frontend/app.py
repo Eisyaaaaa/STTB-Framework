@@ -652,32 +652,30 @@ st.markdown(f"""
 has_admin_tab = st.session_state.get("admin_mode", False)
 
 if has_admin_tab:
-    # 9-column layout: Logo, 6 Menu Buttons, Language, Theme Toggle
-    nav_cols = st.columns([0.8, 1.0, 1.1, 1.1, 1.1, 1.3, 0.9, 1.3, 0.5], vertical_alignment="center")
+    # 8-column layout: Logo, 5 Menu Buttons, Language, Theme Toggle
+    nav_cols = st.columns([0.8, 1.1, 1.2, 1.2, 1.2, 1.0, 1.2, 0.5], vertical_alignment="center")
     menu_options = [
         ("Welcome & Overview", TRANSLATIONS[lang]["overview"]),
         ("Public Survey Form", TRANSLATIONS[lang]["survey"]),
         ("Analytics Dashboard", TRANSLATIONS[lang]["dashboard"]),
-        ("Geographic Trust Map", TRANSLATIONS[lang]["map"]),
         ("Help / Feedback", TRANSLATIONS[lang]["help"]),
         ("Admin Panel", TRANSLATIONS[lang]["admin"])
     ]
-    lang_col_idx = 7
-    theme_col_idx = 8
-    sub_strip_widths = [6.8, 1.4, 1.8]
+    lang_col_idx = 6
+    theme_col_idx = 7
+    sub_strip_widths = [5.6, 1.4, 1.8]
 else:
-    # 8-column layout: Logo, 5 Menu Buttons, Language, Theme Toggle
-    nav_cols = st.columns([1.0, 1.2, 1.2, 1.4, 1.0, 1.8, 1.4, 0.6], vertical_alignment="center")
+    # 7-column layout: Logo, 4 Menu Buttons, Language, Theme Toggle
+    nav_cols = st.columns([1.0, 1.3, 1.3, 1.4, 1.3, 1.5, 0.6], vertical_alignment="center")
     menu_options = [
         ("Welcome & Overview", TRANSLATIONS[lang]["overview"]),
         ("Public Survey Form", TRANSLATIONS[lang]["survey"]),
         ("Analytics Dashboard", TRANSLATIONS[lang]["dashboard"]),
-        ("Geographic Trust Map", TRANSLATIONS[lang]["map"]),
         ("Help / Feedback", TRANSLATIONS[lang]["help"])
     ]
-    lang_col_idx = 6
-    theme_col_idx = 7
-    sub_strip_widths = [6.5, 1.5, 2.0]
+    lang_col_idx = 5
+    theme_col_idx = 6
+    sub_strip_widths = [5.3, 1.5, 2.0]
 
 # Column 0: Sarawak State Flag Logo
 with nav_cols[0]:
@@ -1477,9 +1475,121 @@ elif page == "Analytics Dashboard":
             use_container_width=True
         )
         
+        # 3. Interactive Geographic Digital Trust Map
+        map_title = "Peta Kepercayaan Geografi Sarawak" if lang == "Bahasa Melayu" else "Geographic Sarawak Digital Trust Map"
+        st.markdown(f"<h3 style='color:{gold_color}; margin-top:20px;'>{map_title}</h3>", unsafe_allow_html=True)
+        
+        # Calculate division averages from df_filtered
+        div_stats = df_filtered.groupby("district").agg(
+            sttb_index=("sttb_index", "mean"),
+            count=("respondent_id", "count"),
+            transparency=("ps1_transparency", "mean"),
+            ethics=("ps2_ethics", "mean"),
+            privacy=("ps3_privacy", "mean"),
+            security=("ps4_security", "mean"),
+            inclusion=("ps5_inclusion", "mean")
+        ).to_dict("index")
+        
+        # Setup Folium Map centered on Sarawak
+        m = folium.Map(location=[2.5000, 113.0000], zoom_start=7, tiles="cartodbpositron")
+        
+        # Add colored markers representing division trust
+        for div_name, coords in SARAWAK_DIVISIONS.items():
+            stats = div_stats.get(div_name, {
+                "sttb_index": None, "count": 0, 
+                "transparency": None, "ethics": None, "privacy": None, "security": None, "inclusion": None
+            })
+            
+            # If there are no data entries yet, count is 0
+            if stats["count"] == 0:
+                index_display = "N/A"
+                level_str = "Tiada Data" if lang == "Bahasa Melayu" else "No Data"
+                marker_color = "#7f8c8d"  # Neutral Gray
+                
+                t_val = "N/A"
+                e_val = "N/A"
+                p_val = "N/A"
+                s_val = "N/A"
+                i_val = "N/A"
+            else:
+                index_val = stats["sttb_index"]
+                index_display = f"{index_val:.2f}"
+                eval_info = survey.get_trust_level(index_val)
+                marker_color = eval_info["color"]
+                
+                bm_levels = {
+                    "High Trust": "Kepercayaan Tinggi",
+                    "Moderate Trust": "Kepercayaan Sederhana",
+                    "Low Trust": "Kepercayaan Rendah",
+                    "Very Low Trust": "Kepercayaan Sangat Rendah"
+                }
+                level_str = bm_levels.get(eval_info["level"], eval_info["level"]) if lang == "Bahasa Melayu" else eval_info["level"]
+                
+                t_val = f"{stats['transparency']:.1f}"
+                e_val = f"{stats['ethics']:.1f}"
+                p_val = f"{stats['privacy']:.1f}"
+                s_val = f"{stats['security']:.1f}"
+                i_val = f"{stats['inclusion']:.1f}"
+            
+            if lang == "Bahasa Melayu":
+                popup_html = f"""
+                <div style="font-family: 'Outfit', sans-serif; width: 220px; color: #2c3e50;">
+                    <h4 style="margin: 0 0 5px 0; color: #2980b9;">Bahagian {div_name}</h4>
+                    <div style="font-size: 1.3rem; font-weight: 800; color: {marker_color}; margin-bottom: 5px;">
+                        Indeks STTB: {index_display}
+                    </div>
+                    <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 10px;">
+                        Tahap Kepercayaan: {level_str} <br>
+                        Saiz Sampel (N): {stats['count']}
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
+                    <table style="width: 100%; font-size: 0.8rem;">
+                        <tr><td>Ketelusan:</td><td style="text-align:right; font-weight:bold;">{t_val}</td></tr>
+                        <tr><td>Etika:</td><td style="text-align:right; font-weight:bold;">{e_val}</td></tr>
+                        <tr><td>Privasi:</td><td style="text-align:right; font-weight:bold;">{p_val}</td></tr>
+                        <tr><td>Keselamatan:</td><td style="text-align:right; font-weight:bold;">{s_val}</td></tr>
+                        <tr><td>Inklusi:</td><td style="text-align:right; font-weight:bold;">{i_val}</td></tr>
+                    </table>
+                </div>
+                """
+            else:
+                popup_html = f"""
+                <div style="font-family: 'Outfit', sans-serif; width: 220px; color: #2c3e50;">
+                    <h4 style="margin: 0 0 5px 0; color: #2980b9;">{div_name} Division</h4>
+                    <div style="font-size: 1.3rem; font-weight: 800; color: {marker_color}; margin-bottom: 5px;">
+                        STTB Index: {index_display}
+                    </div>
+                    <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 10px;">
+                        Trust Level: {level_str} <br>
+                        Sample Size (N): {stats['count']}
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
+                    <table style="width: 100%; font-size: 0.8rem;">
+                        <tr><td>Transparency:</td><td style="text-align:right; font-weight:bold;">{t_val}</td></tr>
+                        <tr><td>Ethics:</td><td style="text-align:right; font-weight:bold;">{e_val}</td></tr>
+                        <tr><td>Privacy:</td><td style="text-align:right; font-weight:bold;">{p_val}</td></tr>
+                        <tr><td>Security:</td><td style="text-align:right; font-weight:bold;">{s_val}</td></tr>
+                        <tr><td>Inclusion:</td><td style="text-align:right; font-weight:bold;">{i_val}</td></tr>
+                    </table>
+                </div>
+                """
+            
+            folium.CircleMarker(
+                location=[coords["lat"], coords["lon"]],
+                radius=12 + (stats["count"] * 0.1),
+                popup=folium.Popup(popup_html, max_width=250),
+                color=marker_color,
+                fill=True,
+                fill_color=marker_color,
+                fill_opacity=0.6,
+                tooltip=f"{div_name}: Index = {index_display}"
+            ).add_to(m)
+            
+        st_folium(m, width=1200, height=600, key="dashboard_trust_map")
+        
         # Collapsible Database Administration Panel (Admin Only)
         st.markdown("<br>", unsafe_allow_html=True)
-        admin_title = "🛠️ Tetapan Sistem & Pentadbiran (UTS Admin Sahaja)" if lang == "Bahasa Melayu" else "🛠️ System Settings & Administration (UTS Admin Only)"
+        admin_title = "Tetapan Sistem & Pentadbiran (UTS Admin Sahaja)" if lang == "Bahasa Melayu" else "System Settings & Administration (UTS Admin Only)"
         with st.expander(admin_title):
             if lang == "Bahasa Melayu":
                 st.markdown("""
@@ -1515,122 +1625,6 @@ elif page == "Analytics Dashboard":
                 st.success(succ_purge)
                 st.session_state["page"] = "Welcome & Overview"
                 st.rerun()
-
-
-# ---------------------------------------------------------
-# PAGE 4: GEOGRAPHIC TRUST MAP
-# ---------------------------------------------------------
-elif page == "Geographic Trust Map":
-    if lang == "Bahasa Melayu":
-        st.markdown('<div class="glass-header"><h1>Peta Kepercayaan Digital Geografi</h1><div class="subtitle">Penunjuk Kepercayaan Choropleth peringkat Bahagian (Berasaskan Slocum et al., 2009)</div></div>', unsafe_allow_html=True)
-        st.markdown("""
-        <div class="glass-card">
-            <p>Model geografi ini menggambarkan kepercayaan orang ramai di peringkat bahagian. Klik pada mana-mana penanda bahagian berwarna untuk memeriksa saiz sampel terperinci, purata indeks, dan pemboleh ubah tonggak yang dikira khas.</p>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown('<div class="glass-header"><h1>Geographic Digital Trust Map</h1><div class="subtitle">Division-level Choropleth Trust Indicators (Grounded in Slocum et al., 2009)</div></div>', unsafe_allow_html=True)
-        st.markdown("""
-        <div class="glass-card">
-            <p>This geographic model visualizes district-level public trust. Click on any colored division marker to inspect the detailed sample count, index averages, and custom-computed pillar variables.</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Load and process data
-    conn = get_db_connection()
-    df_resp = pd.read_sql_query("SELECT * FROM respondents", conn)
-    df_scores = pd.read_sql_query("SELECT * FROM computed_scores", conn)
-    conn.close()
-    
-    df = pd.merge(df_resp, df_scores, left_on="id", right_on="respondent_id")
-    
-    # Calculate division averages
-    div_stats = df.groupby("district").agg(
-        sttb_index=("sttb_index", "mean"),
-        count=("respondent_id", "count"),
-        transparency=("ps1_transparency", "mean"),
-        ethics=("ps2_ethics", "mean"),
-        privacy=("ps3_privacy", "mean"),
-        security=("ps4_security", "mean"),
-        inclusion=("ps5_inclusion", "mean")
-    ).to_dict("index")
-    
-    # Setup Folium Map centered on Sarawak
-    m = folium.Map(location=[2.5000, 113.0000], zoom_start=7, tiles="cartodbpositron")
-    
-    # Add colored markers representing division trust
-    for div_name, coords in SARAWAK_DIVISIONS.items():
-        stats = div_stats.get(div_name, {
-            "sttb_index": 50.0, "count": 0, 
-            "transparency": 50.0, "ethics": 50.0, "privacy": 50.0, "security": 50.0, "inclusion": 50.0
-        })
-        
-        index_val = stats["sttb_index"]
-        eval_info = survey.get_trust_level(index_val)
-        bm_levels = {
-            "High Trust": "Kepercayaan Tinggi",
-            "Moderate Trust": "Kepercayaan Sederhana",
-            "Low Trust": "Kepercayaan Rendah",
-            "Very Low Trust": "Kepercayaan Sangat Rendah"
-        }
-        level_str = bm_levels.get(eval_info["level"], eval_info["level"]) if lang == "Bahasa Melayu" else eval_info["level"]
-        
-        if lang == "Bahasa Melayu":
-            popup_html = f"""
-            <div style="font-family: 'Outfit', sans-serif; width: 220px; color: #2c3e50;">
-                <h4 style="margin: 0 0 5px 0; color: #2980b9;">Bahagian {div_name}</h4>
-                <div style="font-size: 1.3rem; font-weight: 800; color: {eval_info['color']}; margin-bottom: 5px;">
-                    Indeks STTB: {index_val:.2f}
-                </div>
-                <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 10px;">
-                    Tahap Kepercayaan: {level_str} <br>
-                    Saiz Sampel (N): {stats['count']}
-                </div>
-                <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
-                <table style="width: 100%; font-size: 0.8rem;">
-                    <tr><td>Ketelusan:</td><td style="text-align:right; font-weight:bold;">{stats['transparency']:.1f}</td></tr>
-                    <tr><td>Etika:</td><td style="text-align:right; font-weight:bold;">{stats['ethics']:.1f}</td></tr>
-                    <tr><td>Privasi:</td><td style="text-align:right; font-weight:bold;">{stats['privacy']:.1f}</td></tr>
-                    <tr><td>Keselamatan:</td><td style="text-align:right; font-weight:bold;">{stats['security']:.1f}</td></tr>
-                    <tr><td>Inklusi:</td><td style="text-align:right; font-weight:bold;">{stats['inclusion']:.1f}</td></tr>
-                </table>
-            </div>
-            """
-        else:
-            popup_html = f"""
-            <div style="font-family: 'Outfit', sans-serif; width: 220px; color: #2c3e50;">
-                <h4 style="margin: 0 0 5px 0; color: #2980b9;">{div_name} Division</h4>
-                <div style="font-size: 1.3rem; font-weight: 800; color: {eval_info['color']}; margin-bottom: 5px;">
-                    STTB Index: {index_val:.2f}
-                </div>
-                <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 10px;">
-                    Trust Level: {eval_info['level']} <br>
-                    Sample Size (N): {stats['count']}
-                </div>
-                <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
-                <table style="width: 100%; font-size: 0.8rem;">
-                    <tr><td>Transparency:</td><td style="text-align:right; font-weight:bold;">{stats['transparency']:.1f}</td></tr>
-                    <tr><td>Ethics:</td><td style="text-align:right; font-weight:bold;">{stats['ethics']:.1f}</td></tr>
-                    <tr><td>Privacy:</td><td style="text-align:right; font-weight:bold;">{stats['privacy']:.1f}</td></tr>
-                    <tr><td>Security:</td><td style="text-align:right; font-weight:bold;">{stats['security']:.1f}</td></tr>
-                    <tr><td>Inclusion:</td><td style="text-align:right; font-weight:bold;">{stats['inclusion']:.1f}</td></tr>
-                </table>
-            </div>
-            """
-        
-        folium.CircleMarker(
-            location=[coords["lat"], coords["lon"]],
-            radius=12 + (stats["count"] * 0.1), # radius based on responses
-            popup=folium.Popup(popup_html, max_width=250),
-            color=eval_info["color"],
-            fill=True,
-            fill_color=eval_info["color"],
-            fill_opacity=0.6,
-            tooltip=f"{div_name}: Index = {index_val:.2f}"
-        ).add_to(m)
-        
-    # Render folium map in Streamlit
-    st_folium(m, width=1200, height=600)
 
 
 # ---------------------------------------------------------
