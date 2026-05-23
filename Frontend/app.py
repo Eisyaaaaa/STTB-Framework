@@ -37,6 +37,12 @@ if st.session_state["theme_mode"] == "Dark Mode":
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,600;1,400&display=swap');
         
+        :root {
+            --text-main: #F4F6F8;
+            --text-muted: var(--text-muted);
+            --text-dim: var(--text-dim);
+        }
+        
         html, body, [class*="css"] {
             font-family: 'Outfit', sans-serif;
         }
@@ -115,7 +121,7 @@ if st.session_state["theme_mode"] == "Dark Mode":
             font-family: 'Playfair Display', serif;
             font-style: italic;
             font-size: 1.2rem;
-            color: #bdc3c7;
+            color: var(--text-muted);
             margin-top: -15px;
             margin-bottom: 25px;
         }
@@ -160,6 +166,12 @@ else:
     st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,600;1,400&display=swap');
+        
+        :root {
+            --text-main: #F4F6F8;
+            --text-muted: var(--text-muted);
+            --text-dim: var(--text-dim);
+        }
         
         html, body, [class*="css"] {
             font-family: 'Outfit', sans-serif;
@@ -784,7 +796,7 @@ with nav_cols[profile_col_idx]:
     <div style="display: flex; align-items: center; justify-content: flex-end; gap: 15px; margin-top: -2px;">
         <div style="display: flex; align-items: center; gap: 8px;">
             <div style="width: 32px; height: 32px; border-radius: 50%; background: {profile_bg}; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.1);">
-                <span style="font-size: 0.9rem; color: #bdc3c7;">👤</span>
+                <span style="font-size: 0.9rem; color: var(--text-muted);">👤</span>
             </div>
             <div style="font-family: 'Outfit', sans-serif;">
                 <div style="font-size: 0.82rem; font-weight: bold; color: {profile_text_color}; line-height: 1.1;">Profile</div>
@@ -903,10 +915,10 @@ if page == "Welcome & Overview_obsolete":
                     <h3>Metrik Barometer Langsung</h3>
                     <div style="margin: 20px 0;">
                         <div class="metric-label">Indeks Kepercayaan Teknologi Sarawak</div>
-                        <div class="metric-value" style="font-size: 2.2rem; color: #bdc3c7; margin: 15px 0;">Menunggu Data</div>
-                        <div class="metric-label" style="color: #bdc3c7; font-weight:bold;">Belum Ada Hantaran</div>
+                        <div class="metric-value" style="font-size: 2.2rem; color: var(--text-muted); margin: 15px 0;">Menunggu Data</div>
+                        <div class="metric-label" style="color: var(--text-muted); font-weight:bold;">Belum Ada Hantaran</div>
                     </div>
-                    <p style="font-size:0.85rem; color:#bdc3c7;">
+                    <p style="font-size:0.85rem; color:var(--text-muted);">
                         Jadilah responden pertama untuk memulakan barometer kepercayaan digital!
                     </p>
                 </div>
@@ -917,10 +929,10 @@ if page == "Welcome & Overview_obsolete":
                     <h3>Live Barometer Metrics</h3>
                     <div style="margin: 20px 0;">
                         <div class="metric-label">Sarawak Tech-Trust Index</div>
-                        <div class="metric-value" style="font-size: 2.2rem; color: #bdc3c7; margin: 15px 0;">Awaiting Data</div>
-                        <div class="metric-label" style="color: #bdc3c7; font-weight:bold;">No Submissions Yet</div>
+                        <div class="metric-value" style="font-size: 2.2rem; color: var(--text-muted); margin: 15px 0;">Awaiting Data</div>
+                        <div class="metric-label" style="color: var(--text-muted); font-weight:bold;">No Submissions Yet</div>
                     </div>
-                    <p style="font-size:0.85rem; color:#bdc3c7;">
+                    <p style="font-size:0.85rem; color:var(--text-muted);">
                         Be the very first respondent to initialize the digital trust barometer!
                     </p>
                 </div>
@@ -946,7 +958,7 @@ if page == "Welcome & Overview_obsolete":
                             {level_str}
                         </div>
                     </div>
-                    <p style="font-size:0.85rem; color:#bdc3c7;">
+                    <p style="font-size:0.85rem; color:var(--text-muted);">
                         Indeks dikemas kini secara automatik dalam masa nyata apabila respons tinjauan awam baharu direkodkan.
                     </p>
                 </div>
@@ -962,7 +974,7 @@ if page == "Welcome & Overview_obsolete":
                             {t_eval['level']}
                         </div>
                     </div>
-                    <p style="font-size:0.85rem; color:#bdc3c7;">
+                    <p style="font-size:0.85rem; color:var(--text-muted);">
                         Index updates automatically in real-time as new public survey responses are recorded.
                     </p>
                 </div>
@@ -1013,14 +1025,14 @@ elif page == "Public Survey Form":
         st.markdown(f"""
         <div class="glass-card" style="padding: 15px; margin-bottom: 20px;">
             <h4 style="margin: 0 0 5px 0; color:{gold_color};">Imbas & Kongsi Tinjauan</h4>
-            <p style="font-size: 0.85rem; color: #bdc3c7; margin: 0 0 12px 0;">Gunakan kod QR di bawah untuk mengakses dan mengedarkan tinjauan kepercayaan digital ini secara dalam talian!</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 12px 0;">Gunakan kod QR di bawah untuk mengakses dan mengedarkan tinjauan kepercayaan digital ini secara dalam talian!</p>
         </div>
         """, unsafe_allow_html=True)
     else:
         st.markdown(f"""
         <div class="glass-card" style="padding: 15px; margin-bottom: 20px;">
             <h4 style="margin: 0 0 5px 0; color:{gold_color};">Scan & Share Survey</h4>
-            <p style="font-size: 0.85rem; color: #bdc3c7; margin: 0 0 12px 0;">Use the QR code below to access and distribute this digital trust survey online!</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 12px 0;">Use the QR code below to access and distribute this digital trust survey online!</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -1041,17 +1053,17 @@ elif page == "Public Survey Form":
         if lang == "Bahasa Melayu":
             st.markdown(f"""
             <div style="padding-top: 10px;">
-                <span style="font-size:0.85rem; color:#bdc3c7;"><b>Pautan Langsung:</b></span><br>
+                <span style="font-size:0.85rem; color:var(--text-muted);"><b>Pautan Langsung:</b></span><br>
                 <a href="{target_url}" target="_blank" style="color:{gold_color}; font-size:1.05rem; font-weight:bold; text-decoration:none;">{target_url}</a>
-                <p style="font-size:0.8rem; color:#888888; margin-top:5px; margin-bottom:0;">Klik kanan imej kod QR untuk menyimpan atau menyalinnya terus ke dalam slaid tesis atau risalah.</p>
+                <p style="font-size:0.8rem; color:var(--text-dim); margin-top:5px; margin-bottom:0;">Klik kanan imej kod QR untuk menyimpan atau menyalinnya terus ke dalam slaid tesis atau risalah.</p>
             </div>
             """, unsafe_allow_html=True)
         else:
             st.markdown(f"""
             <div style="padding-top: 10px;">
-                <span style="font-size:0.85rem; color:#bdc3c7;"><b>Direct Link:</b></span><br>
+                <span style="font-size:0.85rem; color:var(--text-muted);"><b>Direct Link:</b></span><br>
                 <a href="{target_url}" target="_blank" style="color:{gold_color}; font-size:1.05rem; font-weight:bold; text-decoration:none;">{target_url}</a>
-                <p style="font-size:0.8rem; color:#888888; margin-top:5px; margin-bottom:0;">Right-click the QR code image to save or copy it directly into thesis slides or brochures.</p>
+                <p style="font-size:0.8rem; color:var(--text-dim); margin-top:5px; margin-bottom:0;">Right-click the QR code image to save or copy it directly into thesis slides or brochures.</p>
             </div>
             """, unsafe_allow_html=True)
     st.markdown("---")
@@ -1332,7 +1344,7 @@ elif page == "Public Survey Form":
                     <div style="font-weight: 800; font-size: 1.3rem; color: {results['trust_evaluation']['color']};">
                         {level_str}
                     </div>
-                    <p style="margin-top: 10px; font-size:0.9rem; color:#bdc3c7;">
+                    <p style="margin-top: 10px; font-size:0.9rem; color:var(--text-muted);">
                         {interp_str}
                     </p>
                 </div>
@@ -1396,7 +1408,7 @@ elif page == "Dashboard" or page == "Welcome & Overview":
             <h1 style="margin: 0; font-size: 2.8rem; font-weight: 800; line-height: 1.1; color: #ffffff !important; text-shadow: 0 4px 15px rgba(255,255,255,0.05);">
                 Sarawak <span style="color: {gold_color};">Tech-Trust</span><br>Barometer (STTB)
             </h1>
-            <p style="font-size: 1.05rem; color: #bdc3c7; margin-top: 15px; margin-bottom: 25px; line-height: 1.5;">
+            <p style="font-size: 1.05rem; color: var(--text-muted); margin-top: 15px; margin-bottom: 25px; line-height: 1.5;">
                 {"A digital trust analytics framework measuring public sentiment and institutional trustworthiness across Sarawak." if lang == "English" else "Kerangka kerja analisis kepercayaan digital untuk mengukur sentimen awam dan tahap kebolehpercayaan institusi di seluruh Sarawak."}
             </p>
         </div>
@@ -1519,13 +1531,13 @@ elif page == "Dashboard" or page == "Welcome & Overview":
         st.markdown(f"""
         <div class="glass-card" style="padding: 20px; margin-bottom: 20px;">
             <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">Konteks</h3>
-            <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.45; margin-bottom:10px;">
+            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:10px;">
                 <b>Barometer Kepercayaan Teknologi Sarawak (STTB)</b> ialah projek penyelidikan Research and Development (R&D) yang dibangunkan untuk menangani jurang kritikal dalam mengukur dan menjejaki kepercayaan orang ramai terhadap teknologi digital dan institusi di seluruh bahagian pentadbiran di Sarawak.
             </p>
-            <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.45; margin-bottom:10px;">
+            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:10px;">
                 Sejajar secara langsung dengan <b>Strategi Perbadanan Ekonomi Digital Sarawak (SDEC)</b> dan dasar digital kebangsaan, platform ini menyediakan pembuat dasar, penyelidik akademik, dan rakyat dengan penunjuk telus dan masa nyata mengenai cara platform digital mengendalikan privasi data, etika, kebolehcapaian dan keselamatan.
             </p>
-            <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.45; margin-bottom:0;">
+            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:0;">
                 Seni bina pemarkahan kami distrukturkan secara saintifik merentasi <b>5 teras tonggak kepercayaan digital</b>, dipetakan terhadap <b>15 pemboleh ubah analisis</b>, dan dikira daripada instrumen tinjauan <b>75-item komprehensif</b> yang berasaskan Teori Institusi sosiologi oleh W. Richard Scott (1995) dan diperhalusi melalui paradigma etika perundangan Islam.
             </p>
         </div>
@@ -1534,13 +1546,13 @@ elif page == "Dashboard" or page == "Welcome & Overview":
         st.markdown(f"""
         <div class="glass-card" style="padding: 20px; margin-bottom: 20px;">
             <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">Context</h3>
-            <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.45; margin-bottom:10px;">
+            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:10px;">
                 The <b>Sarawak Tech-Trust Barometer (STTB)</b> is an R&D research project developed to address the critical gaps in measuring and tracking public trust in digital technologies and institutions across the administrative divisions of Sarawak.
             </p>
-            <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.45; margin-bottom:10px;">
+            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:10px;">
                 Aligning directly with the <b>Sarawak Digital Economy Corporation (SDEC) Strategy</b> and national digital policies, the platform provides policymakers, academic researchers, and citizens with transparent, real-time indicators regarding how digital platforms handle data privacy, ethics, accessibility, and security.
             </p>
-            <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.45; margin-bottom:0;">
+            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:0;">
                 Our scoring architecture is scientifically structured across <b>5 core digital trust pillars</b>, mapped against <b>15 analytical variables</b>, and calculated from a comprehensive <b>75-item survey instrument</b> grounded in the sociological Institutional Theory by W. Richard Scott (1995) and refined through the ethical paradigms of Islamic jurisprudence.
             </p>
         </div>
@@ -1574,7 +1586,7 @@ elif page == "Dashboard" or page == "Welcome & Overview":
                 <div>
                     <div style="font-size: 0.95rem; font-weight: bold; color: #ffffff; margin-bottom: 4px;">{title}</div>
                     <div style="font-size: 0.78rem; font-style: italic; color: {gold_color}; font-weight: bold; margin-bottom: 10px;">{paradigm}</div>
-                    <p style="font-size: 0.8rem; color: #bdc3c7; line-height: 1.45; margin: 0;">{desc}</p>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin: 0;">{desc}</p>
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -1680,7 +1692,7 @@ elif page == "Dashboard" or page == "Welcome & Overview":
                 # Render beautiful custom glassmorphism card
                 st.markdown(f"""
                 <div class="glass-card" style="padding: 16px; margin-bottom: 10px; border-left: 3px solid {trend_color}; min-height: 140px;">
-                    <div style="font-size: 0.82rem; text-transform: uppercase; font-weight: bold; color: #bdc3c7; height: 35px; overflow: hidden;">
+                    <div style="font-size: 0.82rem; text-transform: uppercase; font-weight: bold; color: var(--text-muted); height: 35px; overflow: hidden;">
                         {label}
                     </div>
                     <div style="font-size: 2.1rem; font-weight: 800; color: #ffffff; margin-top: 8px;">
@@ -1965,7 +1977,7 @@ elif page == "Admin Panel":
             <div class="glass-card" style="text-align: center; border-color: rgba(218, 41, 28, 0.4);">
                 <h4 style="color: #DA291C;">Akses Terperingkat Maklum Balas Civik</h4>
                 <p style="font-size: 0.9rem;">Halaman ini bertujuan untuk digunakan oleh ahli fakulti UTS, penyelidik universiti, dan auditor ekonomi digital Sarawak bagi memeriksa aduan teknikal sistem, pengesahan statistik data, dan cadangan penyelarasan kerangka sosiologi.</p>
-                <p style="font-size: 0.8rem; color: #888888;">Petunjuk: Gunakan kata laluan akademik <b>uts2026</b> untuk log masuk.</p>
+                <p style="font-size: 0.8rem; color: var(--text-dim);">Petunjuk: Gunakan kata laluan akademik <b>uts2026</b> untuk log masuk.</p>
             </div>
             """, unsafe_allow_html=True)
         else:
@@ -1973,7 +1985,7 @@ elif page == "Admin Panel":
             <div class="glass-card" style="text-align: center; border-color: rgba(218, 41, 28, 0.4);">
                 <h4 style="color: #DA291C;">Classified Civic Feedback Access</h4>
                 <p style="font-size: 0.9rem;">This page is intended for UTS academic faculty members, university researchers, and Sarawak digital economy auditors to inspect technical system complaints, data accuracy verifications, and theoretical framework alignments.</p>
-                <p style="font-size: 0.8rem; color: #888888;">Tip: Use the academic password <b>uts2026</b> to log in.</p>
+                <p style="font-size: 0.8rem; color: var(--text-dim);">Tip: Use the academic password <b>uts2026</b> to log in.</p>
             </div>
             """, unsafe_allow_html=True)
     else:
@@ -2109,7 +2121,7 @@ elif page == "Admin Panel":
                         st.markdown(f"""
                         <div class="glass-card" style="border-left: 5px solid #FCD116;">
                             <h4 style="margin: 0 0 5px 0; color: #FCD116;">{record['subject']}</h4>
-                            <div style="font-size: 0.8rem; color: #888888; margin-bottom: 15px;">
+                            <div style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 15px;">
                                 ID: #{record['id']} | {record['submitted_at']} <br>
                                 <b>Peranan:</b> {record['user_role']} <br>
                                 <b>Kategori:</b> {record['category']}
@@ -2165,7 +2177,7 @@ elif page == "Admin Panel":
                 st.markdown("""
                 <div style="padding: 10px; border-left: 3px solid #DA291C;">
                     <h4 style="color:#DA291C; margin: 0 0 10px 0;">Panel Pentadbiran Pangkalan Data</h4>
-                    <p style="font-size:0.85rem; color:#bdc3c7; margin:0 0 15px 0;">
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 15px 0;">
                         Untuk memindahkan kerangka kerja ini daripada fasa penilaian rintisan kepada pengumpulan data akademik dunia sebenar, anda boleh memadamkan semua rekod olok-olok pra-pemuatan di sini. Ini akan mengosongkan pangkalan data sepenuhnya kepada sifar penyerahan dan menghentikan enjin pemuatan automatik secara kekal.
                     </p>
                 </div>
@@ -2174,7 +2186,7 @@ elif page == "Admin Panel":
                 st.markdown("""
                 <div style="padding: 10px; border-left: 3px solid #DA291C;">
                     <h4 style="color:#DA291C; margin: 0 0 10px 0;">Database Administration Panel</h4>
-                    <p style="font-size:0.85rem; color:#bdc3c7; margin:0 0 15px 0;">
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 15px 0;">
                         To transition this framework from the pilot evaluation phase to real-world academic data collection, you can purge all pre-seeded mock records here. This will clear the database entirely to a 0-submission slate and permanently stop the automated seed engine.
                     </p>
                 </div>
@@ -2285,7 +2297,7 @@ elif page == "Admin Panel":
                         st.markdown(f"""
                         <div class="glass-card" style="border-left: 5px solid #CE1126;">
                             <h4 style="margin: 0 0 5px 0; color: #CE1126;">Responden #{resp_id_val}</h4>
-                            <div style="font-size: 0.8rem; color: #888888; margin-bottom: 10px;">
+                            <div style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 10px;">
                                 <b>Tarikh:</b> {resp_date_val} <br>
                                 <b>Kumpulan Umur:</b> {resp_age_val} | <b>Jantina:</b> {resp_gender_val} <br>
                                 <b>Pekerjaan:</b> {resp_occ_val} | <b>Bahagian:</b> {resp_dist_val}
@@ -2602,9 +2614,9 @@ elif page == "Admin Panel":
             st.subheader("Log Audit & Aktiviti Pentadbiran" if lang == "Bahasa Melayu" else "Administrative Activity & Audit Trail")
             
             st.markdown(
-                "<p style='font-size:0.9rem; color:#bdc3c7;'>Sebagai sebahagian daripada keperluan pematuhan audit UTS, semua tindakan pentadbir dipantau dan disimpan secara kekal dalam log sejarah ini untuk rujukan masa hadapan.</p>"
+                "<p style='font-size:0.9rem; color:var(--text-muted);'>Sebagai sebahagian daripada keperluan pematuhan audit UTS, semua tindakan pentadbir dipantau dan disimpan secara kekal dalam log sejarah ini untuk rujukan masa hadapan.</p>"
                 if lang == "Bahasa Melayu" else
-                "<p style='font-size:0.9rem; color:#bdc3c7;'>As part of UTS research audit compliance requirements, all administrative actions are securely tracked and logged below for historical validation and activity monitoring.</p>",
+                "<p style='font-size:0.9rem; color:var(--text-muted);'>As part of UTS research audit compliance requirements, all administrative actions are securely tracked and logged below for historical validation and activity monitoring.</p>",
                 unsafe_allow_html=True
             )
             
@@ -2657,5 +2669,5 @@ elif page == "Admin Panel":
 # ---------------------------------------------------------
 st.markdown("---")
 footer_text = "Barometer Kepercayaan Teknologi Sarawak © 2026." if lang == "Bahasa Melayu" else "Sarawak Tech-Trust Barometer © 2026."
-st.markdown(f"<div style='text-align: center; color: #888888; font-size: 0.85rem; padding: 25px 0 10px 0;'>{footer_text}</div>", unsafe_allow_html=True)
+st.markdown(f"<div style='text-align: center; color: var(--text-dim); font-size: 0.85rem; padding: 25px 0 10px 0;'>{footer_text}</div>", unsafe_allow_html=True)
 
