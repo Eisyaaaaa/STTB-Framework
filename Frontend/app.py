@@ -26,7 +26,7 @@ st.set_page_config(
 if "theme_mode" not in st.session_state:
     st.session_state["theme_mode"] = "Dark Mode"
 
-gold_color = "#A87C00" if st.session_state.get("theme_mode") == "Light Mode" else "#ffd700"
+gold_color = "#D4AF37" if st.session_state.get("theme_mode") == "Light Mode" else "#FCD116"
 
 if st.session_state["theme_mode"] == "Dark Mode":
     st.markdown("""
@@ -38,56 +38,56 @@ if st.session_state["theme_mode"] == "Dark Mode":
         }
         
         .stApp {
-            background: linear-gradient(135deg, #070708 0%, #111115 50%, #180909 100%);
-            color: #f5f6f9;
+            background: #1A1D20;
+            color: #F4F6F8;
         }
         
         [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #070708 0%, #111115 100%) !important;
-            border-right: 1px solid rgba(255, 199, 44, 0.15) !important;
+            background: #000000 !important;
+            border-right: 1px solid rgba(252, 209, 22, 0.15) !important;
         }
         
         [data-testid="stSidebar"] * {
-            color: #f5f6f9 !important;
+            color: #F4F6F8 !important;
         }
         
         /* Ensure selectbox text has perfect dark contrast on its white background */
         div[data-baseweb="select"] * {
-            color: #1a1a24 !important;
+            color: #1A1D20 !important;
         }
         
         /* Make standard input widget labels fully readable in Dark Mode */
         label p {
-            color: #f5f6f9 !important;
+            color: #F4F6F8 !important;
             font-weight: 600 !important;
         }
         
         div[data-testid="stSidebarUserContent"] .stRadio label {
-            color: #f5f6f9 !important;
+            color: #F4F6F8 !important;
         }
         
         .glass-card {
-            background: rgba(22, 22, 26, 0.75);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 199, 44, 0.15);
+            border: 1px solid rgba(252, 209, 22, 0.15);
             border-radius: 16px;
             padding: 24px;
             margin-bottom: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
             transition: all 0.3s ease-in-out;
-            color: #f5f6f9 !important;
+            color: #F4F6F8 !important;
         }
         
         .glass-card:hover {
-            border: 1px solid rgba(255, 199, 44, 0.35);
-            box-shadow: 0 12px 40px 0 rgba(218, 41, 28, 0.12);
+            border: 1px solid rgba(252, 209, 22, 0.35);
+            box-shadow: 0 12px 40px 0 rgba(252, 209, 22, 0.08);
             transform: translateY(-2px);
         }
         
         .glass-header {
-            background: linear-gradient(90deg, rgba(255, 199, 44, 0.12) 0%, rgba(218, 41, 28, 0.04) 60%, rgba(0, 0, 0, 0) 100%);
-            border-left: 5px solid #FFC72C;
+            background: linear-gradient(90deg, rgba(252, 209, 22, 0.12) 0%, rgba(206, 17, 38, 0.04) 60%, rgba(0, 0, 0, 0) 100%);
+            border-left: 5px solid #FCD116;
             border-radius: 4px 16px 16px 4px;
             padding: 20px;
             margin-bottom: 25px;
@@ -97,14 +97,14 @@ if st.session_state["theme_mode"] == "Dark Mode":
             font-family: 'Outfit', sans-serif;
             font-weight: 800 !important;
             letter-spacing: -1px;
-            color: #FFC72C !important;
-            text-shadow: 0px 4px 12px rgba(255, 199, 44, 0.25);
+            color: #FCD116 !important;
+            text-shadow: 0px 4px 12px rgba(252, 209, 22, 0.25);
         }
         
         h2, h3 {
             font-family: 'Outfit', sans-serif;
             font-weight: 600 !important;
-            color: #f5f6f9 !important;
+            color: #F4F6F8 !important;
         }
         
         .subtitle {
@@ -120,7 +120,7 @@ if st.session_state["theme_mode"] == "Dark Mode":
             font-size: 2.8rem;
             font-weight: 800;
             margin: 5px 0;
-            background: linear-gradient(45deg, #FFC72C, #DA291C);
+            background: linear-gradient(45deg, #FCD116, #CE1126);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -133,21 +133,21 @@ if st.session_state["theme_mode"] == "Dark Mode":
         }
         
         div.stButton > button:first-child {
-            background: linear-gradient(135deg, #DA291C 0%, #B81D13 100%) !important;
+            background: linear-gradient(135deg, #CE1126 0%, #A50F1E 100%) !important;
             color: #ffffff !important;
-            border: 1px solid #FFC72C !important;
+            border: 1px solid #FCD116 !important;
             font-weight: 600 !important;
             border-radius: 10px !important;
             padding: 12px 24px !important;
-            box-shadow: 0 4px 15px rgba(218, 41, 28, 0.3) !important;
+            box-shadow: 0 4px 15px rgba(206, 17, 38, 0.3) !important;
             transition: all 0.3s ease !important;
         }
         
         div.stButton > button:first-child:hover {
-            background: linear-gradient(135deg, #FFC72C 0%, #E0AE1B 100%) !important;
-            color: #070708 !important;
-            border: 1px solid #DA291C !important;
-            box-shadow: 0 4px 15px rgba(255, 199, 44, 0.4) !important;
+            background: linear-gradient(135deg, #FCD116 0%, #D8B213 100%) !important;
+            color: #1A1D20 !important;
+            border: 1px solid #CE1126 !important;
+            box-shadow: 0 4px 15px rgba(252, 209, 22, 0.4) !important;
             transform: translateY(-1px) !important;
         }
     </style>
@@ -703,9 +703,9 @@ else:
     theme_col_idx = 6
     sub_strip_widths = [5.3, 1.5, 2.0]
 
-# Column 0: Sarawak State Flag Logo
+# Column 0: Premium STTB Hornbill Logo
 with nav_cols[0]:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/7/7e/Flag_of_Sarawak.svg", width=55 if has_admin_tab else 65)
+    st.image("Frontend/sttb_official_logo.png", width=65 if has_admin_tab else 80)
 
 # Columns 1-5 or 1-6: Horizontal Navigation Menus
 for idx, (page_val, label) in enumerate(menu_options):
