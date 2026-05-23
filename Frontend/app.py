@@ -1525,7 +1525,7 @@ elif page == "Dashboard" or page == "Welcome & Overview":
     # ROW 2: ABOUT STTB (Context & Digital Pillars)
     # ---------------------------------------------------------
     st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
-    st.markdown(f"<div style='font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-bottom: 15px;'>{"About STTB" if lang == "English" else "Mengenai STTB"}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='font-size: 2.5rem; font-weight: 800; color: {gold_color}; margin-bottom: 15px;'>{ 'About STTB' if lang == 'English' else 'Mengenai STTB' }</div>", unsafe_allow_html=True)
     
     if lang == "Bahasa Melayu":
         st.markdown(f"""
@@ -1669,7 +1669,7 @@ elif page == "Dashboard" or page == "Welcome & Overview":
         # ---------------------------------------------------------
         # ROW 3: 5-PILLAR TRUST INDEX HORIZONTAL CARDS
         # ---------------------------------------------------------
-        st.markdown(f"<div style='font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-top: 15px; margin-bottom: 15px;'>5-Pillar Trust Index</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='font-size: 2.5rem; font-weight: 800; color: {gold_color}; margin-top: 15px; margin-bottom: 15px;'>5-Pillar Trust Index</div>", unsafe_allow_html=True)
         
         p_col1, p_col2, p_col3, p_col4, p_col5 = st.columns(5)
         p_cols = [p_col1, p_col2, p_col3, p_col4, p_col5]
