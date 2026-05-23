@@ -1768,7 +1768,9 @@ elif page == "Dashboard" or page == "Welcome & Overview":
             """, unsafe_allow_html=True)
             
         with b_col2:
-            st.markdown(f"<div style='font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-top: 15px; margin-bottom: 15px;'>Historical Trust Trend (2023-2024)</div>", unsafe_allow_html=True)
+            is_dark = st.session_state.get("theme_mode", "Dark Mode") == "Dark Mode"
+            title_color = "#ffffff" if is_dark else "#1A1D20"
+            st.markdown(f"<div style='font-size: 1.25rem; font-weight: 800; color: {title_color}; margin-top: 15px; margin-bottom: 15px;'>{"Historical Trust Trend (2023-2024)" if lang == "English" else "Trend Kepercayaan Sejarah (2023-2024)"}</div>", unsafe_allow_html=True)
             
             # Setup Plotly line chart matching the mockup layout
             months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -1795,19 +1797,26 @@ elif page == "Dashboard" or page == "Welcome & Overview":
                 name='Reference'
             ))
             
+            # Theme-specific layout colors
+            plotly_grid = "rgba(255,255,255,0.05)" if is_dark else "rgba(26,29,32,0.08)"
+            plotly_text = "#a0aec0" if is_dark else "#4a5568"
+            plotly_axis_line = "rgba(255,255,255,0.1)" if is_dark else "rgba(26,29,32,0.1)"
+            anno_bg = "#111115" if is_dark else "#ffffff"
+            anno_text_lbl = "#FCD116" if is_dark else "#CE1126"
+            
             # July highlighted annotation
             fig.add_annotation(
                 x="Jul", y=76.5,
-                text="<b>Overall Score</b><br><span style='font-size:1.1rem; color:#FCD116;'>76.5</span>",
+                text=f"<b>Overall Score</b><br><span style='font-size:1.1rem; color:{anno_text_lbl};'>76.5</span>",
                 showarrow=True,
                 arrowhead=2,
-                arrowcolor="#f5f6f9",
+                arrowcolor=plotly_text,
                 ax=0, ay=-45,
                 bordercolor="#FCD116",
                 borderwidth=2,
                 borderpad=4,
-                bgcolor="#111115",
-                opacity=0.9
+                bgcolor=anno_bg,
+                opacity=0.95
             )
             
             # September highlighted annotation
@@ -1821,8 +1830,8 @@ elif page == "Dashboard" or page == "Welcome & Overview":
                 bordercolor="#2ecc71",
                 borderwidth=1.5,
                 borderpad=4,
-                bgcolor="#111115",
-                opacity=0.9
+                bgcolor=anno_bg,
+                opacity=0.95
             )
             
             fig.update_layout(
@@ -1833,22 +1842,20 @@ elif page == "Dashboard" or page == "Welcome & Overview":
                 showlegend=False,
                 xaxis=dict(
                     showgrid=False,
-                    tickfont=dict(color='#a0aec0'),
-                    linecolor='rgba(255,255,255,0.1)'
+                    tickfont=dict(color=plotly_text, size=11),
+                    linecolor=plotly_axis_line
                 ),
                 yaxis=dict(
                     showgrid=True,
-                    gridcolor='rgba(255,255,255,0.05)',
-                    tickfont=dict(color='#a0aec0'),
+                    gridcolor=plotly_grid,
+                    tickfont=dict(color=plotly_text, size=11),
                     range=[45, 85],
-                    linecolor='rgba(255,255,255,0.1)'
+                    linecolor=plotly_axis_line
                 )
             )
             
-            # Wrap standard container for perfect glassmorphism styling match
-            st.markdown('<div class="glass-card" style="padding: 16px; min-height: 380px;">', unsafe_allow_html=True)
+            # Render directly without split raw HTML div elements
             st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-            st.markdown('</div>', unsafe_allow_html=True)
 
         # ---------------------------------------------------------
         # ADDITIONAL DETAIL: DIVISION RANKINGS TABLE (At the bottom)
