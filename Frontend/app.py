@@ -1576,45 +1576,7 @@ elif page == "Dashboard" or page == "Welcome & Overview":
         pillar_averages = {label: df_filtered[col].mean() for col, label in pillar_cols}
         
         # ---------------------------------------------------------
-        # ROW 2: 5-PILLAR TRUST INDEX HORIZONTAL CARDS
-        # ---------------------------------------------------------
-        st.markdown(f"<div style='font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-top: 15px; margin-bottom: 15px;'>5-Pillar Trust Index</div>", unsafe_allow_html=True)
-        
-        p_col1, p_col2, p_col3, p_col4, p_col5 = st.columns(5)
-        p_cols = [p_col1, p_col2, p_col3, p_col4, p_col5]
-        
-        for idx, (label, val) in enumerate(pillar_averages.items()):
-            with p_cols[idx]:
-                # Format score out of 100 as percentage
-                percent_val = int(round(val))
-                # Dynamic trend icons based on threshold
-                if percent_val >= 75:
-                    trend_icon = "↗"
-                    trend_color = "#2ecc71"  # green
-                elif percent_val >= 65:
-                    trend_icon = "→"
-                    trend_color = "#fcd116"  # gold
-                else:
-                    trend_icon = "↘"
-                    trend_color = "#ce1126"  # red
-                
-                # Render beautiful custom glassmorphism card
-                st.markdown(f"""
-                <div class="glass-card" style="padding: 16px; margin-bottom: 10px; border-left: 3px solid {trend_color}; min-height: 140px;">
-                    <div style="font-size: 0.82rem; text-transform: uppercase; font-weight: bold; color: #bdc3c7; height: 35px; overflow: hidden;">
-                        {label}
-                    </div>
-                    <div style="font-size: 2.1rem; font-weight: 800; color: #ffffff; margin-top: 8px;">
-                        {percent_val}%
-                    </div>
-                    <div style="font-size: 0.85rem; color: {trend_color}; font-weight: bold; margin-top: 3px;">
-                        {trend_icon} {percent_val}%
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
-        # ---------------------------------------------------------
-        # ROW 2.5: INTEGRATED ACADEMIC OVERVIEW & UTS FRAMEWORK DETAILS (Fully Visible)
+        # ROW 2: INTEGRATED ACADEMIC OVERVIEW & UTS FRAMEWORK DETAILS (Fully Visible Below Map)
         # ---------------------------------------------------------
         st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
         st.markdown(f"<div style='font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-bottom: 15px;'>{"Project Context & Theoretical Framework" if lang == "English" else "Konteks Projek & Rangka Kerja Teori"}</div>", unsafe_allow_html=True)
@@ -1688,6 +1650,44 @@ elif page == "Dashboard" or page == "Welcome & Overview":
                 </div>
                 """, unsafe_allow_html=True)
         st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
+
+        # ---------------------------------------------------------
+        # ROW 3: 5-PILLAR TRUST INDEX HORIZONTAL CARDS
+        # ---------------------------------------------------------
+        st.markdown(f"<div style='font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-top: 15px; margin-bottom: 15px;'>5-Pillar Trust Index</div>", unsafe_allow_html=True)
+        
+        p_col1, p_col2, p_col3, p_col4, p_col5 = st.columns(5)
+        p_cols = [p_col1, p_col2, p_col3, p_col4, p_col5]
+        
+        for idx, (label, val) in enumerate(pillar_averages.items()):
+            with p_cols[idx]:
+                # Format score out of 100 as percentage
+                percent_val = int(round(val))
+                # Dynamic trend icons based on threshold
+                if percent_val >= 75:
+                    trend_icon = "↗"
+                    trend_color = "#2ecc71"  # green
+                elif percent_val >= 65:
+                    trend_icon = "→"
+                    trend_color = "#fcd116"  # gold
+                else:
+                    trend_icon = "↘"
+                    trend_color = "#ce1126"  # red
+                
+                # Render beautiful custom glassmorphism card
+                st.markdown(f"""
+                <div class="glass-card" style="padding: 16px; margin-bottom: 10px; border-left: 3px solid {trend_color}; min-height: 140px;">
+                    <div style="font-size: 0.82rem; text-transform: uppercase; font-weight: bold; color: #bdc3c7; height: 35px; overflow: hidden;">
+                        {label}
+                    </div>
+                    <div style="font-size: 2.1rem; font-weight: 800; color: #ffffff; margin-top: 8px;">
+                        {percent_val}%
+                    </div>
+                    <div style="font-size: 0.85rem; color: {trend_color}; font-weight: bold; margin-top: 3px;">
+                        {trend_icon} {percent_val}%
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
         # ---------------------------------------------------------
         # ROW 3: BOTTOM GRID - KEY METRICS (LEFT) & HISTORICAL TREND (RIGHT)
