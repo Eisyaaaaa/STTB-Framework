@@ -1381,14 +1381,11 @@ elif page == "Dashboard" or page == "Welcome & Overview":
     with col_title:
         st.markdown(f"""
         <div style="margin-top: 10px; margin-bottom: 20px;">
-            <div style="font-size: 0.95rem; font-weight: bold; color: {gold_color}; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px;">
-                {"Premium" if lang == "English" else "Premium"}
-            </div>
             <h1 style="margin: 0; font-size: 2.8rem; font-weight: 800; line-height: 1.1; color: #ffffff !important; text-shadow: 0 4px 15px rgba(255,255,255,0.05);">
                 Sarawak <span style="color: {gold_color};">Tech-Trust</span><br>Barometer (STTB)
             </h1>
             <p style="font-size: 1.05rem; color: #bdc3c7; margin-top: 15px; margin-bottom: 25px; line-height: 1.5;">
-                {"A premium, state-of-the-art digital trust analytics framework measuring public sentiment and institutional trustworthiness across all administrative divisions of Sarawak." if lang == "English" else "Kerangka kerja analisis kepercayaan digital bertaraf tinggi untuk mengukur sentimen awam dan tahap kebolehpercayaan institusi di seluruh bahagian pentadbiran Sarawak."}
+                {"A digital trust analytics framework measuring public sentiment and institutional trustworthiness across Sarawak." if lang == "English" else "Kerangka kerja analisis kepercayaan digital untuk mengukur sentimen awam dan tahap kebolehpercayaan institusi di seluruh Sarawak."}
             </p>
         </div>
         """, unsafe_allow_html=True)
