@@ -1848,51 +1848,7 @@ elif page == "Dashboard" or page == "Welcome & Overview":
             use_container_width=True
         )
 
-        # Collapsible Database Administration Panel (Admin Only)
-        st.markdown("<br>", unsafe_allow_html=True)
-        admin_title = "Tetapan Sistem & Pentadbiran (UTS Admin Sahaja)" if lang == "Bahasa Melayu" else "System Settings & Administration (UTS Admin Only)"
-        with st.expander(admin_title):
-            if lang == "Bahasa Melayu":
-                st.markdown("""
-                <div style="padding: 10px; border-left: 3px solid #DA291C;">
-                    <h4 style="color:#DA291C; margin: 0 0 10px 0;">Panel Pentadbiran Pangkalan Data</h4>
-                    <p style="font-size:0.85rem; color:#bdc3c7; margin:0 0 15px 0;">
-                        Untuk memindahkan kerangka kerja ini daripada fasa penilaian rintisan kepada pengumpulan data akademik dunia sebenar, anda boleh memadamkan semua rekod olok-olok pra-pemuatan di sini. Ini akan mengosongkan pangkalan data sepenuhnya kepada sifar penyerahan dan menghentikan enjin pemuatan automatik secara kekal.
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
-            else:
-                st.markdown("""
-                <div style="padding: 10px; border-left: 3px solid #DA291C;">
-                    <h4 style="color:#DA291C; margin: 0 0 10px 0;">Database Administration Panel</h4>
-                    <p style="font-size:0.85rem; color:#bdc3c7; margin:0 0 15px 0;">
-                        To transition this framework from the pilot evaluation phase to real-world academic data collection, you can purge all pre-seeded mock records here. This will clear the database entirely to a 0-submission slate and permanently stop the automated seed engine.
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            purge_btn_lbl = "Padam Semua Rekod Pangkalan Data Rintisan" if lang == "Bahasa Melayu" else "Purge All Pilot Database Records"
-            if st.button(purge_btn_lbl, type="secondary", use_container_width=True, key="admin_purge_btn"):
-                conn = get_db_connection()
-                cursor = conn.cursor()
-                cursor.execute("DELETE FROM respondents")
-                cursor.execute("DELETE FROM responses")
-                cursor.execute("DELETE FROM computed_scores")
-                cursor.execute("CREATE TABLE IF NOT EXISTS system_config (key TEXT UNIQUE, val TEXT)")
-                cursor.execute("INSERT OR REPLACE INTO system_config (key, val) VALUES ('seeded', 'false')")
-                conn.commit()
-                conn.close()
-                
-                # Log action
-                log_admin_action(
-                    "Database Purge", 
-                    "Purged all mock respondents, responses, and computed scores to clean system for academic production phase."
-                )
-                
-                succ_purge = "Pangkalan data berjaya dipadamkan kepada keadaan bersih! Mengarah semula..." if lang == "Bahasa Melayu" else "Database successfully purged to a clean state! Redirecting..."
-                st.success(succ_purge)
-                st.session_state["page"] = "Dashboard"
-                st.rerun()
+
 
 
 # ---------------------------------------------------------
