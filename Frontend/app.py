@@ -1389,11 +1389,7 @@ elif page == "Dashboard" or page == "Welcome & Overview":
             </p>
         </div>
         """, unsafe_allow_html=True)
-        
-        # Dashboard Anchor button
-        btn_lbl = "Papan Pemuka >" if lang == "Bahasa Melayu" else "Dashboard >"
-        if st.button(btn_lbl, key="dashboard_anchor_btn"):
-            st.rerun()
+
 
     # ---------------------------------------------------------
     # DYNAMIC INTERACTIVE GIS MAP (Col 7)
