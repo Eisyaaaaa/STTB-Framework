@@ -26,7 +26,11 @@ st.set_page_config(
 if "theme_mode" not in st.session_state:
     st.session_state["theme_mode"] = "Dark Mode"
 
-gold_color = "#D4AF37" if st.session_state.get("theme_mode") == "Light Mode" else "#FCD116"
+gold_color = "#FCD116"
+red_color = "#CE1126"
+charcoal_color = "#1A1D20"
+light_gray = "#F4F6F8"
+black_color = "#000000"
 
 if st.session_state["theme_mode"] == "Dark Mode":
     st.markdown("""
@@ -162,8 +166,8 @@ else:
         }
         
         .stApp {
-            background: linear-gradient(135deg, #f4f5f8 0%, #ffffff 100%);
-            color: #1a1a24;
+            background: #F4F6F8;
+            color: #1A1D20;
         }
         
         [data-testid="stSidebar"] {
@@ -172,44 +176,44 @@ else:
         }
         
         [data-testid="stSidebar"] * {
-            color: #1a1a24 !important;
+            color: #1A1D20 !important;
         }
         
         /* Ensure selectbox text has perfect dark contrast */
         div[data-baseweb="select"] * {
-            color: #1a1a24 !important;
+            color: #1A1D20 !important;
         }
         
         /* Ensure standard input widget labels are dark in Light Mode */
         label p {
-            color: #1a1a24 !important;
+            color: #1A1D20 !important;
             font-weight: 600 !important;
         }
         
         div[data-testid="stSidebarUserContent"] .stRadio label {
-            color: #1a1a24 !important;
+            color: #1A1D20 !important;
         }
         
         .glass-card {
             background: #ffffff;
-            border: 1px solid rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(26, 29, 32, 0.12);
             border-radius: 16px;
             padding: 24px;
             margin-bottom: 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
             transition: all 0.3s ease-in-out;
-            color: #1a1a24 !important;
+            color: #1A1D20 !important;
         }
         
         .glass-card:hover {
-            border: 1px solid rgba(218, 41, 28, 0.3);
-            box-shadow: 0 8px 30px rgba(218, 41, 28, 0.06);
+            border: 1px solid rgba(206, 17, 38, 0.3);
+            box-shadow: 0 8px 30px rgba(206, 17, 38, 0.06);
             transform: translateY(-2px);
         }
         
         .glass-header {
-            background: linear-gradient(90deg, rgba(255, 199, 44, 0.18) 0%, rgba(218, 41, 28, 0.05) 60%, rgba(0, 0, 0, 0) 100%);
-            border-left: 5px solid #E0AE1B;
+            background: linear-gradient(90deg, rgba(252, 209, 22, 0.18) 0%, rgba(206, 17, 38, 0.05) 60%, rgba(0, 0, 0, 0) 100%);
+            border-left: 5px solid #FCD116;
             border-radius: 4px 16px 16px 4px;
             padding: 20px;
             margin-bottom: 25px;
@@ -219,14 +223,14 @@ else:
             font-family: 'Outfit', sans-serif;
             font-weight: 800 !important;
             letter-spacing: -1px;
-            color: #DA291C !important;
+            color: #CE1126 !important;
             text-shadow: none;
         }
         
         h2, h3 {
             font-family: 'Outfit', sans-serif;
             font-weight: 600 !important;
-            color: #1a1a24 !important;
+            color: #1A1D20 !important;
         }
         
         .subtitle {
@@ -242,7 +246,7 @@ else:
             font-size: 2.8rem;
             font-weight: 800;
             margin: 5px 0;
-            background: linear-gradient(45deg, #DA291C, #E0AE1B);
+            background: linear-gradient(45deg, #CE1126, #FCD116);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -255,21 +259,21 @@ else:
         }
         
         div.stButton > button:first-child {
-            background: linear-gradient(135deg, #DA291C 0%, #B81D13 100%) !important;
+            background: linear-gradient(135deg, #CE1126 0%, #A50F1E 100%) !important;
             color: #ffffff !important;
-            border: 1px solid #E0AE1B !important;
+            border: 1px solid #FCD116 !important;
             font-weight: 600 !important;
             border-radius: 10px !important;
             padding: 12px 24px !important;
-            box-shadow: 0 4px 15px rgba(218, 41, 28, 0.15) !important;
+            box-shadow: 0 4px 15px rgba(206, 17, 38, 0.15) !important;
             transition: all 0.3s ease !important;
         }
         
         div.stButton > button:first-child:hover {
-            background: linear-gradient(135deg, #E0AE1B 0%, #CFA015 100%) !important;
+            background: linear-gradient(135deg, #FCD116 0%, #D8B213 100%) !important;
             color: #ffffff !important;
-            border: 1px solid #DA291C !important;
-            box-shadow: 0 4px 15px rgba(255, 199, 44, 0.2) !important;
+            border: 1px solid #CE1126 !important;
+            box-shadow: 0 4px 15px rgba(252, 209, 22, 0.2) !important;
             transform: translateY(-1px) !important;
         }
     </style>
@@ -616,7 +620,7 @@ else:
     nav_border = "rgba(0, 0, 0, 0.08)"
     nav_text = "#718096"
     nav_shadow = "0 8px 32px 0 rgba(0, 0, 0, 0.08)"
-    active_color = "#DA291C"
+    active_color = "#CE1126"
 
 # Container/styling for unified horizontal navbar strip
 st.markdown(f"""
@@ -2175,8 +2179,8 @@ elif page == "Admin Panel":
                         
                         # Display clean card
                         st.markdown(f"""
-                        <div class="glass-card" style="border-left: 5px solid #FFC72C;">
-                            <h4 style="margin: 0 0 5px 0; color: #FFC72C;">{record['subject']}</h4>
+                        <div class="glass-card" style="border-left: 5px solid #FCD116;">
+                            <h4 style="margin: 0 0 5px 0; color: #FCD116;">{record['subject']}</h4>
                             <div style="font-size: 0.8rem; color: #888888; margin-bottom: 15px;">
                                 ID: #{record['id']} | {record['submitted_at']} <br>
                                 <b>Peranan:</b> {record['user_role']} <br>
@@ -2219,13 +2223,13 @@ elif page == "Admin Panel":
                     # Category counts chart
                     cat_counts = df_feed["category"].value_counts().reset_index()
                     cat_counts.columns = ["Kategori" if lang == "Bahasa Melayu" else "Category", "Jumlah" if lang == "Bahasa Melayu" else "Count"]
-                    st.bar_chart(data=cat_counts, x="Kategori" if lang == "Bahasa Melayu" else "Category", y="Jumlah" if lang == "Bahasa Melayu" else "Count", color="#FFC72C")
+                    st.bar_chart(data=cat_counts, x="Kategori" if lang == "Bahasa Melayu" else "Category", y="Jumlah" if lang == "Bahasa Melayu" else "Count", color="#FCD116")
                     
                 with c_chart2:
                     # Satisfaction frequency chart
                     sat_counts = df_feed["satisfaction"].value_counts().reset_index()
                     sat_counts.columns = ["Skor" if lang == "Bahasa Melayu" else "Score", "Jumlah" if lang == "Bahasa Melayu" else "Count"]
-                    st.bar_chart(data=sat_counts, x="Skor" if lang == "Bahasa Melayu" else "Score", y="Jumlah" if lang == "Bahasa Melayu" else "Count", color="#DA291C")
+                    st.bar_chart(data=sat_counts, x="Skor" if lang == "Bahasa Melayu" else "Score", y="Jumlah" if lang == "Bahasa Melayu" else "Count", color="#CE1126")
 
             # 4. Database Administration Panel
             st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.15);'><br>", unsafe_allow_html=True)
@@ -2351,8 +2355,8 @@ elif page == "Admin Panel":
                         
                         # Display clean card
                         st.markdown(f"""
-                        <div class="glass-card" style="border-left: 5px solid #DA291C;">
-                            <h4 style="margin: 0 0 5px 0; color: #DA291C;">Responden #{resp_id_val}</h4>
+                        <div class="glass-card" style="border-left: 5px solid #CE1126;">
+                            <h4 style="margin: 0 0 5px 0; color: #CE1126;">Responden #{resp_id_val}</h4>
                             <div style="font-size: 0.8rem; color: #888888; margin-bottom: 10px;">
                                 <b>Tarikh:</b> {resp_date_val} <br>
                                 <b>Kumpulan Umur:</b> {resp_age_val} | <b>Jantina:</b> {resp_gender_val} <br>
@@ -2402,13 +2406,13 @@ elif page == "Admin Panel":
             
             if lang == "Bahasa Melayu":
                 st.markdown("""
-                <div class="glass-card" style="border-left: 3px solid #FFC72C;">
+                <div class="glass-card" style="border-left: 3px solid #FCD116;">
                     <p><b>Muat Naik Data Tinjauan Google Form:</b> Jika anda mengumpul data menggunakan Google Form luar, anda boleh mengimport entri di sini. Pemuat menyokong pemetaan lajur automatik atau manual untuk disesuaikan dengan soalan mini-tinjauan anda.</p>
                 </div>
                 """, unsafe_allow_html=True)
             else:
                 st.markdown("""
-                <div class="glass-card" style="border-left: 3px solid #FFC72C;">
+                <div class="glass-card" style="border-left: 3px solid #FCD116;">
                     <p><b>Upload Google Form Survey Data:</b> If you collected responses via an external Google Form, you can import them here. The loader supports automatic detection or manual column mapping for the 15 mini-survey questions.</p>
                 </div>
                 """, unsafe_allow_html=True)
