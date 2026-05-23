@@ -587,7 +587,7 @@ TRANSLATIONS = {
     "English": {
         "overview": "Overview",
         "survey": "Survey",
-        "dashboard": "Dashboard",
+        "dashboard": "Main Page",
         "map": "Map",
         "help": "Help",
         "admin": "Admin"
@@ -595,7 +595,7 @@ TRANSLATIONS = {
     "Bahasa Melayu": {
         "overview": "Ringkasan",
         "survey": "Soal Selidik",
-        "dashboard": "Papan Pemuka",
+        "dashboard": "Halaman Utama",
         "map": "Peta Kawasan",
         "help": "Bantuan",
         "admin": "Admin"
