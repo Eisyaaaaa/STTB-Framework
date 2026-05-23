@@ -773,6 +773,17 @@ with nav_cols[lang_col_idx]:
     if st.button("Language", key="nav_language_toggle", type=btn_kind, use_container_width=True):
         st.session_state["show_lang_options"] = not is_lang_menu_open
         st.rerun()
+        
+    if is_lang_menu_open:
+        st.markdown("<div style='margin-top: 5px;'></div>", unsafe_allow_html=True)
+        if st.button("English", key="lang_opt_English", type="primary" if lang == "English" else "secondary", use_container_width=True):
+            st.session_state["language"] = "English"
+            st.session_state["show_lang_options"] = False
+            st.rerun()
+        if st.button("Bahasa Melayu", key="lang_opt_Malay", type="primary" if lang == "Bahasa Melayu" else "secondary", use_container_width=True):
+            st.session_state["language"] = "Bahasa Melayu"
+            st.session_state["show_lang_options"] = False
+            st.rerun()
 
 # Theme Toggle Column
 with nav_cols[theme_col_idx]:
@@ -810,26 +821,7 @@ with nav_cols[profile_col_idx]:
     </div>
     """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# DYNAMIC LANGUAGE DROPDOWN SUB-STRIP
-# ---------------------------------------------------------
-if st.session_state.get("show_lang_options", False):
-    # Render language options right-aligned in a clean, non-wrapping thin row (English and Bahasa Melayu only)
-    st.markdown("<div style='margin-top: -15px;'></div>", unsafe_allow_html=True)
-    sub_cols = st.columns(sub_strip_widths)
-    
-    with sub_cols[1]:
-        if st.button("English", key="lang_opt_English", type="primary" if lang == "English" else "secondary", use_container_width=True):
-            st.session_state["language"] = "English"
-            st.session_state["show_lang_options"] = False
-            st.rerun()
-            
-    with sub_cols[2]:
-        if st.button("Bahasa Melayu", key="lang_opt_Malay", type="primary" if lang == "Bahasa Melayu" else "secondary", use_container_width=True):
-            st.session_state["language"] = "Bahasa Melayu"
-            st.session_state["show_lang_options"] = False
-            st.rerun()
-    st.markdown("<div style='margin-bottom: 15px;'></div>", unsafe_allow_html=True)
+
 
 
 # Get current page selection from session state
