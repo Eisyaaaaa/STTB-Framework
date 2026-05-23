@@ -1583,7 +1583,7 @@ elif page == "Dashboard" or page == "Welcome & Overview":
     # ---------------------------------------------------------
     # ROW 2.2: THE 5 DIGITAL TRUST PILLARS EXPLAINED (Bento Grid Layout)
     # ---------------------------------------------------------
-    st.markdown(f"<div style='font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-bottom: 15px;'>{"The 5 Pillars of Digital Trust Explained" if lang == "English" else "Penjelasan 5 Tonggak Kepercayaan Digital"}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-bottom: 15px;'>{"STTB's Digital Pillars" if lang == "English" else "Tonggak Digital STTB"}</div>", unsafe_allow_html=True)
     
     pi_col1, pi_col2, pi_col3, pi_col4, pi_col5 = st.columns(5)
     pi_cols = [pi_col1, pi_col2, pi_col3, pi_col4, pi_col5]
