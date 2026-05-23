@@ -18,7 +18,8 @@ STTB-Framework/
 │
 ├── Frontend/                 # User Interface & Visualizations Layer
 │   ├── app.py                # Main Streamlit application & interactive panels
-│   └── sarawak_flag.svg      # (Local Asset) Sarawak State Flag logo
+│   ├── sarawak_flag.svg      # (Local Asset) Sarawak State Flag logo
+│   └── sttb_official_logo.png # (Local Asset) Stylized Golden Hornbill Brand Logo
 │
 └── Backend/                  # Scoring Logic & Data Persistence Layer
     ├── survey.py             # Math scoring engine & 75-item bilingual database
