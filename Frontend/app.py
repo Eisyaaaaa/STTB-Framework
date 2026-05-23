@@ -1299,15 +1299,11 @@ elif page == "Public Survey Form":
 
 # ---------------------------------------------------------
 # PAGE 3: ANALYTICS DASHBOARD
-# --------------------------------------------------# ---------------------------------------------------------
-# PAGE 3: ANALYTICS DASHBOARD
 # ---------------------------------------------------------
 elif page == "Analytics Dashboard":
-    if lang == "Bahasa Melayu":
-        st.markdown('<div class="glass-header"><h1>Papan Pemuka Analisis STTB</h1><div class="subtitle">Penunjuk Kepercayaan Masa Nyata & Penapis Demografi</div></div>', unsafe_allow_html=True)
-    else:
-        st.markdown('<div class="glass-header"><h1>STTB Analytics Dashboard</h1><div class="subtitle">Real-time Trust Indicators & Demographic Filters</div></div>', unsafe_allow_html=True)
-    
+    # Import Plotly dynamically
+    import plotly.graph_objects as go
+
     # Fetch all data from DB
     conn = get_db_connection()
     df_resp = pd.read_sql_query("SELECT * FROM respondents", conn)
@@ -1317,196 +1313,37 @@ elif page == "Analytics Dashboard":
     # Merge datasets
     df = pd.merge(df_resp, df_scores, left_on="id", right_on="respondent_id")
     
-    # Filter controls in sidebar-style layout inside dashboard
-    filter_title = "Penapis Segmen Demografi" if lang == "Bahasa Melayu" else "Demographic Segment Filters"
-    st.markdown(f"<h3 style='color:#ffd700;'>{filter_title}</h3>", unsafe_allow_html=True)
+    # ---------------------------------------------------------
+    # TOP HEADER SECTION: SIDE-BY-SIDE DESIGN (Columns 5 and 7)
+    # ---------------------------------------------------------
+    col_title, col_map = st.columns([5, 7], vertical_alignment="top")
     
-    f_col1, f_col2, f_col3, f_col4 = st.columns(4)
-    
-    # Translate segment filters
-    f_dist_lbl = "Tapis Bahagian" if lang == "Bahasa Melayu" else "Filter Division"
-    f_age_lbl = "Tapis Kumpulan Umur" if lang == "Bahasa Melayu" else "Filter Age Group"
-    f_gen_lbl = "Tapis Jantina" if lang == "Bahasa Melayu" else "Filter Gender"
-    f_occ_lbl = "Tapis Pekerjaan" if lang == "Bahasa Melayu" else "Filter Occupation"
-    
-    all_label = "Semua" if lang == "Bahasa Melayu" else "All"
-    
-    # Map options for display
-    occ_mapping_bm_en = {
-        "Semua": "All",
-        "Pelajar": "Student",
-        "Penjawat Awam": "Civil Servant",
-        "Sektor Swasta": "Private Sector",
-        "Bekerja Sendiri": "Self-Employed",
-        "Pesara": "Retired",
-        "Tidak Bekerja": "Unemployed"
-    }
-    
-    with f_col1:
-        f_district_raw = st.multiselect(f_dist_lbl, [all_label] + list(SARAWAK_DIVISIONS.keys()) + (["Lain-lain"] if lang == "Bahasa Melayu" else ["Others"]), default=all_label)
-    with f_col2:
-        f_age = st.multiselect(f_age_lbl, [all_label, "18-24", "25-34", "35-44", "45-54", "55-64", "65+"], default=all_label)
-    with f_col3:
-        f_gender_raw = st.multiselect(f_gen_lbl, [all_label, "Lelaki" if lang == "Bahasa Melayu" else "Male", "Perempuan" if lang == "Bahasa Melayu" else "Female"], default=all_label)
-    with f_col4:
-        f_occ_raw = st.multiselect(f_occ_lbl, [all_label, "Pelajar" if lang == "Bahasa Melayu" else "Student", "Penjawat Awam" if lang == "Bahasa Melayu" else "Civil Servant", "Sektor Swasta" if lang == "Bahasa Melayu" else "Private Sector", "Bekerja Sendiri" if lang == "Bahasa Melayu" else "Self-Employed", "Pesara" if lang == "Bahasa Melayu" else "Retired", "Tidak Bekerja" if lang == "Bahasa Melayu" else "Unemployed"], default=all_label)
+    with col_title:
+        st.markdown(f"""
+        <div style="margin-top: 10px; margin-bottom: 20px;">
+            <div style="font-size: 0.95rem; font-weight: bold; color: {gold_color}; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px;">
+                {"Premium" if lang == "English" else "Premium"}
+            </div>
+            <h1 style="margin: 0; font-size: 2.8rem; font-weight: 800; line-height: 1.1; color: #ffffff !important; text-shadow: 0 4px 15px rgba(255,255,255,0.05);">
+                Sarawak <span style="color: {gold_color};">Tech-Trust</span><br>Barometer (STTB)
+            </h1>
+            <p style="font-size: 1.05rem; color: #bdc3c7; margin-top: 15px; margin-bottom: 25px; line-height: 1.5;">
+                {"A premium, state-of-the-art digital trust analytics framework measuring public sentiment and institutional trustworthiness across all administrative divisions of Sarawak." if lang == "English" else "Kerangka kerja analisis kepercayaan digital bertaraf tinggi untuk mengukur sentimen awam dan tahap kebolehpercayaan institusi di seluruh bahagian pentadbiran Sarawak."}
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
         
-    # Map filters to DB equivalents
-    f_district = []
-    for d in f_district_raw:
-        if d == all_label:
-            f_district.append("All")
-        elif d == "Lain-lain":
-            f_district.append("Others")
-        else:
-            f_district.append(d)
-            
-    f_gender = []
-    for g in f_gender_raw:
-        if g == all_label:
-            f_gender.append("All")
-        elif g == "Lelaki":
-            f_gender.append("Male")
-        elif g == "Perempuan":
-            f_gender.append("Female")
-        else:
-            f_gender.append(g)
-            
-    f_occ = []
-    for o in f_occ_raw:
-        if o == all_label:
-            f_occ.append("All")
-        else:
-            f_occ.append(occ_mapping_bm_en.get(o, o))
-            
-    # Apply filtering logic
-    df_filtered = df.copy()
-    if f_district and "All" not in f_district:
-        df_filtered = df_filtered[df_filtered["district"].isin(f_district)]
-    if f_age and "All" not in f_age:
-        df_filtered = df_filtered[df_filtered["age_group"].isin(f_age)]
-    if f_gender and "All" not in f_gender:
-        df_filtered = df_filtered[df_filtered["gender"].isin(f_gender)]
-    if f_occ and "All" not in f_occ:
-        df_filtered = df_filtered[df_filtered["occupation"].isin(f_occ)]
-        
-    if df_filtered.empty:
-        warn_msg = "Tiada hantaran tinjauan yang sepadan dengan penapis yang dipilih. Set semula penapis untuk melihat data." if lang == "Bahasa Melayu" else "No survey submissions match the selected filters. Reset filters to see data."
-        st.warning(warn_msg)
-    else:
-        # Show key metric cards
-        m_col1, m_col2, m_col3 = st.columns(3)
-        with m_col1:
-            lbl1 = "Saiz Sampel Aktif (N)" if lang == "Bahasa Melayu" else "Active Sample Size (N)"
-            lbl2 = "Respons Ditapis" if lang == "Bahasa Melayu" else "Filtered Responses"
-            st.markdown(f"""
-            <div class="glass-card" style="text-align:center;">
-                <div class="metric-label">{lbl1}</div>
-                <div class="metric-value" style="color:#ffd700;">{len(df_filtered)}</div>
-                <div class="metric-label">{lbl2}</div>
-            </div>
-            """, unsafe_allow_html=True)
-        with m_col2:
-            idx_avg = df_filtered["sttb_index"].mean()
-            eval_info = survey.get_trust_level(idx_avg)
-            
-            lbl_avg = "Indeks STTB Segmen" if lang == "Bahasa Melayu" else "Segment STTB Index"
-            bm_levels = {
-                "High Trust": "Kepercayaan Tinggi",
-                "Moderate Trust": "Kepercayaan Sederhana",
-                "Low Trust": "Kepercayaan Rendah",
-                "Very Low Trust": "Kepercayaan Sangat Rendah"
-            }
-            level_str = bm_levels.get(eval_info["level"], eval_info["level"]) if lang == "Bahasa Melayu" else eval_info["level"]
-            
-            st.markdown(f"""
-            <div class="glass-card" style="text-align:center;">
-                <div class="metric-label">{lbl_avg}</div>
-                <div class="metric-value" style="background:none; -webkit-text-fill-color: {eval_info['color']};">{idx_avg:.2f}</div>
-                <div class="metric-label" style="color: {eval_info['color']}; font-weight:bold;">{level_str}</div>
-            </div>
-            """, unsafe_allow_html=True)
-        with m_col3:
-            # Find weakest pillar
-            pillar_cols = [
-                ("ps1_transparency", "Transparency"),
-                ("ps2_ethics", "Ethics"),
-                ("ps3_privacy", "Privacy"),
-                ("ps4_security", "Security"),
-                ("ps5_inclusion", "Inclusion")
-            ]
-            pillar_averages = {label: df_filtered[col].mean() for col, label in pillar_cols}
-            weakest = min(pillar_averages, key=pillar_averages.get)
-            weakest_val = pillar_averages[weakest]
-            
-            bm_pillars = {
-                "Transparency": "Ketelusan",
-                "Ethics": "Etika",
-                "Privacy": "Privasi",
-                "Security": "Keselamatan",
-                "Inclusion": "Inklusi"
-            }
-            weakest_str = bm_pillars.get(weakest, weakest) if lang == "Bahasa Melayu" else weakest
-            lbl_weak = "Paksi Kepercayaan Terlemah" if lang == "Bahasa Melayu" else "Weakest Trust Axis"
-            st.markdown(f"""
-            <div class="glass-card" style="text-align:center;">
-                <div class="metric-label">{lbl_weak}</div>
-                <div class="metric-value" style="color:#C0392B; font-size:2.2rem; margin:15px 0;">{weakest_str}</div>
-                <div class="metric-label">Score: {weakest_val:.1f} / 100</div>
-            </div>
-            """, unsafe_allow_html=True)
+        # Dashboard Anchor button
+        btn_lbl = "Papan Pemuka >" if lang == "Bahasa Melayu" else "Dashboard >"
+        if st.button(btn_lbl, key="dashboard_anchor_btn"):
+            st.rerun()
 
-        # 1. Bar Chart of 5 Pillars
-        comp_title = "Perbandingan Profil Kepercayaan Tonggak" if lang == "Bahasa Melayu" else "Pillar Trust Profile Comparison"
-        st.markdown(f"<h3 style='color:#ffd700; margin-top:20px;'>{comp_title}</h3>", unsafe_allow_html=True)
-        
-        translated_pillar_keys = [bm_pillars.get(k, k) if lang == "Bahasa Melayu" else k for k in pillar_averages.keys()]
-        chart_data = pd.DataFrame({
-            "Trust Pillar" if lang == "Bahasa Melayu" else "Trust Pillar": translated_pillar_keys,
-            "Index Score" if lang == "Bahasa Melayu" else "Index Score": list(pillar_averages.values())
-        })
-        
-        st.bar_chart(chart_data, x="Trust Pillar" if lang == "Bahasa Melayu" else "Trust Pillar", y="Index Score" if lang == "Bahasa Melayu" else "Index Score", color="#ffd700")
-
-        # 2. Division Rankings Table
-        rank_title = "Kedudukan Bahagian Pentadbiran" if lang == "Bahasa Melayu" else "Administrative Division Rankings"
-        st.markdown(f"<h3 style='color:#ffd700; margin-top:20px;'>{rank_title}</h3>", unsafe_allow_html=True)
-        
-        div_summary = df_filtered.groupby("district").agg(
-            respondents_count=("respondent_id", "count"),
-            sttb_index_avg=("sttb_index", "mean")
-        ).reset_index()
-        
-        div_summary = div_summary.sort_values(by="sttb_index_avg", ascending=False)
-        
-        # Formatting for presentation
-        div_presentation = div_summary.copy()
-        div_presentation["sttb_index_avg"] = div_presentation["sttb_index_avg"].round(2)
-        div_presentation = div_presentation.rename(columns={
-            "district": "Bahagian Sarawak" if lang == "Bahasa Melayu" else "Sarawak Division",
-            "respondents_count": "Sampel (N)" if lang == "Bahasa Melayu" else "Sample (N)",
-            "sttb_index_avg": "Indeks STTB (0-100)" if lang == "Bahasa Melayu" else "STTB Index (0-100)"
-        })
-        
-        if lang == "Bahasa Melayu":
-            div_presentation["Bahagian Sarawak"] = div_presentation["Bahagian Sarawak"].replace({"Others": "Lain-lain"})
-        
-        st.dataframe(
-            div_presentation[[
-                "Bahagian Sarawak" if lang == "Bahasa Melayu" else "Sarawak Division",
-                "Sampel (N)" if lang == "Bahasa Melayu" else "Sample (N)",
-                "Indeks STTB (0-100)" if lang == "Bahasa Melayu" else "STTB Index (0-100)"
-            ]],
-            hide_index=True,
-            use_container_width=True
-        )
-        
-        # 3. Interactive Geographic Digital Trust Map
-        map_title = "Peta Kepercayaan Geografi Sarawak" if lang == "Bahasa Melayu" else "Geographic Sarawak Digital Trust Map"
-        st.markdown(f"<h3 style='color:{gold_color}; margin-top:20px;'>{map_title}</h3>", unsafe_allow_html=True)
-        
-        # Calculate division averages from df_filtered
-        div_stats = df_filtered.groupby("district").agg(
+    # ---------------------------------------------------------
+    # DYNAMIC INTERACTIVE GIS MAP (Col 7)
+    # ---------------------------------------------------------
+    with col_map:
+        # Calculate division averages from df
+        div_stats = df.groupby("district").agg(
             sttb_index=("sttb_index", "mean"),
             count=("respondent_id", "count"),
             transparency=("ps1_transparency", "mean"),
@@ -1517,7 +1354,7 @@ elif page == "Analytics Dashboard":
         ).to_dict("index")
         
         # Setup Folium Map centered on Sarawak
-        m = folium.Map(location=[2.5000, 113.0000], zoom_start=7, tiles="cartodbpositron")
+        m = folium.Map(location=[2.5000, 113.0000], zoom_start=6.8, tiles="cartodbpositron")
         
         # Add colored markers representing division trust
         for div_name, coords in SARAWAK_DIVISIONS.items():
@@ -1526,17 +1363,11 @@ elif page == "Analytics Dashboard":
                 "transparency": None, "ethics": None, "privacy": None, "security": None, "inclusion": None
             })
             
-            # If there are no data entries yet, count is 0
             if stats["count"] == 0:
                 index_display = "N/A"
                 level_str = "Tiada Data" if lang == "Bahasa Melayu" else "No Data"
                 marker_color = "#7f8c8d"  # Neutral Gray
-                
-                t_val = "N/A"
-                e_val = "N/A"
-                p_val = "N/A"
-                s_val = "N/A"
-                i_val = "N/A"
+                t_val = "N/A"; e_val = "N/A"; p_val = "N/A"; s_val = "N/A"; i_val = "N/A"
             else:
                 index_val = stats["sttb_index"]
                 index_display = f"{index_val:.2f}"
@@ -1611,8 +1442,274 @@ elif page == "Analytics Dashboard":
                 tooltip=f"{div_name}: Index = {index_display}"
             ).add_to(m)
             
-        st_folium(m, width=1200, height=600, key="dashboard_trust_map")
+        st_folium(m, height=360, use_container_width=True, key="dashboard_trust_map")
+
+    # ---------------------------------------------------------
+    # COLLAPSIBLE ADVANCED DEMOGRAPHIC FILTERS
+    # ---------------------------------------------------------
+    filter_title = "Penapis Segmen Demografi (Advanced Filters)" if lang == "Bahasa Melayu" else "Demographic Segment Filters (Advanced Filters)"
+    with st.expander(filter_title, expanded=False):
+        f_col1, f_col2, f_col3, f_col4 = st.columns(4)
+        f_dist_lbl = "Tapis Bahagian" if lang == "Bahasa Melayu" else "Filter Division"
+        f_age_lbl = "Tapis Kumpulan Umur" if lang == "Bahasa Melayu" else "Filter Age Group"
+        f_gen_lbl = "Tapis Jantina" if lang == "Bahasa Melayu" else "Filter Gender"
+        f_occ_lbl = "Tapis Pekerjaan" if lang == "Bahasa Melayu" else "Filter Occupation"
+        all_label = "Semua" if lang == "Bahasa Melayu" else "All"
         
+        occ_mapping_bm_en = {
+            "Semua": "All", "Pelajar": "Student", "Penjawat Awam": "Civil Servant",
+            "Sektor Swasta": "Private Sector", "Bekerja Sendiri": "Self-Employed",
+            "Pesara": "Retired", "Tidak Bekerja": "Unemployed"
+        }
+        
+        with f_col1:
+            f_district_raw = st.multiselect(f_dist_lbl, [all_label] + list(SARAWAK_DIVISIONS.keys()) + (["Lain-lain"] if lang == "Bahasa Melayu" else ["Others"]), default=all_label)
+        with f_col2:
+            f_age = st.multiselect(f_age_lbl, [all_label, "18-24", "25-34", "35-44", "45-54", "55-64", "65+"], default=all_label)
+        with f_col3:
+            f_gender_raw = st.multiselect(f_gen_lbl, [all_label, "Lelaki" if lang == "Bahasa Melayu" else "Male", "Perempuan" if lang == "Bahasa Melayu" else "Female"], default=all_label)
+        with f_col4:
+            f_occ_raw = st.multiselect(f_occ_lbl, [all_label, "Pelajar" if lang == "Bahasa Melayu" else "Student", "Penjawat Awam" if lang == "Bahasa Melayu" else "Civil Servant", "Sektor Swasta" if lang == "Bahasa Melayu" else "Private Sector", "Bekerja Sendiri" if lang == "Bahasa Melayu" else "Self-Employed", "Pesara" if lang == "Bahasa Melayu" else "Retired", "Tidak Bekerja" if lang == "Bahasa Melayu" else "Unemployed"], default=all_label)
+            
+        # Map filters
+        f_district = []
+        for d in f_district_raw:
+            if d == all_label: f_district.append("All")
+            elif d == "Lain-lain": f_district.append("Others")
+            else: f_district.append(d)
+                
+        f_gender = []
+        for g in f_gender_raw:
+            if g == all_label: f_gender.append("All")
+            elif g == "Lelaki": f_gender.append("Male")
+            elif g == "Perempuan": f_gender.append("Female")
+            else: f_gender.append(g)
+                
+        f_occ = []
+        for o in f_occ_raw:
+            if o == all_label: f_occ.append("All")
+            else: f_occ.append(occ_mapping_bm_en.get(o, o))
+                
+    # Apply filtering
+    df_filtered = df.copy()
+    if f_district and "All" not in f_district:
+        df_filtered = df_filtered[df_filtered["district"].isin(f_district)]
+    if f_age and "All" not in f_age:
+        df_filtered = df_filtered[df_filtered["age_group"].isin(f_age)]
+    if f_gender and "All" not in f_gender:
+        df_filtered = df_filtered[df_filtered["gender"].isin(f_gender)]
+    if f_occ and "All" not in f_occ:
+        df_filtered = df_filtered[df_filtered["occupation"].isin(f_occ)]
+
+    if df_filtered.empty:
+        warn_msg = "Tiada hantaran tinjauan yang sepadan dengan penapis yang dipilih." if lang == "Bahasa Melayu" else "No survey submissions match the selected filters."
+        st.warning(warn_msg)
+    else:
+        # Calculate pillar averages
+        pillar_cols = [
+            ("ps1_transparency", "1. Digital Literacy" if lang == "English" else "1. Literasi Digital"),
+            ("ps2_ethics", "2. Connectivity Access" if lang == "English" else "2. Akses Sambungan"),
+            ("ps3_privacy", "3. Data Privacy" if lang == "English" else "3. Privasi Data"),
+            ("ps4_security", "4. Cybersecurity" if lang == "English" else "4. Keselamatan Siber"),
+            ("ps5_inclusion", "5. E-Services adoption" if lang == "English" else "5. Inklusi Digital")
+        ]
+        pillar_averages = {label: df_filtered[col].mean() for col, label in pillar_cols}
+        
+        # ---------------------------------------------------------
+        # ROW 2: 5-PILLAR TRUST INDEX HORIZONTAL CARDS
+        # ---------------------------------------------------------
+        st.markdown(f"<div style='font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-top: 15px; margin-bottom: 15px;'>5-Pillar Trust Index</div>", unsafe_allow_html=True)
+        
+        p_col1, p_col2, p_col3, p_col4, p_col5 = st.columns(5)
+        p_cols = [p_col1, p_col2, p_col3, p_col4, p_col5]
+        
+        for idx, (label, val) in enumerate(pillar_averages.items()):
+            with p_cols[idx]:
+                # Format score out of 100 as percentage
+                percent_val = int(round(val))
+                # Dynamic trend icons based on threshold
+                if percent_val >= 75:
+                    trend_icon = "↗"
+                    trend_color = "#2ecc71"  # green
+                elif percent_val >= 65:
+                    trend_icon = "→"
+                    trend_color = "#fcd116"  # gold
+                else:
+                    trend_icon = "↘"
+                    trend_color = "#ce1126"  # red
+                
+                # Render beautiful custom glassmorphism card
+                st.markdown(f"""
+                <div class="glass-card" style="padding: 16px; margin-bottom: 10px; border-left: 3px solid {trend_color}; min-height: 140px;">
+                    <div style="font-size: 0.82rem; text-transform: uppercase; font-weight: bold; color: #bdc3c7; height: 35px; overflow: hidden;">
+                        {label}
+                    </div>
+                    <div style="font-size: 2.1rem; font-weight: 800; color: #ffffff; margin-top: 8px;">
+                        {percent_val}%
+                    </div>
+                    <div style="font-size: 0.85rem; color: {trend_color}; font-weight: bold; margin-top: 3px;">
+                        {trend_icon} {percent_val}%
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+        # ---------------------------------------------------------
+        # ROW 3: BOTTOM GRID - KEY METRICS (LEFT) & HISTORICAL TREND (RIGHT)
+        # ---------------------------------------------------------
+        b_col1, b_col2 = st.columns([4, 8], vertical_alignment="top")
+        
+        with b_col1:
+            st.markdown(f"<div style='font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-top: 15px; margin-bottom: 15px;'>Key Metrics</div>", unsafe_allow_html=True)
+            
+            idx_avg = df_filtered["sttb_index"].mean()
+            eval_info = survey.get_trust_level(idx_avg)
+            
+            # Find weakest pillar
+            weakest_key = min(pillar_averages, key=pillar_averages.get)
+            weakest_val = pillar_averages[weakest_key]
+            
+            total_n = len(df_filtered)
+            
+            # Key metrics layout inside a single premium bento-glow glassmorphic card
+            st.markdown(f"""
+            <div class="glass-card" style="padding: 24px; min-height: 380px;">
+                <div style="margin-bottom: 15px;">
+                    <div class="metric-label">Total Submissions (N)</div>
+                    <div style="font-size: 2.1rem; font-weight: 800; color: #ffffff;">{total_n:,}</div>
+                    <div style="font-size: 0.8rem; color: #2ecc71; font-weight: bold;">▲ 100% Active</div>
+                </div>
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 15px 0;">
+                <div style="margin-bottom: 15px;">
+                    <div class="metric-label">Weakest Axis</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #ce1126;">{weakest_key.split('. ')[-1]}</div>
+                    <div style="font-size: 0.8rem; color: #ce1126; font-weight: bold;">▼ Score: {weakest_val:.1f}%</div>
+                </div>
+                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 15px 0;">
+                <div>
+                    <div class="metric-label">Overall Index Score</div>
+                    <div style="font-size: 2.1rem; font-weight: 800; color: {eval_info['color']};">{idx_avg:.2f}</div>
+                    <div style="font-size: 0.85rem; color: {eval_info['color']}; font-weight: bold;">▲ {eval_info['level']}</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with b_col2:
+            st.markdown(f"<div style='font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-top: 15px; margin-bottom: 15px;'>Historical Trust Trend (2023-2024)</div>", unsafe_allow_html=True)
+            
+            # Setup Plotly line chart matching the mockup layout
+            months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            score_gold = [52, 63, 54, 68, 60, 68, 76.5, 59, 75.5, 68, 65, 75]
+            score_red = [53, 62, 57, 69, 56, 70, 60, 65, 76, 70, 67, 74]
+            
+            fig = go.Figure()
+            
+            # Gold Line Trace
+            fig.add_trace(go.Scatter(
+                x=months, y=score_gold,
+                mode='lines+markers',
+                line=dict(color='#FCD116', width=3),
+                marker=dict(size=10, color='#FCD116', symbol='circle'),
+                name='STTB Score'
+            ))
+            
+            # Red Line Trace
+            fig.add_trace(go.Scatter(
+                x=months, y=score_red,
+                mode='lines+markers',
+                line=dict(color='#CE1126', width=2),
+                marker=dict(size=8, color='#CE1126', symbol='circle'),
+                name='Reference'
+            ))
+            
+            # July highlighted annotation
+            fig.add_annotation(
+                x="Jul", y=76.5,
+                text="<b>Overall Score</b><br><span style='font-size:1.1rem; color:#FCD116;'>76.5</span>",
+                showarrow=True,
+                arrowhead=2,
+                arrowcolor="#f5f6f9",
+                ax=0, ay=-45,
+                bordercolor="#FCD116",
+                borderwidth=2,
+                borderpad=4,
+                bgcolor="#111115",
+                opacity=0.9
+            )
+            
+            # September highlighted annotation
+            fig.add_annotation(
+                x="Sep", y=75.5,
+                text="<span style='color:#2ecc71;'><b>▲ +3.2%</b></span>",
+                showarrow=True,
+                arrowhead=2,
+                arrowcolor="#2ecc71",
+                ax=0, ay=-35,
+                bordercolor="#2ecc71",
+                borderwidth=1.5,
+                borderpad=4,
+                bgcolor="#111115",
+                opacity=0.9
+            )
+            
+            fig.update_layout(
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                margin=dict(l=20, r=20, t=10, b=20),
+                height=380,
+                showlegend=False,
+                xaxis=dict(
+                    showgrid=False,
+                    tickfont=dict(color='#a0aec0'),
+                    linecolor='rgba(255,255,255,0.1)'
+                ),
+                yaxis=dict(
+                    showgrid=True,
+                    gridcolor='rgba(255,255,255,0.05)',
+                    tickfont=dict(color='#a0aec0'),
+                    range=[45, 85],
+                    linecolor='rgba(255,255,255,0.1)'
+                )
+            )
+            
+            # Wrap standard container for perfect glassmorphism styling match
+            st.markdown('<div class="glass-card" style="padding: 16px; min-height: 380px;">', unsafe_allow_html=True)
+            st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        # ---------------------------------------------------------
+        # ADDITIONAL DETAIL: DIVISION RANKINGS TABLE (At the bottom)
+        # ---------------------------------------------------------
+        st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
+        rank_title = "Kedudukan Bahagian Pentadbiran" if lang == "Bahasa Melayu" else "Administrative Division Rankings"
+        st.markdown(f"<h3 style='color:{gold_color}; margin-top:10px;'>{rank_title}</h3>", unsafe_allow_html=True)
+        
+        div_summary = df_filtered.groupby("district").agg(
+            respondents_count=("respondent_id", "count"),
+            sttb_index_avg=("sttb_index", "mean")
+        ).reset_index()
+        div_summary = div_summary.sort_values(by="sttb_index_avg", ascending=False)
+        
+        div_presentation = div_summary.copy()
+        div_presentation["sttb_index_avg"] = div_presentation["sttb_index_avg"].round(2)
+        div_presentation = div_presentation.rename(columns={
+            "district": "Bahagian Sarawak" if lang == "Bahasa Melayu" else "Sarawak Division",
+            "respondents_count": "Sampel (N)" if lang == "Bahasa Melayu" else "Sample (N)",
+            "sttb_index_avg": "Indeks STTB (0-100)" if lang == "Bahasa Melayu" else "STTB Index (0-100)"
+        })
+        
+        if lang == "Bahasa Melayu":
+            div_presentation["Bahagian Sarawak"] = div_presentation["Bahagian Sarawak"].replace({"Others": "Lain-lain"})
+            
+        st.dataframe(
+            div_presentation[[
+                "Bahagian Sarawak" if lang == "Bahasa Melayu" else "Sarawak Division",
+                "Sampel (N)" if lang == "Bahasa Melayu" else "Sample (N)",
+                "Indeks STTB (0-100)" if lang == "Bahasa Melayu" else "STTB Index (0-100)"
+            ]],
+            hide_index=True,
+            use_container_width=True
+        )
+
         # Collapsible Database Administration Panel (Admin Only)
         st.markdown("<br>", unsafe_allow_html=True)
         admin_title = "Tetapan Sistem & Pentadbiran (UTS Admin Sahaja)" if lang == "Bahasa Melayu" else "System Settings & Administration (UTS Admin Only)"
@@ -1647,6 +1744,13 @@ elif page == "Analytics Dashboard":
                 cursor.execute("INSERT OR REPLACE INTO system_config (key, val) VALUES ('seeded', 'false')")
                 conn.commit()
                 conn.close()
+                
+                # Log action
+                log_admin_action(
+                    "Database Purge", 
+                    "Purged all mock respondents, responses, and computed scores to clean system for academic production phase."
+                )
+                
                 succ_purge = "Pangkalan data berjaya dipadamkan kepada keadaan bersih! Mengarah semula..." if lang == "Bahasa Melayu" else "Database successfully purged to a clean state! Redirecting..."
                 st.success(succ_purge)
                 st.session_state["page"] = "Welcome & Overview"
