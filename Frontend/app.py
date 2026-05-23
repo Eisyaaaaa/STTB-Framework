@@ -604,16 +604,19 @@ lang = st.session_state.get("language", "English")
 # 4. TOP NAVIGATION BAR & THEME SYMBOL
 # ---------------------------------------------------------
 # Determine theme variables for navbar styling
+# Determine theme variables for navbar styling
 if st.session_state.get("theme_mode", "Dark Mode") == "Dark Mode":
     nav_bg = "rgba(22, 22, 26, 0.85)"
-    nav_border = "rgba(255, 199, 44, 0.2)"
-    nav_text = "#ffffff"
+    nav_border = "rgba(255, 199, 44, 0.15)"
+    nav_text = "#a0aec0"
     nav_shadow = "0 8px 32px 0 rgba(0, 0, 0, 0.4)"
+    active_color = "#FCD116"
 else:
     nav_bg = "rgba(255, 255, 255, 0.85)"
     nav_border = "rgba(0, 0, 0, 0.08)"
-    nav_text = "#1a1a24"
+    nav_text = "#718096"
     nav_shadow = "0 8px 32px 0 rgba(0, 0, 0, 0.08)"
+    active_color = "#DA291C"
 
 # Container/styling for unified horizontal navbar strip
 st.markdown(f"""
@@ -625,7 +628,7 @@ st.markdown(f"""
         -webkit-backdrop-filter: blur(12px) !important;
         border: 1px solid {nav_border} !important;
         border-radius: 12px !important;
-        padding: 10px 25px !important;
+        padding: 12px 25px !important;
         margin-bottom: 30px !important;
         box-shadow: {nav_shadow} !important;
         display: flex !important;
@@ -646,30 +649,36 @@ st.markdown(f"""
         border: none !important;
         box-shadow: none !important;
         font-family: 'Outfit', sans-serif !important;
-        font-weight: 500 !important;
-        font-size: 1.02rem !important;
+        font-weight: 600 !important;
+        font-size: 1.05rem !important;
         border-radius: 0px !important;
-        padding: 4px 0px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        padding: 4px 0px 8px 0px !important;
+        transition: all 0.2s ease-in-out !important;
         height: auto !important;
         margin: 0 !important;
-        border-bottom: 2px solid transparent !important;
+        border-bottom: 3px solid transparent !important;
     }}
     
-    /* Highlight the active page/language selection with dynamic word color and a clean underline */
+    /* Highlight the active page/language selection with dynamic word color and a clean golden underline */
     div[data-testid="stHorizontalBlock"]:first-of-type div.stButton > button[kind="primary"] {{
         background: transparent !important;
-        color: #FFC72C !important;
+        color: {active_color} !important;
         font-weight: 700 !important;
         box-shadow: none !important;
-        border-bottom: 2px solid #DA291C !important;
+        border-bottom: 3px solid {active_color} !important;
     }}
     
-    /* Hover effect: text turns yellow/gold and shows a faint bottom underline */
+    /* Hover effect: text turns white (or dark on light mode) with clean transitions */
     div[data-testid="stHorizontalBlock"]:first-of-type div.stButton > button:hover {{
         background: transparent !important;
-        color: #FFC72C !important;
-        border-bottom: 2px solid rgba(255, 199, 44, 0.5) !important;
+        color: {"#ffffff" if st.session_state.get("theme_mode", "Dark Mode") == "Dark Mode" else "#1a1a24"} !important;
+        border-bottom: 3px solid transparent !important;
+    }}
+    
+    /* Retain active border-bottom even on hover */
+    div[data-testid="stHorizontalBlock"]:first-of-type div.stButton > button[kind="primary"]:hover {{
+        border-bottom: 3px solid {active_color} !important;
+        color: {active_color} !important;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -677,9 +686,19 @@ st.markdown(f"""
 # Determine dynamic navigation layout based on admin_mode status
 has_admin_tab = st.session_state.get("admin_mode", False)
 
+import base64
+def get_base64_logo():
+    logo_path = "Frontend/sttb_official_logo.png"
+    if os.path.exists(logo_path):
+        with open(logo_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')
+    return ""
+
+logo_base64 = get_base64_logo()
+
 if has_admin_tab:
-    # 8-column layout: Logo, 5 Menu Buttons, Language, Theme Toggle
-    nav_cols = st.columns([0.8, 1.1, 1.2, 1.2, 1.2, 1.0, 1.2, 0.5], vertical_alignment="center")
+    # 9-column layout: Logo block (width 2.2), 5 Menu Buttons (width 1.1 each), Language Toggle (width 0.8), Theme Toggle (width 0.5), User Profile Block (width 1.8)
+    nav_cols = st.columns([2.2, 1.1, 1.1, 1.2, 1.1, 1.1, 0.8, 0.5, 1.8], vertical_alignment="center")
     menu_options = [
         ("Welcome & Overview", TRANSLATIONS[lang]["overview"]),
         ("Public Survey Form", TRANSLATIONS[lang]["survey"]),
@@ -689,10 +708,11 @@ if has_admin_tab:
     ]
     lang_col_idx = 6
     theme_col_idx = 7
-    sub_strip_widths = [5.6, 1.4, 1.8]
+    profile_col_idx = 8
+    sub_strip_widths = [6.8, 1.0, 1.2]
 else:
-    # 7-column layout: Logo, 4 Menu Buttons, Language, Theme Toggle
-    nav_cols = st.columns([1.0, 1.3, 1.3, 1.4, 1.3, 1.5, 0.6], vertical_alignment="center")
+    # 8-column layout: Logo block (width 2.2), 4 Menu Buttons (width 1.2 each), Language Toggle (width 0.8), Theme Toggle (width 0.5), User Profile Block (width 1.8)
+    nav_cols = st.columns([2.2, 1.2, 1.2, 1.3, 1.2, 0.8, 0.5, 1.8], vertical_alignment="center")
     menu_options = [
         ("Welcome & Overview", TRANSLATIONS[lang]["overview"]),
         ("Public Survey Form", TRANSLATIONS[lang]["survey"]),
@@ -701,13 +721,29 @@ else:
     ]
     lang_col_idx = 5
     theme_col_idx = 6
-    sub_strip_widths = [5.3, 1.5, 2.0]
+    profile_col_idx = 7
+    sub_strip_widths = [5.9, 1.0, 1.2]
 
-# Column 0: Premium STTB Hornbill Logo
+# Column 0: Premium STTB Logo and title block matching crop exactly
 with nav_cols[0]:
-    st.image("Frontend/sttb_official_logo.png", width=65 if has_admin_tab else 80)
+    if logo_base64:
+        st.markdown(f"""
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: -2px;">
+            <img src="data:image/png;base64,{logo_base64}" width="42" style="border-radius: 4px;">
+            <div style="font-family: 'Outfit', sans-serif;">
+                <div style="font-size: 0.75rem; color: #a0aec0; font-weight: 500; white-space: nowrap; line-height: 1.2;">
+                    Sarawak Tech-Trust Barometer
+                </div>
+                <div style="font-size: 1.2rem; color: {gold_color}; font-weight: 800; letter-spacing: 0.5px; line-height: 1.1;">
+                    STTB
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.image("Frontend/sttb_official_logo.png", width=65 if has_admin_tab else 80)
 
-# Columns 1-5 or 1-6: Horizontal Navigation Menus
+# Columns 1 to N-3: Menu options
 for idx, (page_val, label) in enumerate(menu_options):
     with nav_cols[idx + 1]:
         is_active = (st.session_state["page"] == page_val)
@@ -716,7 +752,7 @@ for idx, (page_val, label) in enumerate(menu_options):
             st.session_state["page"] = page_val
             st.rerun()
 
-# Column 6 or 7: Minimalist Language toggle link
+# Language Toggle Column
 with nav_cols[lang_col_idx]:
     is_lang_menu_open = st.session_state.get("show_lang_options", False)
     btn_kind = "primary" if is_lang_menu_open else "secondary"
@@ -724,7 +760,7 @@ with nav_cols[lang_col_idx]:
         st.session_state["show_lang_options"] = not is_lang_menu_open
         st.rerun()
 
-# Column 7 or 8: Theme Selector Symbol (☾ for Dark, ☀ for Light)
+# Theme Toggle Column
 with nav_cols[theme_col_idx]:
     current_symbol = "☀" if st.session_state["theme_mode"] == "Dark Mode" else "☾"
     if st.button(current_symbol, key="theme_toggle_btn", use_container_width=True):
@@ -733,6 +769,32 @@ with nav_cols[theme_col_idx]:
         else:
             st.session_state["theme_mode"] = "Dark Mode"
         st.rerun()
+
+# Right Column: Premium User Profile and notification bell matching crop exactly
+with nav_cols[profile_col_idx]:
+    profile_bg = "#2c3035" if st.session_state["theme_mode"] == "Dark Mode" else "#edf2f7"
+    profile_text_color = "#ffffff" if st.session_state["theme_mode"] == "Dark Mode" else "#1a202c"
+    profile_sub_text_color = "#a0aec0" if st.session_state["theme_mode"] == "Dark Mode" else "#718096"
+    bell_color = "#a0aec0" if st.session_state["theme_mode"] == "Dark Mode" else "#4a5568"
+    border_color = "#1a1d20" if st.session_state["theme_mode"] == "Dark Mode" else "#ffffff"
+    
+    st.markdown(f"""
+    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 15px; margin-top: -2px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: {profile_bg}; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.1);">
+                <span style="font-size: 0.9rem; color: #bdc3c7;">👤</span>
+            </div>
+            <div style="font-family: 'Outfit', sans-serif;">
+                <div style="font-size: 0.82rem; font-weight: bold; color: {profile_text_color}; line-height: 1.1;">Profile</div>
+                <div style="font-size: 0.68rem; color: {profile_sub_text_color}; line-height: 1.0; white-space: nowrap;">User: R. K. Adenan</div>
+            </div>
+        </div>
+        <div style="position: relative; cursor: pointer;">
+            <span style="font-size: 1.2rem; color: {bell_color};">🔔</span>
+            <span style="position: absolute; top: -2px; right: -2px; width: 7px; height: 7px; background: #ce1126; border-radius: 50%; border: 1.5px solid {border_color};"></span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # DYNAMIC LANGUAGE DROPDOWN SUB-STRIP
