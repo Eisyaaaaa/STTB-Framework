@@ -1544,7 +1544,7 @@ elif page == "Dashboard" or page == "Welcome & Overview":
         if lang == "Bahasa Melayu":
             st.markdown(f"""
             <div class="glass-card" style="padding: 20px; height: 100%;">
-                <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">Integrasi Rangka Kerja Teori & 5 Tonggak</h3>
+                <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">Integrasi Teori</h3>
                 <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.4; margin-bottom:10px;">
                     Setiap tonggak mewakili paksi kritikal penilaian awam yang dipetakan kepada Tiga Tonggak Institusi W. Richard Scott:
                 </p>
@@ -1561,7 +1561,7 @@ elif page == "Dashboard" or page == "Welcome & Overview":
         else:
             st.markdown(f"""
             <div class="glass-card" style="padding: 20px; height: 100%;">
-                <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">Theoretical Integration & 5 Pillars</h3>
+                <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">Theoretical Integration</h3>
                 <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.4; margin-bottom:10px;">
                     Each pillar represents a critical axis of public evaluation mapped to W. Richard Scott's Three Institutional Pillars:
                 </p>
