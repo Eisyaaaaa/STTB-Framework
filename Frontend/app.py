@@ -1397,6 +1397,84 @@ elif page == "Dashboard" or page == "Welcome & Overview":
     # Merge datasets
     df = pd.merge(df_resp, df_scores, left_on="id", right_on="respondent_id")
     
+
+
+    # ---------------------------------------------------------
+    # ROW 2: ABOUT STTB (Context & Digital Pillars)
+    # ---------------------------------------------------------
+    st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
+    st.markdown(f"<div style='font-size: 2.5rem; font-weight: 800; color: {gold_color}; margin-bottom: 15px;'>{ 'About STTB' if lang == 'English' else 'Mengenai STTB' }</div>", unsafe_allow_html=True)
+    
+    if lang == "Bahasa Melayu":
+        st.markdown(f"""
+        <div class="glass-card" style="padding: 20px; margin-bottom: 20px;">
+            <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">Konteks</h3>
+            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:10px;">
+                <b>Barometer Kepercayaan Teknologi Sarawak (STTB)</b> ialah projek penyelidikan Research and Development (R&D) yang dibangunkan untuk menangani jurang kritikal dalam mengukur dan menjejaki kepercayaan orang ramai terhadap teknologi digital dan institusi di seluruh bahagian pentadbiran di Sarawak.
+            </p>
+            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:10px;">
+                Sejajar secara langsung dengan <b>Strategi Perbadanan Ekonomi Digital Sarawak (SDEC)</b> dan dasar digital kebangsaan, platform ini menyediakan pembuat dasar, penyelidik akademik, dan rakyat dengan penunjuk telus dan masa nyata mengenai cara platform digital mengendalikan privasi data, etika, kebolehcapaian dan keselamatan.
+            </p>
+            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:0;">
+                Seni bina pemarkahan kami distrukturkan secara saintifik merentasi <b>5 teras tonggak kepercayaan digital</b>, dipetakan terhadap <b>15 pemboleh ubah analisis</b>, dan dikira daripada instrumen tinjauan <b>75-item komprehensif</b> yang berasaskan Teori Institusi sosiologi oleh W. Richard Scott (1995) dan diperhalusi melalui paradigma etika perundangan Islam.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown(f"""
+        <div class="glass-card" style="padding: 20px; margin-bottom: 20px;">
+            <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">Context</h3>
+            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:10px;">
+                The <b>Sarawak Tech-Trust Barometer (STTB)</b> is an R&D research project developed to address the critical gaps in measuring and tracking public trust in digital technologies and institutions across the administrative divisions of Sarawak.
+            </p>
+            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:10px;">
+                Aligning directly with the <b>Sarawak Digital Economy Corporation (SDEC) Strategy</b> and national digital policies, the platform provides policymakers, academic researchers, and citizens with transparent, real-time indicators regarding how digital platforms handle data privacy, ethics, accessibility, and security.
+            </p>
+            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:0;">
+                Our scoring architecture is scientifically structured across <b>5 core digital trust pillars</b>, mapped against <b>15 analytical variables</b>, and calculated from a comprehensive <b>75-item survey instrument</b> grounded in the sociological Institutional Theory by W. Richard Scott (1995) and refined through the ethical paradigms of Islamic jurisprudence.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # ---------------------------------------------------------
+    # STTB's DIGITAL PILLARS EXPLAINED (Below Context)
+    # ---------------------------------------------------------
+    st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
+    st.markdown(f"<div style='font-size: 2.5rem; font-weight: 800; color: {gold_color}; margin-bottom: 15px;'>{ 'STTB\'s Digital Pillars' if lang == 'English' else 'Teras Tonggak Digital STTB' }</div>", unsafe_allow_html=True)
+    
+    pi_col1, pi_col2, pi_col3, pi_col4, pi_col5 = st.columns(5)
+    pi_cols = [pi_col1, pi_col2, pi_col3, pi_col4, pi_col5]
+    
+    if lang == "Bahasa Melayu":
+        pillars_info = [
+            ("1. Ketelusan & Kebolehcapaian", "Sidq & Tabayyun", "Mengukur keterbukaan proses algoritma, kemudahan akses maklumat, dan penyebaran berita sahih bebas daripada manipulasi."),
+            ("2. Etika & Tanggungjawab", "Amanah", "Mengukur integriti reka bentuk perisian, ketiadaan kecenderungan berat sebelah algoritma, dan tanggungjawab penjagaan kebajikan digital."),
+            ("3. Privasi & Kawalan", "Tajassus & Haya", "Mengukur perlindungan hak privasi pengguna, pencegahan pencerobohan data tanpa izin, dan kawalan persetujuan data pengguna."),
+            ("4. Keselamatan & Kebolehpercayaan", "Itqan", "Mengukur kecemerlangan teknikal infrastruktur digital, ketahanan terhadap serangan siber, dan kebolehpercayaan perkhidmatan."),
+            ("5. Inklusi Digital & Kesaksamaan", "Adl", "Mengukur kesaksamaan capaian digital antara kawasan bandar dan luar bandar, pemupukan literasi, dan kebolehcapaian inklusif.")
+        ]
+    else:
+        pillars_info = [
+            ("1. Transparency & Accessibility", "Sidq & Tabayyun", "Measures clarity of algorithmic processes, ease of information access, and verifying authentic information."),
+            ("2. Ethics & Responsibility", "Amanah", "Evaluates software design integrity, absence of algorithmic bias, and ethical stewardship of digital systems."),
+            ("3. Privacy & Control", "Tajassus & Haya", "Evaluates protection of user privacy rights, prevention of unauthorized data intrusion, and user control over consent."),
+            ("4. Security & Reliability", "Itqan", "Measures technical excellence, resilience against cyber threats, and reliable system uptime."),
+            ("5. Digital Inclusion & Equity", "Adl", "Evaluates equal digital access across urban and rural zones, digital literacy enablement, and inclusion of marginalized groups.")
+        ]
+        
+    for idx, (title, paradigm, desc) in enumerate(pillars_info):
+        with pi_cols[idx]:
+            st.markdown(f"""
+            <div class="glass-card" style="padding: 16px; min-height: 240px; border-top: 3px solid {gold_color}; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                <div>
+                    <div style="font-size: 0.95rem; font-weight: bold; color: #ffffff; margin-bottom: 4px;">{title}</div>
+                    <div style="font-size: 0.78rem; font-style: italic; color: {gold_color}; font-weight: bold; margin-bottom: 10px;">{paradigm}</div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin: 0;">{desc}</p>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
     # ---------------------------------------------------------
     # TOP HEADER SECTION: SIDE-BY-SIDE DESIGN (Columns 5 and 7)
     # ---------------------------------------------------------
@@ -1520,81 +1598,6 @@ elif page == "Dashboard" or page == "Welcome & Overview":
             ).add_to(m)
             
         st_folium(m, height=360, use_container_width=True, key="dashboard_trust_map")
-
-    # ---------------------------------------------------------
-    # ROW 2: ABOUT STTB (Context & Digital Pillars)
-    # ---------------------------------------------------------
-    st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
-    st.markdown(f"<div style='font-size: 2.5rem; font-weight: 800; color: {gold_color}; margin-bottom: 15px;'>{ 'About STTB' if lang == 'English' else 'Mengenai STTB' }</div>", unsafe_allow_html=True)
-    
-    if lang == "Bahasa Melayu":
-        st.markdown(f"""
-        <div class="glass-card" style="padding: 20px; margin-bottom: 20px;">
-            <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">Konteks</h3>
-            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:10px;">
-                <b>Barometer Kepercayaan Teknologi Sarawak (STTB)</b> ialah projek penyelidikan Research and Development (R&D) yang dibangunkan untuk menangani jurang kritikal dalam mengukur dan menjejaki kepercayaan orang ramai terhadap teknologi digital dan institusi di seluruh bahagian pentadbiran di Sarawak.
-            </p>
-            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:10px;">
-                Sejajar secara langsung dengan <b>Strategi Perbadanan Ekonomi Digital Sarawak (SDEC)</b> dan dasar digital kebangsaan, platform ini menyediakan pembuat dasar, penyelidik akademik, dan rakyat dengan penunjuk telus dan masa nyata mengenai cara platform digital mengendalikan privasi data, etika, kebolehcapaian dan keselamatan.
-            </p>
-            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:0;">
-                Seni bina pemarkahan kami distrukturkan secara saintifik merentasi <b>5 teras tonggak kepercayaan digital</b>, dipetakan terhadap <b>15 pemboleh ubah analisis</b>, dan dikira daripada instrumen tinjauan <b>75-item komprehensif</b> yang berasaskan Teori Institusi sosiologi oleh W. Richard Scott (1995) dan diperhalusi melalui paradigma etika perundangan Islam.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown(f"""
-        <div class="glass-card" style="padding: 20px; margin-bottom: 20px;">
-            <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">Context</h3>
-            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:10px;">
-                The <b>Sarawak Tech-Trust Barometer (STTB)</b> is an R&D research project developed to address the critical gaps in measuring and tracking public trust in digital technologies and institutions across the administrative divisions of Sarawak.
-            </p>
-            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:10px;">
-                Aligning directly with the <b>Sarawak Digital Economy Corporation (SDEC) Strategy</b> and national digital policies, the platform provides policymakers, academic researchers, and citizens with transparent, real-time indicators regarding how digital platforms handle data privacy, ethics, accessibility, and security.
-            </p>
-            <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.45; margin-bottom:0;">
-                Our scoring architecture is scientifically structured across <b>5 core digital trust pillars</b>, mapped against <b>15 analytical variables</b>, and calculated from a comprehensive <b>75-item survey instrument</b> grounded in the sociological Institutional Theory by W. Richard Scott (1995) and refined through the ethical paradigms of Islamic jurisprudence.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-
-    # ---------------------------------------------------------
-    # STTB's DIGITAL PILLARS EXPLAINED (Below Context)
-    # ---------------------------------------------------------
-    st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
-    st.markdown(f"<div style='font-size: 2.5rem; font-weight: 800; color: {gold_color}; margin-bottom: 15px;'>{ 'STTB\'s Digital Pillars' if lang == 'English' else 'Teras Tonggak Digital STTB' }</div>", unsafe_allow_html=True)
-    
-    pi_col1, pi_col2, pi_col3, pi_col4, pi_col5 = st.columns(5)
-    pi_cols = [pi_col1, pi_col2, pi_col3, pi_col4, pi_col5]
-    
-    if lang == "Bahasa Melayu":
-        pillars_info = [
-            ("1. Ketelusan & Kebolehcapaian", "Sidq & Tabayyun", "Mengukur keterbukaan proses algoritma, kemudahan akses maklumat, dan penyebaran berita sahih bebas daripada manipulasi."),
-            ("2. Etika & Tanggungjawab", "Amanah", "Mengukur integriti reka bentuk perisian, ketiadaan kecenderungan berat sebelah algoritma, dan tanggungjawab penjagaan kebajikan digital."),
-            ("3. Privasi & Kawalan", "Tajassus & Haya", "Mengukur perlindungan hak privasi pengguna, pencegahan pencerobohan data tanpa izin, dan kawalan persetujuan data pengguna."),
-            ("4. Keselamatan & Kebolehpercayaan", "Itqan", "Mengukur kecemerlangan teknikal infrastruktur digital, ketahanan terhadap serangan siber, dan kebolehpercayaan perkhidmatan."),
-            ("5. Inklusi Digital & Kesaksamaan", "Adl", "Mengukur kesaksamaan capaian digital antara kawasan bandar dan luar bandar, pemupukan literasi, dan kebolehcapaian inklusif.")
-        ]
-    else:
-        pillars_info = [
-            ("1. Transparency & Accessibility", "Sidq & Tabayyun", "Measures clarity of algorithmic processes, ease of information access, and verifying authentic information."),
-            ("2. Ethics & Responsibility", "Amanah", "Evaluates software design integrity, absence of algorithmic bias, and ethical stewardship of digital systems."),
-            ("3. Privacy & Control", "Tajassus & Haya", "Evaluates protection of user privacy rights, prevention of unauthorized data intrusion, and user control over consent."),
-            ("4. Security & Reliability", "Itqan", "Measures technical excellence, resilience against cyber threats, and reliable system uptime."),
-            ("5. Digital Inclusion & Equity", "Adl", "Evaluates equal digital access across urban and rural zones, digital literacy enablement, and inclusion of marginalized groups.")
-        ]
-        
-    for idx, (title, paradigm, desc) in enumerate(pillars_info):
-        with pi_cols[idx]:
-            st.markdown(f"""
-            <div class="glass-card" style="padding: 16px; min-height: 240px; border-top: 3px solid {gold_color}; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
-                <div>
-                    <div style="font-size: 0.95rem; font-weight: bold; color: #ffffff; margin-bottom: 4px;">{title}</div>
-                    <div style="font-size: 0.78rem; font-style: italic; color: {gold_color}; font-weight: bold; margin-bottom: 10px;">{paradigm}</div>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin: 0;">{desc}</p>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
 
 
             
