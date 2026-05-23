@@ -1614,6 +1614,82 @@ elif page == "Dashboard" or page == "Welcome & Overview":
                 """, unsafe_allow_html=True)
 
         # ---------------------------------------------------------
+        # ROW 2.5: INTEGRATED ACADEMIC OVERVIEW & UTS FRAMEWORK DETAILS (Fully Visible)
+        # ---------------------------------------------------------
+        st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
+        st.markdown(f"<div style='font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-bottom: 15px;'>{"Project Context & Theoretical Framework" if lang == "English" else "Konteks Projek & Rangka Kerja Teori"}</div>", unsafe_allow_html=True)
+        
+        info_col1, info_col2 = st.columns([1, 1])
+        with info_col1:
+            if lang == "Bahasa Melayu":
+                st.markdown(f"""
+                <div class="glass-card" style="padding: 20px; height: 100%;">
+                    <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">Mengenai Projek</h3>
+                    <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.45; margin-bottom:10px;">
+                        <b>Barometer Kepercayaan Teknologi Sarawak (STTB)</b> ialah projek penyelidikan Research and Development (R&D) yang dibangunkan untuk menangani jurang kritikal dalam mengukur dan menjejaki kepercayaan orang ramai terhadap teknologi digital dan institusi di seluruh bahagian pentadbiran di Sarawak.
+                    </p>
+                    <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.45; margin-bottom:10px;">
+                        Sejajar secara langsung dengan <b>Strategi Perbadanan Ekonomi Digital Sarawak (SDEC)</b> dan dasar digital kebangsaan, platform ini menyediakan pembuat dasar, penyelidik akademik, dan rakyat dengan penunjuk telus dan masa nyata mengenai cara platform digital mengendalikan privasi data, etika, kebolehcapaian dan keselamatan.
+                    </p>
+                    <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.45; margin-bottom:0;">
+                        Seni bina pemarkahan kami distrukturkan secara saintifik merentasi <b>5 teras tonggak kepercayaan digital</b>, dipetakan terhadap <b>15 pemboleh ubah analisis</b>, dan dikira daripada instrumen tinjauan <b>75-item komprehensif</b> yang berasaskan Teori Institusi sosiologi oleh W. Richard Scott (1995) dan diperhalusi melalui paradigma etika perundangan Islam.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="glass-card" style="padding: 20px; height: 100%;">
+                    <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">About The Project</h3>
+                    <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.45; margin-bottom:10px;">
+                        The <b>Sarawak Tech-Trust Barometer (STTB)</b> is an R&D research project developed to address the critical gaps in measuring and tracking public trust in digital technologies and institutions across the administrative divisions of Sarawak.
+                    </p>
+                    <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.45; margin-bottom:10px;">
+                        Aligning directly with the <b>Sarawak Digital Economy Corporation (SDEC) Strategy</b> and national digital policies, the platform provides policymakers, academic researchers, and citizens with transparent, real-time indicators regarding how digital platforms handle data privacy, ethics, accessibility, and security.
+                    </p>
+                    <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.45; margin-bottom:0;">
+                        Our scoring architecture is scientifically structured across <b>5 core digital trust pillars</b>, mapped against <b>15 analytical variables</b>, and calculated from a comprehensive <b>75-item survey instrument</b> grounded in the sociological Institutional Theory by W. Richard Scott (1995) and refined through the ethical paradigms of Islamic jurisprudence.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+        
+        with info_col2:
+            if lang == "Bahasa Melayu":
+                st.markdown(f"""
+                <div class="glass-card" style="padding: 20px; height: 100%;">
+                    <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">Integrasi Rangka Kerja Teori & 5 Tonggak</h3>
+                    <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.4; margin-bottom:10px;">
+                        Setiap tonggak mewakili paksi kritikal penilaian awam yang dipetakan kepada Tiga Tonggak Institusi W. Richard Scott:
+                    </p>
+                    <ol style="margin-bottom:15px; padding-left:20px; font-size:0.88rem; color:#bdc3c7; line-height:1.45;">
+                        <li><b>Tonggak Regulatif (Regulative)</b>: Mencegah pencerobohan dan memastikan keselamatan (Privasi & Keselamatan - patuh PDPA 2010).</li>
+                        <li><b>Tonggak Normatif (Normative)</b>: Piawaian etika reka bentuk dan operasi (Etika & Ketelusan perkhidmatan).</li>
+                        <li><b>Tonggak Budaya-Kognitif (Cultural-Cognitive)</b>: Pengagihan saksama dan pembangunan kemahiran (Literasi & Inklusi Digital luar bandar).</li>
+                    </ol>
+                    <p style="font-size:0.85rem; color:#bdc3c7; line-height:1.4;">
+                        Model pemarkahan STTB diperhalusi menggunakan paradigma keadilan awam (Adl), etika akauntabiliti amanah (Amanah), serta ketelusan kognitif (Sidq & Tabayyun).
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="glass-card" style="padding: 20px; height: 100%;">
+                    <h3 style="color:{gold_color}; margin-top:0; font-size:1.15rem;">Theoretical Integration & 5 Pillars</h3>
+                    <p style="font-size:0.88rem; color:#bdc3c7; line-height:1.4; margin-bottom:10px;">
+                        Each pillar represents a critical axis of public evaluation mapped to W. Richard Scott's Three Institutional Pillars:
+                    </p>
+                    <ol style="margin-bottom:15px; padding-left:20px; font-size:0.88rem; color:#bdc3c7; line-height:1.45;">
+                        <li><b>Regulative Pillar</b>: Mapped to <i>Security</i> and <i>Privacy</i> rules (PDPA 2010 compliance).</li>
+                        <li><b>Normative Pillar</b>: Mapped to <i>Transparency</i> and <i>Ethics</i> (trustworthiness standards).</li>
+                        <li><b>Cultural-Cognitive Pillar</b>: Mapped to <i>Digital Inclusion</i> (rural digital literacy and adoption).</li>
+                    </ol>
+                    <p style="font-size:0.85rem; color:#bdc3c7; line-height:1.4;">
+                        The STTB framework scoring matrix is dynamically synthesized utilizing sociological, institutional, and ethical paradigms of digital trust.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+        st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
+
+        # ---------------------------------------------------------
         # ROW 3: BOTTOM GRID - KEY METRICS (LEFT) & HISTORICAL TREND (RIGHT)
         # ---------------------------------------------------------
         b_col1, b_col2 = st.columns([4, 8], vertical_alignment="top")
@@ -1769,75 +1845,6 @@ elif page == "Dashboard" or page == "Welcome & Overview":
             hide_index=True,
             use_container_width=True
         )
-
-        # ---------------------------------------------------------
-        # COLLAPSIBLE ACADEMIC OVERVIEW & UTS FRAMEWORK DETAILS (Integrated Overview)
-        # ---------------------------------------------------------
-        st.markdown("<br>", unsafe_allow_html=True)
-        overview_title = "💡 Mengenai Rangka Kerja & 5 Tonggak Kepercayaan UTS" if lang == "Bahasa Melayu" else "💡 About the UTS Framework & 5 Digital Trust Pillars"
-        with st.expander(overview_title, expanded=False):
-            if lang == "Bahasa Melayu":
-                st.markdown(f"""
-                <div class="glass-card" style="margin-top: 10px;">
-                    <h3 style="color:{gold_color};">Mengenai Projek</h3>
-                    <p><b>Barometer Kepercayaan Teknologi Sarawak (STTB)</b> ialah projek penyelidikan Research and Development (R&D) yang dibangunkan untuk menangani jurang kritikal dalam mengukur dan menjejaki kepercayaan orang ramai terhadap teknologi digital dan institusi di seluruh bahagian pentadbiran di Sarawak.</p>
-                    <p>Sejajar secara langsung dengan <b>Strategi Perbadanan Ekonomi Digital Sarawak (SDEC)</b> dan dasar digital kebangsaan, platform ini menyediakan pembuat dasar, penyelidik akademik, dan rakyat dengan penunjuk telus dan masa nyata mengenai cara platform digital mengendalikan privasi data, etika, kebolehcapaian dan keselamatan.</p>
-                    <p>Seni bina pemarkahan kami distrukturkan secara saintifik merentasi <b>5 teras tonggak kepercayaan digital</b>, dipetakan terhadap <b>15 pemboleh ubah analisis</b>, dan dikira daripada instrumen tinjauan <b>75-item komprehensif</b> yang berasaskan Teori Institusi sosiologi oleh W. Richard Scott (1995) dan diperhalusi melalui paradigma etika perundangan Islam.</p>
-                </div>
-                
-                <div class="glass-card">
-                    <h3 style="color:{gold_color};">Lima Tonggak Kepercayaan Digital</h3>
-                    <p>Setiap tonggak mewakili paksi kritikal penilaian awam:</p>
-                    <ul>
-                        <li><b>1. Ketelusan & Kebolehcapaian (Sidq & Tabayyun)</b>: Membuka proses algoritma, dasar bahasa mudah, dan menangani jurang maklumat antara kerajaan dan rakyat.</li>
-                        <li><b>2. Etika & Tanggungjawab (Amanah)</b>: Mempromosikan reka bentuk perisian yang adil, tanpa kecenderungan algoritma, dan pemimpin yang mengambil alih pengurusan kebajikan sivik.</li>
-                        <li><b>3. Privasi & Kawalan (Tajassus & Haya)</b>: Mencegah pencerobohan tanpa kebenaran, memberikan pilihan persetujuan terperinci, dan mengurangkan peletakan jawatan digital.</li>
-                        <li><b>4. Keselamatan & Kebolehpercayaan (Itqan)</b>: Memintasi kecemerlangan teknikal, daya resilience infrastruktur, dan masa henti perkhidmatan yang rendah.</li>
-                        <li><b>5. Inklusi Digital & Kesaksamaan (Adl)</b>: Mengimbangi liputan geografi antara zon bandar dan luar bandar, menyokong literasi digital, dan kebolehcapaian untuk kumpulan terpinggir.</li>
-                    </ul>
-                </div>
-                
-                <div class="glass-card">
-                    <h3 style="color:{gold_color};">Integrasi Kerangka Teori</h3>
-                    <p>Skema pangkalan data dan model pemarkahan bipartit kami disintesis di sekitar Tiga Tonggak Institusi W. Richard Scott:</p>
-                    <ol>
-                        <li><b>Tonggak Regulatif</b>: Dipetakan kepada peraturan Keselamatan dan Privasi (pematuhan PDPA 2010).</li>
-                        <li><b>Tonggak Normatif</b>: Dipetakan kepada Ketelusan dan Etika (piawaian kebolehpercayaan).</li>
-                        <li><b>Tonggak Budaya-Kognitif</b>: Dipetakan kepada Inklusi Digital (pengagihan adil, literasi digital kognitif).</li>
-                    </ol>
-                </div>
-                """, unsafe_allow_html=True)
-            else:
-                st.markdown(f"""
-                <div class="glass-card" style="margin-top: 10px;">
-                    <h3 style="color:{gold_color};">About The Project</h3>
-                    <p>The <b>Sarawak Tech-Trust Barometer (STTB)</b> is an R&D research project developed to address the critical gaps in measuring and tracking public trust in digital technologies and institutions across the administrative divisions of Sarawak.</p>
-                    <p>Aligning directly with the <b>Sarawak Digital Economy Corporation (SDEC) Strategy</b> and national digital policies, the platform provides policymakers, academic researchers, and citizens with transparent, real-time indicators regarding how digital platforms handle data privacy, ethics, accessibility, and security.</p>
-                    <p>Our scoring architecture is scientifically structured across <b>5 core digital trust pillars</b>, mapped against <b>15 analytical variables</b>, and calculated from a comprehensive <b>75-item survey instrument</b> grounded in the sociological Institutional Theory by W. Richard Scott (1995) and refined through the ethical paradigms of Islamic jurisprudence.</p>
-                </div>
-                
-                <div class="glass-card">
-                    <h3 style="color:{gold_color};">The Five Digital Trust Pillars</h3>
-                    <p>Each pillar represents a critical axis of public evaluation:</p>
-                    <ul>
-                        <li><b>1. Transparency & Accessibility (Sidq & Tabayyun)</b>: Opening algorithmic processes, plain language policies, and addressing information gaps between state and citizen.</li>
-                        <li><b>2. Ethics & Responsibility (Amanah)</b>: Promoting fair software designs, algorithmic non-bias, and leaders taking stewardship of civic welfare.</li>
-                        <li><b>3. Privacy & Control (Tajassus & Haya)</b>: Preventing unauthorized intrusion, giving granular consent options, and mitigating digital resignation.</li>
-                        <li><b>4. Security & Reliability (Itqan)</b>: Ensuring technical excellence, infrastructure resilience, and low service downtime.</li>
-                        <li><b>5. Digital Inclusion & Equity (Adl)</b>: Balancing geographic coverage between urban and rural zones, supporting digital literacy, and accessibility for marginalized groups.</li>
-                    </ul>
-                </div>
-                
-                <div class="glass-card">
-                    <h3 style="color:{gold_color};">Theoretical Framework Integration</h3>
-                    <p>Our database schema and bipartite scoring models are synthesized around W. Richard Scott's <b>Three Pillars of Institutions</b>:</p>
-                    <ol>
-                        <li><b>Regulative Pillar</b>: Mapped to <i>Security</i> and <i>Privacy</i> rules (PDPA 2010 compliance).</li>
-                        <li><b>Normative Pillar</b>: Mapped to <i>Transparency</i> and <i>Ethics</i> (trustworthiness standards).</li>
-                        <li><b>Cultural-Cognitive Pillar</b>: Mapped to <i>Digital Inclusion</i> (fair distribution, cognitive digital literacy).</li>
-                    </ol>
-                </div>
-                """, unsafe_allow_html=True)
 
         # Collapsible Database Administration Panel (Admin Only)
         st.markdown("<br>", unsafe_allow_html=True)
