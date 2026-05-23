@@ -1027,8 +1027,16 @@ elif page == "Public Survey Form":
     qr_col1, qr_col2 = st.columns([1, 4])
     with qr_col1:
         target_url = "https://sarawak-tech-trust.streamlit.app"
-        qr_api_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=003366&data={target_url}"
-        st.markdown(f'<img src="{qr_api_url}" style="border: 3px solid white; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);" width="110" height="110">', unsafe_allow_html=True)
+        qr_path = "Frontend/sttb_gold_qr.png"
+        qr_base64 = ""
+        if os.path.exists(qr_path):
+            with open(qr_path, "rb") as f:
+                qr_base64 = base64.b64encode(f.read()).decode('utf-8')
+        if qr_base64:
+            st.markdown(f'<img src="data:image/png;base64,{qr_base64}" style="border: 3px solid white; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);" width="110" height="110">', unsafe_allow_html=True)
+        else:
+            qr_api_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=FCD116&data={target_url}"
+            st.markdown(f'<img src="{qr_api_url}" style="border: 3px solid white; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);" width="110" height="110">', unsafe_allow_html=True)
     with qr_col2:
         if lang == "Bahasa Melayu":
             st.markdown(f"""

@@ -8,6 +8,7 @@
 # Do not ignore these specific deployment files
 !Frontend/app.py
 !Frontend/sttb_rapid_survey.pdf
+!Frontend/sttb_gold_qr.png
 !Backend/survey.py
 !Backend/generate_pdf.py
 !requirements.txt
