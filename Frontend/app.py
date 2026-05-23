@@ -559,7 +559,7 @@ init_db()
 
 # Initialize session state for navigation
 if "page" not in st.session_state:
-    st.session_state["page"] = "Welcome & Overview"
+    st.session_state["page"] = "Dashboard"
 
 if "language" not in st.session_state:
     st.session_state["language"] = "English"
@@ -697,32 +697,30 @@ def get_base64_logo():
 logo_base64 = get_base64_logo()
 
 if has_admin_tab:
-    # 9-column layout: Logo block (width 2.2), 5 Menu Buttons (width 1.1 each), Language Toggle (width 0.8), Theme Toggle (width 0.5), User Profile Block (width 1.8)
-    nav_cols = st.columns([2.2, 1.1, 1.1, 1.2, 1.1, 1.1, 0.8, 0.5, 1.8], vertical_alignment="center")
+    # 8-column layout: Logo block (width 2.2), 4 Menu Buttons (width 1.3, 1.8, 1.5, 1.3), Language (width 0.8), Theme (width 0.5), User Profile Block (width 1.8)
+    nav_cols = st.columns([2.2, 1.3, 1.8, 1.5, 1.3, 0.8, 0.5, 1.8], vertical_alignment="center")
     menu_options = [
-        ("Welcome & Overview", TRANSLATIONS[lang]["overview"]),
+        ("Dashboard", TRANSLATIONS[lang]["dashboard"]),
         ("Public Survey Form", TRANSLATIONS[lang]["survey"]),
-        ("Analytics Dashboard", TRANSLATIONS[lang]["dashboard"]),
         ("Help / Feedback", TRANSLATIONS[lang]["help"]),
         ("Admin Panel", TRANSLATIONS[lang]["admin"])
-    ]
-    lang_col_idx = 6
-    theme_col_idx = 7
-    profile_col_idx = 8
-    sub_strip_widths = [6.8, 1.0, 1.2]
-else:
-    # 8-column layout: Logo block (width 2.2), 4 Menu Buttons (width 1.2 each), Language Toggle (width 0.8), Theme Toggle (width 0.5), User Profile Block (width 1.8)
-    nav_cols = st.columns([2.2, 1.2, 1.2, 1.3, 1.2, 0.8, 0.5, 1.8], vertical_alignment="center")
-    menu_options = [
-        ("Welcome & Overview", TRANSLATIONS[lang]["overview"]),
-        ("Public Survey Form", TRANSLATIONS[lang]["survey"]),
-        ("Analytics Dashboard", TRANSLATIONS[lang]["dashboard"]),
-        ("Help / Feedback", TRANSLATIONS[lang]["help"])
     ]
     lang_col_idx = 5
     theme_col_idx = 6
     profile_col_idx = 7
-    sub_strip_widths = [5.9, 1.0, 1.2]
+    sub_strip_widths = [5.6, 1.0, 1.2]
+else:
+    # 7-column layout: Logo block (width 2.2), 3 Menu Buttons (width 1.3, 1.8, 1.5), Language (width 0.8), Theme (width 0.5), User Profile Block (width 1.8)
+    nav_cols = st.columns([2.2, 1.3, 1.8, 1.5, 0.8, 0.5, 1.8], vertical_alignment="center")
+    menu_options = [
+        ("Dashboard", TRANSLATIONS[lang]["dashboard"]),
+        ("Public Survey Form", TRANSLATIONS[lang]["survey"]),
+        ("Help / Feedback", TRANSLATIONS[lang]["help"])
+    ]
+    lang_col_idx = 4
+    theme_col_idx = 5
+    profile_col_idx = 6
+    sub_strip_widths = [4.3, 1.0, 1.2]
 
 # Column 0: Premium STTB Logo and title block matching crop exactly
 with nav_cols[0]:
@@ -819,13 +817,13 @@ if st.session_state.get("show_lang_options", False):
 
 
 # Get current page selection from session state
-page = st.session_state.get("page", "Welcome & Overview")
+page = st.session_state.get("page", "Dashboard")
 
 # ---------------------------------------------------------
 # ---------------------------------------------------------
 # PAGE 1: WELCOME & OVERVIEW
 # ---------------------------------------------------------
-if page == "Welcome & Overview":
+if page == "Welcome & Overview_obsolete":
     if lang == "Bahasa Melayu":
         st.markdown('<div class="glass-header"><h1>Barometer Kepercayaan Teknologi Sarawak (STTB)</h1><div class="subtitle">Kerangka Sosio-Teknikal untuk Pengukuran Kepercayaan Digital di Sarawak</div></div>', unsafe_allow_html=True)
     else:
@@ -1362,7 +1360,7 @@ elif page == "Public Survey Form":
 # ---------------------------------------------------------
 # PAGE 3: ANALYTICS DASHBOARD
 # ---------------------------------------------------------
-elif page == "Analytics Dashboard":
+elif page == "Dashboard" or page == "Welcome & Overview":
     # Import Plotly dynamically
     import plotly.graph_objects as go
 
@@ -1772,6 +1770,75 @@ elif page == "Analytics Dashboard":
             use_container_width=True
         )
 
+        # ---------------------------------------------------------
+        # COLLAPSIBLE ACADEMIC OVERVIEW & UTS FRAMEWORK DETAILS (Integrated Overview)
+        # ---------------------------------------------------------
+        st.markdown("<br>", unsafe_allow_html=True)
+        overview_title = "💡 Mengenai Rangka Kerja & 5 Tonggak Kepercayaan UTS" if lang == "Bahasa Melayu" else "💡 About the UTS Framework & 5 Digital Trust Pillars"
+        with st.expander(overview_title, expanded=False):
+            if lang == "Bahasa Melayu":
+                st.markdown(f"""
+                <div class="glass-card" style="margin-top: 10px;">
+                    <h3 style="color:{gold_color};">Mengenai Projek</h3>
+                    <p><b>Barometer Kepercayaan Teknologi Sarawak (STTB)</b> ialah projek penyelidikan Research and Development (R&D) yang dibangunkan untuk menangani jurang kritikal dalam mengukur dan menjejaki kepercayaan orang ramai terhadap teknologi digital dan institusi di seluruh bahagian pentadbiran di Sarawak.</p>
+                    <p>Sejajar secara langsung dengan <b>Strategi Perbadanan Ekonomi Digital Sarawak (SDEC)</b> dan dasar digital kebangsaan, platform ini menyediakan pembuat dasar, penyelidik akademik, dan rakyat dengan penunjuk telus dan masa nyata mengenai cara platform digital mengendalikan privasi data, etika, kebolehcapaian dan keselamatan.</p>
+                    <p>Seni bina pemarkahan kami distrukturkan secara saintifik merentasi <b>5 teras tonggak kepercayaan digital</b>, dipetakan terhadap <b>15 pemboleh ubah analisis</b>, dan dikira daripada instrumen tinjauan <b>75-item komprehensif</b> yang berasaskan Teori Institusi sosiologi oleh W. Richard Scott (1995) dan diperhalusi melalui paradigma etika perundangan Islam.</p>
+                </div>
+                
+                <div class="glass-card">
+                    <h3 style="color:{gold_color};">Lima Tonggak Kepercayaan Digital</h3>
+                    <p>Setiap tonggak mewakili paksi kritikal penilaian awam:</p>
+                    <ul>
+                        <li><b>1. Ketelusan & Kebolehcapaian (Sidq & Tabayyun)</b>: Membuka proses algoritma, dasar bahasa mudah, dan menangani jurang maklumat antara kerajaan dan rakyat.</li>
+                        <li><b>2. Etika & Tanggungjawab (Amanah)</b>: Mempromosikan reka bentuk perisian yang adil, tanpa kecenderungan algoritma, dan pemimpin yang mengambil alih pengurusan kebajikan sivik.</li>
+                        <li><b>3. Privasi & Kawalan (Tajassus & Haya)</b>: Mencegah pencerobohan tanpa kebenaran, memberikan pilihan persetujuan terperinci, dan mengurangkan peletakan jawatan digital.</li>
+                        <li><b>4. Keselamatan & Kebolehpercayaan (Itqan)</b>: Memintasi kecemerlangan teknikal, daya resilience infrastruktur, dan masa henti perkhidmatan yang rendah.</li>
+                        <li><b>5. Inklusi Digital & Kesaksamaan (Adl)</b>: Mengimbangi liputan geografi antara zon bandar dan luar bandar, menyokong literasi digital, dan kebolehcapaian untuk kumpulan terpinggir.</li>
+                    </ul>
+                </div>
+                
+                <div class="glass-card">
+                    <h3 style="color:{gold_color};">Integrasi Kerangka Teori</h3>
+                    <p>Skema pangkalan data dan model pemarkahan bipartit kami disintesis di sekitar Tiga Tonggak Institusi W. Richard Scott:</p>
+                    <ol>
+                        <li><b>Tonggak Regulatif</b>: Dipetakan kepada peraturan Keselamatan dan Privasi (pematuhan PDPA 2010).</li>
+                        <li><b>Tonggak Normatif</b>: Dipetakan kepada Ketelusan dan Etika (piawaian kebolehpercayaan).</li>
+                        <li><b>Tonggak Budaya-Kognitif</b>: Dipetakan kepada Inklusi Digital (pengagihan adil, literasi digital kognitif).</li>
+                    </ol>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="glass-card" style="margin-top: 10px;">
+                    <h3 style="color:{gold_color};">About The Project</h3>
+                    <p>The <b>Sarawak Tech-Trust Barometer (STTB)</b> is an R&D research project developed to address the critical gaps in measuring and tracking public trust in digital technologies and institutions across the administrative divisions of Sarawak.</p>
+                    <p>Aligning directly with the <b>Sarawak Digital Economy Corporation (SDEC) Strategy</b> and national digital policies, the platform provides policymakers, academic researchers, and citizens with transparent, real-time indicators regarding how digital platforms handle data privacy, ethics, accessibility, and security.</p>
+                    <p>Our scoring architecture is scientifically structured across <b>5 core digital trust pillars</b>, mapped against <b>15 analytical variables</b>, and calculated from a comprehensive <b>75-item survey instrument</b> grounded in the sociological Institutional Theory by W. Richard Scott (1995) and refined through the ethical paradigms of Islamic jurisprudence.</p>
+                </div>
+                
+                <div class="glass-card">
+                    <h3 style="color:{gold_color};">The Five Digital Trust Pillars</h3>
+                    <p>Each pillar represents a critical axis of public evaluation:</p>
+                    <ul>
+                        <li><b>1. Transparency & Accessibility (Sidq & Tabayyun)</b>: Opening algorithmic processes, plain language policies, and addressing information gaps between state and citizen.</li>
+                        <li><b>2. Ethics & Responsibility (Amanah)</b>: Promoting fair software designs, algorithmic non-bias, and leaders taking stewardship of civic welfare.</li>
+                        <li><b>3. Privacy & Control (Tajassus & Haya)</b>: Preventing unauthorized intrusion, giving granular consent options, and mitigating digital resignation.</li>
+                        <li><b>4. Security & Reliability (Itqan)</b>: Ensuring technical excellence, infrastructure resilience, and low service downtime.</li>
+                        <li><b>5. Digital Inclusion & Equity (Adl)</b>: Balancing geographic coverage between urban and rural zones, supporting digital literacy, and accessibility for marginalized groups.</li>
+                    </ul>
+                </div>
+                
+                <div class="glass-card">
+                    <h3 style="color:{gold_color};">Theoretical Framework Integration</h3>
+                    <p>Our database schema and bipartite scoring models are synthesized around W. Richard Scott's <b>Three Pillars of Institutions</b>:</p>
+                    <ol>
+                        <li><b>Regulative Pillar</b>: Mapped to <i>Security</i> and <i>Privacy</i> rules (PDPA 2010 compliance).</li>
+                        <li><b>Normative Pillar</b>: Mapped to <i>Transparency</i> and <i>Ethics</i> (trustworthiness standards).</li>
+                        <li><b>Cultural-Cognitive Pillar</b>: Mapped to <i>Digital Inclusion</i> (fair distribution, cognitive digital literacy).</li>
+                    </ol>
+                </div>
+                """, unsafe_allow_html=True)
+
         # Collapsible Database Administration Panel (Admin Only)
         st.markdown("<br>", unsafe_allow_html=True)
         admin_title = "Tetapan Sistem & Pentadbiran (UTS Admin Sahaja)" if lang == "Bahasa Melayu" else "System Settings & Administration (UTS Admin Only)"
@@ -1815,7 +1882,7 @@ elif page == "Analytics Dashboard":
                 
                 succ_purge = "Pangkalan data berjaya dipadamkan kepada keadaan bersih! Mengarah semula..." if lang == "Bahasa Melayu" else "Database successfully purged to a clean state! Redirecting..."
                 st.success(succ_purge)
-                st.session_state["page"] = "Welcome & Overview"
+                st.session_state["page"] = "Dashboard"
                 st.rerun()
 
 
@@ -1946,7 +2013,7 @@ elif page == "Admin Panel":
             lock_label = "Kunci Portal & Keluar" if lang == "Bahasa Melayu" else "Lock Portal & Logout"
             if st.button(lock_label, type="secondary", use_container_width=True, key="lock_portal_btn"):
                 st.session_state["admin_mode"] = False
-                st.session_state["page"] = "Welcome & Overview"
+                st.session_state["page"] = "Dashboard"
                 st.query_params.clear()
                 st.rerun()
                 
@@ -2157,7 +2224,7 @@ elif page == "Admin Panel":
                 
                 succ_purge = "Pangkalan data berjaya dipadamkan kepada keadaan bersih! Mengarah semula..." if lang == "Bahasa Melayu" else "Database successfully purged to a clean state! Redirecting..."
                 st.success(succ_purge)
-                st.session_state["page"] = "Welcome & Overview"
+                st.session_state["page"] = "Dashboard"
                 st.rerun()
 
         # ---------------------------------------------------------
