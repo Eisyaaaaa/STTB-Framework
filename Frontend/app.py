@@ -1402,7 +1402,6 @@ elif page == "Dashboard" or page == "Welcome & Overview":
     # ---------------------------------------------------------
     # ROW 2: ABOUT STTB (Context & Digital Pillars)
     # ---------------------------------------------------------
-    st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
     st.markdown(f"<div style='font-size: 2.5rem; font-weight: 800; color: {gold_color}; margin-bottom: 15px;'>{ 'About STTB' if lang == 'English' else 'Mengenai STTB' }</div>", unsafe_allow_html=True)
     
     if lang == "Bahasa Melayu":
