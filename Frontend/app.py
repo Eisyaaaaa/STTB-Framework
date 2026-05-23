@@ -342,8 +342,34 @@ def init_db():
     )
     """)
     
+    # 5. Administrative Audit Logs Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS admin_audit_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        action_type TEXT NOT NULL,
+        details TEXT NOT NULL,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    
     conn.commit()
     conn.close()
+
+
+def log_admin_action(action_type, details):
+    """Inserts a new record into the admin audit logs table."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO admin_audit_logs (action_type, details)
+            VALUES (?, ?)
+        """, (action_type, details))
+        conn.commit()
+    except Exception as e:
+        pass
+    finally:
+        conn.close()
 
 
 def seed_database_if_empty():
@@ -1758,159 +1784,343 @@ elif page == "Admin Panel":
                 st.query_params.clear()
                 st.rerun()
                 
-        # Load feedback data
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        df_feed = pd.read_sql_query("SELECT * FROM system_feedback ORDER BY submitted_at DESC", conn)
-        conn.close()
+        # Initialize Admin Tabs Workspace
+        admin_tab_1, admin_tab_2, admin_tab_3 = st.tabs([
+            "✉️ Maklum Balas Civik / Civic Feedback" if lang == "Bahasa Melayu" else "✉️ Civic Feedback & Complaints",
+            "📊 Data Respon Tinjauan / Survey Responses" if lang == "Bahasa Melayu" else "📊 Survey Responses Manager",
+            "🛡️ Log Audit Pentadbir / Admin Audit Logs" if lang == "Bahasa Melayu" else "🛡️ Admin Activity & Audit Logs"
+        ])
         
-        total_feedback = len(df_feed)
-        
-        if total_feedback == 0:
-            st.info("Tiada maklum balas sistem yang telah dikemukakan lagi." if lang == "Bahasa Melayu" else "No system feedback has been submitted yet.")
-        else:
-            # 1. KPI Panel Cards
-            avg_sat = df_feed["satisfaction"].mean()
-            bugs_count = len(df_feed[df_feed["category"].str.contains("Technical|Pepijat")])
-            academic_count = len(df_feed[df_feed["category"].str.contains("Academic|Teori|Tonggak")])
+        # ---------------------------------------------------------
+        # TAB 1: CIVIC FEEDBACK WORKSPACE
+        # ---------------------------------------------------------
+        with admin_tab_1:
+            # Load feedback data
+            conn = get_db_connection()
+            df_feed = pd.read_sql_query("SELECT * FROM system_feedback ORDER BY submitted_at DESC", conn)
+            conn.close()
             
-            kpi_c1, kpi_c2, kpi_c3, kpi_c4 = st.columns(4)
+            total_feedback = len(df_feed)
             
-            with kpi_c1:
-                title_lbl = "Jumlah Maklum Balas" if lang == "Bahasa Melayu" else "Total Feedback Entries"
-                st.markdown(f"""
-                <div class="glass-card" style="text-align: center; padding: 15px;">
-                    <div class="metric-label">{title_lbl}</div>
-                    <div class="metric-value" style="font-size: 2.2rem;">{total_feedback}</div>
-                </div>
-                """, unsafe_allow_html=True)
+            if total_feedback == 0:
+                st.info("Tiada maklum balas sistem yang telah dikemukakan lagi." if lang == "Bahasa Melayu" else "No system feedback has been submitted yet.")
+            else:
+                # 1. KPI Panel Cards
+                avg_sat = df_feed["satisfaction"].mean()
+                bugs_count = len(df_feed[df_feed["category"].str.contains("Technical|Pepijat")])
+                academic_count = len(df_feed[df_feed["category"].str.contains("Academic|Teori|Tonggak")])
                 
-            with kpi_c2:
-                title_lbl = "Purata Kepuasan" if lang == "Bahasa Melayu" else "Avg System Rating"
-                st.markdown(f"""
-                <div class="glass-card" style="text-align: center; padding: 15px;">
-                    <div class="metric-label">{title_lbl}</div>
-                    <div class="metric-value" style="font-size: 2.2rem; color: #ffd700;">{avg_sat:.2f}/5.00</div>
-                </div>
-                """, unsafe_allow_html=True)
+                kpi_c1, kpi_c2, kpi_c3, kpi_c4 = st.columns(4)
                 
-            with kpi_c3:
-                title_lbl = "Laporan Pepijat/Ralat" if lang == "Bahasa Melayu" else "Bug Reports"
-                st.markdown(f"""
-                <div class="glass-card" style="text-align: center; padding: 15px;">
-                    <div class="metric-label">{title_lbl}</div>
-                    <div class="metric-value" style="font-size: 2.2rem; color: #ff4d4d;">{bugs_count}</div>
-                </div>
-                """, unsafe_allow_html=True)
-                
-            with kpi_c4:
-                title_lbl = "Penyelarasan Akademik" if lang == "Bahasa Melayu" else "Academic Inquiries"
-                st.markdown(f"""
-                <div class="glass-card" style="text-align: center; padding: 15px;">
-                    <div class="metric-label">{title_lbl}</div>
-                    <div class="metric-value" style="font-size: 2.2rem; color: #4da6ff;">{academic_count}</div>
-                </div>
-                """, unsafe_allow_html=True)
-                
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            # 2. Main Double-Column Layout
-            d_col1, d_col2 = st.columns([3, 2])
-            
-            with d_col1:
-                st.subheader("Carian & Tapis Senarai Maklum Balas" if lang == "Bahasa Melayu" else "Search & Filter Feedback Submissions")
-                
-                # Filters
-                f_role_lbl = "Tapis Peranan:" if lang == "Bahasa Melayu" else "Filter Role:"
-                f_cat_lbl = "Tapis Kategori:" if lang == "Bahasa Melayu" else "Filter Category:"
-                
-                roles_available = sorted(list(df_feed["user_role"].unique()))
-                cats_available = sorted(list(df_feed["category"].unique()))
-                
-                sf_col1, sf_col2 = st.columns(2)
-                with sf_col1:
-                    selected_roles = st.multiselect(f_role_lbl, roles_available, default=roles_available)
-                with sf_col2:
-                    selected_cats = st.multiselect(f_cat_lbl, cats_available, default=cats_available)
-                    
-                # Apply filter
-                filtered_df = df_feed[
-                    df_feed["user_role"].isin(selected_roles) & 
-                    df_feed["category"].isin(selected_cats)
-                ]
-                
-                # Display DataFrame
-                st.markdown(f"<div style='font-size: 0.9rem; margin-bottom: 10px; color:#888;'>Hasil carian: {len(filtered_df)} entri</div>", unsafe_allow_html=True)
-                
-                display_cols = ["id", "user_role", "category", "subject", "satisfaction", "submitted_at"]
-                renamed_df = filtered_df[display_cols].copy()
-                if lang == "Bahasa Melayu":
-                    renamed_df.columns = ["ID", "Peranan", "Kategori", "Subjek Mesej", "Kepuasan", "Tarikh Dihantar"]
-                else:
-                    renamed_df.columns = ["ID", "Stakeholder Role", "Feedback Category", "Subject / Summary", "Rating", "Submitted At"]
-                    
-                st.dataframe(renamed_df, use_container_width=True, hide_index=True)
-                
-            with d_col2:
-                st.subheader("Panel Perincian & Penyelesaian" if lang == "Bahasa Melayu" else "Feedback Detail & Resolution Panel")
-                
-                if len(filtered_df) == 0:
-                    st.info("Tiada padanan dijumpai untuk kriteria tapis semasa." if lang == "Bahasa Melayu" else "No matching entries found for current filters.")
-                else:
-                    select_lbl = "Pilih ID entri untuk audit perperincian:" if lang == "Bahasa Melayu" else "Select entry ID to audit details:"
-                    selected_id = st.selectbox(select_lbl, filtered_df["id"].tolist())
-                    
-                    # Fetch selected record
-                    record = filtered_df[filtered_df["id"] == selected_id].iloc[0]
-                    
-                    # Display clean card
+                with kpi_c1:
+                    title_lbl = "Jumlah Maklum Balas" if lang == "Bahasa Melayu" else "Total Feedback Entries"
                     st.markdown(f"""
-                    <div class="glass-card" style="border-left: 5px solid #FFC72C;">
-                        <h4 style="margin: 0 0 5px 0; color: #FFC72C;">{record['subject']}</h4>
-                        <div style="font-size: 0.8rem; color: #888888; margin-bottom: 15px;">
-                            ID: #{record['id']} | {record['submitted_at']} <br>
-                            <b>Peranan:</b> {record['user_role']} <br>
-                            <b>Kategori:</b> {record['category']}
-                        </div>
-                        <p style="font-size: 0.95rem; border-top: 1px solid rgba(255,199,44,0.15); padding-top: 15px;">
-                            {record['description']}
-                        </p>
-                        <div style="margin-top: 15px; font-weight: bold; color: #ffd700;">
-                            Skor Penarafan Sistem: {"⭐" * record['satisfaction']} ({record['satisfaction']}/5)
-                        </div>
+                    <div class="glass-card" style="text-align: center; padding: 15px;">
+                        <div class="metric-label">{title_lbl}</div>
+                        <div class="metric-value" style="font-size: 2.2rem;">{total_feedback}</div>
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # Delete action
-                    res_btn = "Tandakan Selesai & Padam Aduan" if lang == "Bahasa Melayu" else "Mark Resolved & Purge Entry"
-                    if st.button(res_btn, type="primary", use_container_width=True, key=f"del_feed_{selected_id}"):
+                with kpi_c2:
+                    title_lbl = "Purata Kepuasan" if lang == "Bahasa Melayu" else "Avg System Rating"
+                    st.markdown(f"""
+                    <div class="glass-card" style="text-align: center; padding: 15px;">
+                        <div class="metric-label">{title_lbl}</div>
+                        <div class="metric-value" style="font-size: 2.2rem; color: #ffd700;">{avg_sat:.2f}/5.00</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                with kpi_c3:
+                    title_lbl = "Laporan Pepijat/Ralat" if lang == "Bahasa Melayu" else "Bug Reports"
+                    st.markdown(f"""
+                    <div class="glass-card" style="text-align: center; padding: 15px;">
+                        <div class="metric-label">{title_lbl}</div>
+                        <div class="metric-value" style="font-size: 2.2rem; color: #ff4d4d;">{bugs_count}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                with kpi_c4:
+                    title_lbl = "Penyelarasan Akademik" if lang == "Bahasa Melayu" else "Academic Inquiries"
+                    st.markdown(f"""
+                    <div class="glass-card" style="text-align: center; padding: 15px;">
+                        <div class="metric-label">{title_lbl}</div>
+                        <div class="metric-value" style="font-size: 2.2rem; color: #4da6ff;">{academic_count}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                st.markdown("<br>", unsafe_allow_html=True)
+                
+                # 2. Main Double-Column Layout
+                d_col1, d_col2 = st.columns([3, 2])
+                
+                with d_col1:
+                    st.subheader("Carian & Tapis Senarai Maklum Balas" if lang == "Bahasa Melayu" else "Search & Filter Feedback Submissions")
+                    
+                    # Filters
+                    f_role_lbl = "Tapis Peranan:" if lang == "Bahasa Melayu" else "Filter Role:"
+                    f_cat_lbl = "Tapis Kategori:" if lang == "Bahasa Melayu" else "Filter Category:"
+                    
+                    roles_available = sorted(list(df_feed["user_role"].unique()))
+                    cats_available = sorted(list(df_feed["category"].unique()))
+                    
+                    sf_col1, sf_col2 = st.columns(2)
+                    with sf_col1:
+                        selected_roles = st.multiselect(f_role_lbl, roles_available, default=roles_available)
+                    with sf_col2:
+                        selected_cats = st.multiselect(f_cat_lbl, cats_available, default=cats_available)
+                        
+                    # Apply filter
+                    filtered_df = df_feed[
+                        df_feed["user_role"].isin(selected_roles) & 
+                        df_feed["category"].isin(selected_cats)
+                    ]
+                    
+                    # Display DataFrame
+                    st.markdown(f"<div style='font-size: 0.9rem; margin-bottom: 10px; color:#888;'>Hasil carian: {len(filtered_df)} entri</div>", unsafe_allow_html=True)
+                    
+                    display_cols = ["id", "user_role", "category", "subject", "satisfaction", "submitted_at"]
+                    renamed_df = filtered_df[display_cols].copy()
+                    if lang == "Bahasa Melayu":
+                        renamed_df.columns = ["ID", "Peranan", "Kategori", "Subjek Mesej", "Kepuasan", "Tarikh Dihantar"]
+                    else:
+                        renamed_df.columns = ["ID", "Stakeholder Role", "Feedback Category", "Subject / Summary", "Rating", "Submitted At"]
+                        
+                    st.dataframe(renamed_df, use_container_width=True, hide_index=True)
+                    
+                with d_col2:
+                    st.subheader("Panel Perincian & Penyelesaian" if lang == "Bahasa Melayu" else "Feedback Detail & Resolution Panel")
+                    
+                    if len(filtered_df) == 0:
+                        st.info("Tiada padanan dijumpai untuk kriteria tapis semasa." if lang == "Bahasa Melayu" else "No matching entries found for current filters.")
+                    else:
+                        select_lbl = "Pilih ID entri untuk audit perperincian:" if lang == "Bahasa Melayu" else "Select entry ID to audit details:"
+                        selected_id = st.selectbox(select_lbl, filtered_df["id"].tolist())
+                        
+                        # Fetch selected record
+                        record = filtered_df[filtered_df["id"] == selected_id].iloc[0]
+                        
+                        # Display clean card
+                        st.markdown(f"""
+                        <div class="glass-card" style="border-left: 5px solid #FFC72C;">
+                            <h4 style="margin: 0 0 5px 0; color: #FFC72C;">{record['subject']}</h4>
+                            <div style="font-size: 0.8rem; color: #888888; margin-bottom: 15px;">
+                                ID: #{record['id']} | {record['submitted_at']} <br>
+                                <b>Peranan:</b> {record['user_role']} <br>
+                                <b>Kategori:</b> {record['category']}
+                            </div>
+                            <p style="font-size: 0.95rem; border-top: 1px solid rgba(255,199,44,0.15); padding-top: 15px;">
+                                {record['description']}
+                            </p>
+                            <div style="margin-top: 15px; font-weight: bold; color: #ffd700;">
+                                Skor Penarafan Sistem: {"⭐" * record['satisfaction']} ({record['satisfaction']}/5)
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        # Delete action
+                        res_btn = "Tandakan Selesai & Padam Aduan" if lang == "Bahasa Melayu" else "Mark Resolved & Purge Entry"
+                        if st.button(res_btn, type="primary", use_container_width=True, key=f"del_feed_{selected_id}"):
+                            conn = get_db_connection()
+                            cursor = conn.cursor()
+                            cursor.execute("DELETE FROM system_feedback WHERE id = ?", (int(selected_id),))
+                            conn.commit()
+                            conn.close()
+                            
+                            # Log Action
+                            log_admin_action(
+                                "Delete Feedback", 
+                                f"Deleted system feedback entry ID {selected_id} (subject: '{record['subject']}')"
+                            )
+                            
+                            succ_purge = "Aduan berjaya diselesaikan dan dipadamkan daripada pangkalan data!" if lang == "Bahasa Melayu" else "Feedback entry resolved and purged from the database successfully!"
+                            st.success(succ_purge)
+                            st.rerun()
+                            
+                # 3. Quick Visual Breakdown Charts
+                st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.15);'><br>", unsafe_allow_html=True)
+                st.subheader("Pecahan Statistik Maklum Balas" if lang == "Bahasa Melayu" else "Statistical Feedback Breakdown")
+                
+                c_chart1, c_chart2 = st.columns(2)
+                with c_chart1:
+                    # Category counts chart
+                    cat_counts = df_feed["category"].value_counts().reset_index()
+                    cat_counts.columns = ["Kategori" if lang == "Bahasa Melayu" else "Category", "Jumlah" if lang == "Bahasa Melayu" else "Count"]
+                    st.bar_chart(data=cat_counts, x="Kategori" if lang == "Bahasa Melayu" else "Category", y="Jumlah" if lang == "Bahasa Melayu" else "Count", color="#FFC72C")
+                    
+                with c_chart2:
+                    # Satisfaction frequency chart
+                    sat_counts = df_feed["satisfaction"].value_counts().reset_index()
+                    sat_counts.columns = ["Skor" if lang == "Bahasa Melayu" else "Score", "Jumlah" if lang == "Bahasa Melayu" else "Count"]
+                    st.bar_chart(data=sat_counts, x="Skor" if lang == "Bahasa Melayu" else "Score", y="Jumlah" if lang == "Bahasa Melayu" else "Count", color="#DA291C")
+
+            # 4. Database Administration Panel
+            st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.15);'><br>", unsafe_allow_html=True)
+            if lang == "Bahasa Melayu":
+                st.markdown("""
+                <div style="padding: 10px; border-left: 3px solid #DA291C;">
+                    <h4 style="color:#DA291C; margin: 0 0 10px 0;">Panel Pentadbiran Pangkalan Data</h4>
+                    <p style="font-size:0.85rem; color:#bdc3c7; margin:0 0 15px 0;">
+                        Untuk memindahkan kerangka kerja ini daripada fasa penilaian rintisan kepada pengumpulan data akademik dunia sebenar, anda boleh memadamkan semua rekod olok-olok pra-pemuatan di sini. Ini akan mengosongkan pangkalan data sepenuhnya kepada sifar penyerahan dan menghentikan enjin pemuatan automatik secara kekal.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown("""
+                <div style="padding: 10px; border-left: 3px solid #DA291C;">
+                    <h4 style="color:#DA291C; margin: 0 0 10px 0;">Database Administration Panel</h4>
+                    <p style="font-size:0.85rem; color:#bdc3c7; margin:0 0 15px 0;">
+                        To transition this framework from the pilot evaluation phase to real-world academic data collection, you can purge all pre-seeded mock records here. This will clear the database entirely to a 0-submission slate and permanently stop the automated seed engine.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            purge_btn_lbl = "Padam Semua Rekod Pangkalan Data Rintisan" if lang == "Bahasa Melayu" else "Purge All Pilot Database Records"
+            if st.button(purge_btn_lbl, type="secondary", use_container_width=True, key="admin_purge_btn"):
+                conn = get_db_connection()
+                cursor = conn.cursor()
+                cursor.execute("DELETE FROM respondents")
+                cursor.execute("DELETE FROM responses")
+                cursor.execute("DELETE FROM computed_scores")
+                cursor.execute("CREATE TABLE IF NOT EXISTS system_config (key TEXT UNIQUE, val TEXT)")
+                cursor.execute("INSERT OR REPLACE INTO system_config (key, val) VALUES ('seeded', 'false')")
+                conn.commit()
+                conn.close()
+                
+                # Log action
+                log_admin_action("Purge Database", "Purged all pre-seeded pilot database records and respondents")
+                
+                succ_purge = "Pangkalan data berjaya dipadamkan kepada keadaan bersih! Mengarah semula..." if lang == "Bahasa Melayu" else "Database successfully purged to a clean state! Redirecting..."
+                st.success(succ_purge)
+                st.session_state["page"] = "Welcome & Overview"
+                st.rerun()
+
+        # ---------------------------------------------------------
+        # TAB 2: SURVEY RESPONSES WORKSPACE (Auditing & Deleting & CSV Load)
+        # ---------------------------------------------------------
+        with admin_tab_2:
+            st.subheader("Pengurusan Data Respon Tinjauan" if lang == "Bahasa Melayu" else "Survey Response Data Auditing")
+            
+            # Load all survey respondents
+            conn = get_db_connection()
+            df_resp = pd.read_sql_query("""
+                SELECT r.id, r.age_group, r.gender, r.occupation, r.district, r.submitted_at, c.sttb_index, c.trust_level
+                FROM respondents r
+                LEFT JOIN computed_scores c ON r.id = c.respondent_id
+                ORDER BY r.id DESC
+            """, conn)
+            conn.close()
+            
+            total_resp = len(df_resp)
+            st.markdown(f"<div style='font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;'>Jumlah Penyerahan Tinjauan: {total_resp} entri</div>", unsafe_allow_html=True)
+            
+            if total_resp == 0:
+                st.info("Tiada respon tinjauan dalam pangkalan data lagi." if lang == "Bahasa Melayu" else "No survey responses found in the database.")
+            else:
+                # Layout
+                dm_col1, dm_col2 = st.columns([3, 2])
+                
+                with dm_col1:
+                    # Filter Controls
+                    st.markdown("#### Carian & Tapis Respon" if lang == "Bahasa Melayu" else "#### Search & Filter Responses")
+                    f_col_div, f_col_age = st.columns(2)
+                    with f_col_div:
+                        districts_avail = ["All"] + sorted(list(df_resp["district"].dropna().unique()))
+                        selected_dist = st.selectbox("Tapis Bahagian / District:" if lang == "Bahasa Melayu" else "Filter Sarawak Division:", districts_avail)
+                    with f_col_age:
+                        ages_avail = ["All"] + sorted(list(df_resp["age_group"].dropna().unique()))
+                        selected_age = st.selectbox("Tapis Kumpulan Umur / Age Group:" if lang == "Bahasa Melayu" else "Filter Age Group:", ages_avail)
+                        
+                    # Apply filter
+                    filtered_resp = df_resp.copy()
+                    if selected_dist != "All":
+                        filtered_resp = filtered_resp[filtered_resp["district"] == selected_dist]
+                    if selected_age != "All":
+                        filtered_resp = filtered_resp[filtered_resp["age_group"] == selected_age]
+                        
+                    # Display Dataframe
+                    disp_resp_df = filtered_resp.copy()
+                    if lang == "Bahasa Melayu":
+                        disp_resp_df.columns = ["Responden ID", "Kumpulan Umur", "Jantina", "Pekerjaan", "Bahagian", "Tarikh Hantar", "Indeks STTB", "Tahap Kepercayaan"]
+                    else:
+                        disp_resp_df.columns = ["Respondent ID", "Age Group", "Gender", "Occupation", "Sarawak Division", "Submitted At", "STTB Index", "Trust Level"]
+                        
+                    st.dataframe(disp_resp_df, use_container_width=True, hide_index=True)
+                    
+                with dm_col2:
+                    st.markdown("#### Audit & Pemadaman Respon" if lang == "Bahasa Melayu" else "#### Response Auditor & Individual Purge")
+                    
+                    audit_resp_id = st.selectbox(
+                        "Pilih ID Responden untuk diaudit / Select Respondent ID to audit:" if lang == "Bahasa Melayu" else "Select Respondent ID for details & purge:",
+                        filtered_resp["id"].tolist()
+                    )
+                    
+                    if audit_resp_id:
+                        selected_resp = filtered_resp[filtered_resp["id"] == audit_resp_id].iloc[0]
+                        
+                        # Load raw answers
                         conn = get_db_connection()
                         cursor = conn.cursor()
-                        cursor.execute("DELETE FROM system_feedback WHERE id = ?", (int(selected_id),))
-                        conn.commit()
+                        cursor.execute("SELECT responses_json FROM survey_responses WHERE respondent_id = ?", (int(audit_resp_id),))
+                        row_json = cursor.fetchone()
                         conn.close()
                         
-                        succ_purge = "Aduan berjaya diselesaikan dan dipadamkan daripada pangkalan data!" if lang == "Bahasa Melayu" else "Feedback entry resolved and purged from the database successfully!"
-                        st.success(succ_purge)
-                        st.rerun()
+                        # Extract demographics safely to avoid f-string nested key syntax issues
+                        resp_id_val = selected_resp['id']
+                        resp_date_val = selected_resp['submitted_at']
+                        resp_age_val = selected_resp['age_group']
+                        resp_gender_val = selected_resp['gender']
+                        resp_occ_val = selected_resp['occupation']
+                        resp_dist_val = selected_resp['district']
+                        resp_sttb_val = float(selected_resp['sttb_index']) if pd.notnull(selected_resp['sttb_index']) else 0.0
+                        formatted_sttb_val = f"{resp_sttb_val:.2f}"
+                        resp_level_val = selected_resp['trust_level']
                         
-            # 3. Quick Visual Breakdown Charts
-            st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.15);'><br>", unsafe_allow_html=True)
-            st.subheader("Pecahan Statistik Maklum Balas" if lang == "Bahasa Melayu" else "Statistical Feedback Breakdown")
-            
-            c_chart1, c_chart2 = st.columns(2)
-            with c_chart1:
-                # Category counts chart
-                cat_counts = df_feed["category"].value_counts().reset_index()
-                cat_counts.columns = ["Kategori" if lang == "Bahasa Melayu" else "Category", "Jumlah" if lang == "Bahasa Melayu" else "Count"]
-                st.bar_chart(data=cat_counts, x="Kategori" if lang == "Bahasa Melayu" else "Category", y="Jumlah" if lang == "Bahasa Melayu" else "Count", color="#FFC72C")
-                
-            with c_chart2:
-                # Satisfaction frequency chart
-                sat_counts = df_feed["satisfaction"].value_counts().reset_index()
-                sat_counts.columns = ["Skor" if lang == "Bahasa Melayu" else "Score", "Jumlah" if lang == "Bahasa Melayu" else "Count"]
-                st.bar_chart(data=sat_counts, x="Skor" if lang == "Bahasa Melayu" else "Score", y="Jumlah" if lang == "Bahasa Melayu" else "Count", color="#DA291C")
-                
+                        # Display clean card
+                        st.markdown(f"""
+                        <div class="glass-card" style="border-left: 5px solid #DA291C;">
+                            <h4 style="margin: 0 0 5px 0; color: #DA291C;">Responden #{resp_id_val}</h4>
+                            <div style="font-size: 0.8rem; color: #888888; margin-bottom: 10px;">
+                                <b>Tarikh:</b> {resp_date_val} <br>
+                                <b>Kumpulan Umur:</b> {resp_age_val} | <b>Jantina:</b> {resp_gender_val} <br>
+                                <b>Pekerjaan:</b> {resp_occ_val} | <b>Bahagian:</b> {resp_dist_val}
+                            </div>
+                            <div style="font-size: 1rem; font-weight: bold; margin-top: 10px; color:#ffd700;">
+                                Skor Indeks STTB: {formatted_sttb_val} ({resp_level_val})
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        # Expand raw answers json preview
+                        if row_json:
+                            try:
+                                answers_dict = json.loads(row_json[0])
+                                with st.expander("Pratonton Jawapan Mentah (Raw Answers)" if lang == "Bahasa Melayu" else "View Raw Answers JSON"):
+                                    st.json(answers_dict)
+                            except Exception:
+                                pass
+                                
+                        # Delete action
+                        del_btn_lbl = f"Padam Data Responden #{audit_resp_id} Secara Kekal" if lang == "Bahasa Melayu" else f"Permanently Delete Respondent #{audit_resp_id} Data"
+                        
+                        if st.button(del_btn_lbl, type="primary", use_container_width=True, key=f"del_resp_{audit_resp_id}"):
+                            conn = get_db_connection()
+                            cursor = conn.cursor()
+                            cursor.execute("DELETE FROM respondents WHERE id = ?", (int(audit_resp_id),))
+                            cursor.execute("DELETE FROM survey_responses WHERE respondent_id = ?", (int(audit_resp_id),))
+                            cursor.execute("DELETE FROM computed_scores WHERE respondent_id = ?", (int(audit_resp_id),))
+                            conn.commit()
+                            conn.close()
+                            
+                            # Log action
+                            log_admin_action(
+                                "Delete Respondent Data", 
+                                f"Deleted individual respondent ID {audit_resp_id} (demographics: {selected_resp['age_group']}, {selected_resp['gender']}, {selected_resp['occupation']}, {selected_resp['district']})"
+                            )
+                            
+                            succ_del = f"Responden #{audit_resp_id} berjaya dipadamkan daripada pangkalan data!" if lang == "Bahasa Melayu" else f"Respondent #{audit_resp_id} successfully deleted from the database!"
+                            st.success(succ_del)
+                            st.rerun()
+                            
             # 4. External Data Import Panel (Google Form CSV Loader)
             st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.15);'><br>", unsafe_allow_html=True)
             csv_import_title = "Pemuat Data Tinjauan Luaran (.csv)" if lang == "Bahasa Melayu" else "External CSV Survey Data Loader (.csv)"
@@ -2163,6 +2373,12 @@ elif page == "Admin Panel":
                         conn.commit()
                         conn.close()
                         
+                        # Log Action
+                        log_admin_action(
+                            "CSV Import", 
+                            f"Imported {success_count} survey responses from CSV file (errors: {error_count})"
+                        )
+                        
                         st.success(
                             f"Proses import CSV selesai! {success_count} rekod berjaya diimport. {error_count} ralat dikesan." 
                             if lang == "Bahasa Melayu" else 
@@ -2172,6 +2388,62 @@ elif page == "Admin Panel":
                         
                 except Exception as e:
                     st.error(f"Gagal memproses fail CSV: {str(e)}" if lang == "Bahasa Melayu" else f"Failed to process CSV file: {str(e)}")
+
+        # ---------------------------------------------------------
+        # TAB 3: ADMIN ACTIVITY & AUDIT LOGS Trail Viewer
+        # ---------------------------------------------------------
+        with admin_tab_3:
+            st.subheader("Log Audit & Aktiviti Pentadbiran" if lang == "Bahasa Melayu" else "Administrative Activity & Audit Trail")
+            
+            st.markdown(
+                "<p style='font-size:0.9rem; color:#bdc3c7;'>Sebagai sebahagian daripada keperluan pematuhan audit UTS, semua tindakan pentadbir dipantau dan disimpan secara kekal dalam log sejarah ini untuk rujukan masa hadapan.</p>"
+                if lang == "Bahasa Melayu" else
+                "<p style='font-size:0.9rem; color:#bdc3c7;'>As part of UTS research audit compliance requirements, all administrative actions are securely tracked and logged below for historical validation and activity monitoring.</p>",
+                unsafe_allow_html=True
+            )
+            
+            # Load Audit Logs
+            conn = get_db_connection()
+            df_audit = pd.read_sql_query("SELECT id, action_type, details, timestamp FROM admin_audit_logs ORDER BY timestamp DESC", conn)
+            conn.close()
+            
+            total_actions = len(df_audit)
+            st.markdown(f"<div style='font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;'>Jumlah Rekod Aktiviti Pentadbiran: {total_actions} tindakan</div>", unsafe_allow_html=True)
+            
+            if total_actions == 0:
+                st.info("Tiada rekod aktiviti pentadbiran yang didokumenkan lagi." if lang == "Bahasa Melayu" else "No administrative activities recorded in the system yet.")
+            else:
+                # Add action type filter
+                action_types_avail = ["All"] + sorted(list(df_audit["action_type"].unique()))
+                selected_action_type = st.selectbox(
+                    "Tapis Tindakan / Filter Action Type:" if lang == "Bahasa Melayu" else "Filter by Activity Type:",
+                    action_types_avail
+                )
+                
+                filtered_audit = df_audit.copy()
+                if selected_action_type != "All":
+                    filtered_audit = filtered_audit[filtered_audit["action_type"] == selected_action_type]
+                    
+                # Format DF
+                disp_audit_df = filtered_audit.copy()
+                if lang == "Bahasa Melayu":
+                    disp_audit_df.columns = ["Log ID", "Jenis Tindakan", "Butiran Terperinci", "Masa Kejadian"]
+                else:
+                    disp_audit_df.columns = ["Log ID", "Action Type", "Detailed Summary", "Timestamp"]
+                    
+                st.dataframe(disp_audit_df, use_container_width=True, hide_index=True)
+                
+                # Provide CSV Download compliance button
+                csv_data = filtered_audit.to_csv(index=False).encode('utf-8')
+                dl_lbl = "Muat Turun Log Audit (.csv)" if lang == "Bahasa Melayu" else "Download Official Audit Log (.csv)"
+                st.download_button(
+                    label=dl_lbl,
+                    data=csv_data,
+                    file_name="sttb_admin_audit_logs.csv",
+                    mime="text/csv",
+                    use_container_width=True,
+                    key="download_audit_logs_btn"
+                )
 
 
 # ---------------------------------------------------------
