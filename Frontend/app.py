@@ -1558,38 +1558,7 @@ elif page == "Dashboard" or page == "Welcome & Overview":
         </div>
         """, unsafe_allow_html=True)
 
-    # Nesting the 5 digital pillars bento grid inside the section
-    pi_col1, pi_col2, pi_col3, pi_col4, pi_col5 = st.columns(5)
-    pi_cols = [pi_col1, pi_col2, pi_col3, pi_col4, pi_col5]
-    
-    if lang == "Bahasa Melayu":
-        pillars_info = [
-            ("1. Ketelusan & Kebolehcapaian", "Sidq & Tabayyun", "Mengukur keterbukaan proses algoritma, kemudahan akses maklumat, dan penyebaran berita sahih bebas daripada manipulasi."),
-            ("2. Etika & Tanggungjawab", "Amanah", "Mengukur integriti reka bentuk perisian, ketiadaan kecenderungan berat sebelah algoritma, dan tanggungjawab penjagaan kebajikan digital."),
-            ("3. Privasi & Kawalan", "Tajassus & Haya", "Mengukur perlindungan hak privasi pengguna, pencegahan pencerobohan data tanpa izin, dan kawalan persetujuan data pengguna."),
-            ("4. Keselamatan & Kebolehpercayaan", "Itqan", "Mengukur kecemerlangan teknikal infrastruktur digital, ketahanan terhadap serangan siber, dan kebolehpercayaan perkhidmatan."),
-            ("5. Inklusi Digital & Kesaksamaan", "Adl", "Mengukur kesaksamaan capaian digital antara kawasan bandar dan luar bandar, pemupukan literasi, dan kebolehcapaian inklusif.")
-        ]
-    else:
-        pillars_info = [
-            ("1. Transparency & Accessibility", "Sidq & Tabayyun", "Measures clarity of algorithmic processes, ease of information access, and verifying authentic information."),
-            ("2. Ethics & Responsibility", "Amanah", "Evaluates software design integrity, absence of algorithmic bias, and ethical stewardship of digital systems."),
-            ("3. Privacy & Control", "Tajassus & Haya", "Evaluates protection of user privacy rights, prevention of unauthorized data intrusion, and user control over consent."),
-            ("4. Security & Reliability", "Itqan", "Measures technical excellence, resilience against cyber threats, and reliable system uptime."),
-            ("5. Digital Inclusion & Equity", "Adl", "Evaluates equal digital access across urban and rural zones, digital literacy enablement, and inclusion of marginalized groups.")
-        ]
-        
-    for idx, (title, paradigm, desc) in enumerate(pillars_info):
-        with pi_cols[idx]:
-            st.markdown(f"""
-            <div class="glass-card" style="padding: 16px; min-height: 240px; border-top: 3px solid {gold_color}; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
-                <div>
-                    <div style="font-size: 0.95rem; font-weight: bold; color: #ffffff; margin-bottom: 4px;">{title}</div>
-                    <div style="font-size: 0.78rem; font-style: italic; color: {gold_color}; font-weight: bold; margin-bottom: 10px;">{paradigm}</div>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin: 0;">{desc}</p>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+
             
     st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
 
@@ -1867,6 +1836,44 @@ elif page == "Dashboard" or page == "Welcome & Overview":
             hide_index=True,
             use_container_width=True
         )
+
+        # ---------------------------------------------------------
+        # STTB's DIGITAL PILLARS EXPLAINED (At the bottom)
+        # ---------------------------------------------------------
+        st.markdown("<br><hr style='border:0; border-top:1px solid rgba(255,255,255,0.08);'><br>", unsafe_allow_html=True)
+        st.markdown(f"<div style='font-size: 2.5rem; font-weight: 800; color: {gold_color}; margin-bottom: 15px;'>{ 'STTB\'s Digital Pillars' if lang == 'English' else 'Teras Tonggak Digital STTB' }</div>", unsafe_allow_html=True)
+        
+        pi_col1, pi_col2, pi_col3, pi_col4, pi_col5 = st.columns(5)
+        pi_cols = [pi_col1, pi_col2, pi_col3, pi_col4, pi_col5]
+        
+        if lang == "Bahasa Melayu":
+            pillars_info = [
+                ("1. Ketelusan & Kebolehcapaian", "Sidq & Tabayyun", "Mengukur keterbukaan proses algoritma, kemudahan akses maklumat, dan penyebaran berita sahih bebas daripada manipulasi."),
+                ("2. Etika & Tanggungjawab", "Amanah", "Mengukur integriti reka bentuk perisian, ketiadaan kecenderungan berat sebelah algoritma, dan tanggungjawab penjagaan kebajikan digital."),
+                ("3. Privasi & Kawalan", "Tajassus & Haya", "Mengukur perlindungan hak privasi pengguna, pencegahan pencerobohan data tanpa izin, dan kawalan persetujuan data pengguna."),
+                ("4. Keselamatan & Kebolehpercayaan", "Itqan", "Mengukur kecemerlangan teknikal infrastruktur digital, ketahanan terhadap serangan siber, dan kebolehpercayaan perkhidmatan."),
+                ("5. Inklusi Digital & Kesaksamaan", "Adl", "Mengukur kesaksamaan capaian digital antara kawasan bandar dan luar bandar, pemupukan literasi, dan kebolehcapaian inklusif.")
+            ]
+        else:
+            pillars_info = [
+                ("1. Transparency & Accessibility", "Sidq & Tabayyun", "Measures clarity of algorithmic processes, ease of information access, and verifying authentic information."),
+                ("2. Ethics & Responsibility", "Amanah", "Evaluates software design integrity, absence of algorithmic bias, and ethical stewardship of digital systems."),
+                ("3. Privacy & Control", "Tajassus & Haya", "Evaluates protection of user privacy rights, prevention of unauthorized data intrusion, and user control over consent."),
+                ("4. Security & Reliability", "Itqan", "Measures technical excellence, resilience against cyber threats, and reliable system uptime."),
+                ("5. Digital Inclusion & Equity", "Adl", "Evaluates equal digital access across urban and rural zones, digital literacy enablement, and inclusion of marginalized groups.")
+            ]
+            
+        for idx, (title, paradigm, desc) in enumerate(pillars_info):
+            with pi_cols[idx]:
+                st.markdown(f"""
+                <div class="glass-card" style="padding: 16px; min-height: 240px; border-top: 3px solid {gold_color}; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                    <div>
+                        <div style="font-size: 0.95rem; font-weight: bold; color: #ffffff; margin-bottom: 4px;">{title}</div>
+                        <div style="font-size: 0.78rem; font-style: italic; color: {gold_color}; font-weight: bold; margin-bottom: 10px;">{paradigm}</div>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin: 0;">{desc}</p>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
 
 
