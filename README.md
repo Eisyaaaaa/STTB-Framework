@@ -80,6 +80,18 @@ The app will automatically launch in your default web browser at `http://localho
 
 ---
 
+## UI Design System (Selected: Premium Dark Mode)
+
+The UI visual design has been officially locked to the **Premium Dark Mode layout** based on the official Sarawak flag color palette. 
+
+- **Primary Canvas Background**: Deep, sophisticated charcoal slate gray (`#1A1D20`) to eliminate eye fatigue.
+- **Card Elements**: Semi-transparent dark glassmorphism cards with a `backdrop-filter: blur(12px)` and ultra-thin glowing borders.
+- **Primary Glowing Accents**: Sarawak Gold/Yellow (`#FCD116`) for active navigation menu items, glowing Sarawak division markers, and primary highlight text.
+- **Status & Trend Highlights**: Crimson Red (`#CE1126`) for visual metrics, chart trends, and status indicators.
+- **Visual Reference**: The design proposal and high-fidelity mockups are documented at [design_mockup_proposal.md](file:///Users/muizzatuleisya/.gemini/antigravity/brain/8048ec51-8308-4864-a5c9-ab6632ca0f7a/design_mockup_proposal.md).
+
+---
+
 ## License & Credits
 
 Developed as an academic R&D Final Year Project for UTS.
