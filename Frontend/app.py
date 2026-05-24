@@ -1578,9 +1578,9 @@ elif page == "Dashboard" or page == "Welcome & Overview":
                 """
             
             if lang == "Bahasa Melayu":
-                tooltip_str = f"Bahagian {div_name}\nResponden = {stats['count']}\nIndeks Kepercayaan = {index_display}"
+                tooltip_str = f"<b>Bahagian {div_name}</b><br>Responden = {stats['count']}<br>Indeks Kepercayaan = {index_display}"
             else:
-                tooltip_str = f"{div_name} Division\nRespondent = {stats['count']}\nTrust Index = {index_display}"
+                tooltip_str = f"<b>{div_name} Division</b><br>Respondent = {stats['count']}<br>Trust Index = {index_display}"
             
             folium.CircleMarker(
                 location=[coords["lat"], coords["lon"]],
