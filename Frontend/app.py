@@ -1539,11 +1539,11 @@ elif page == "Dashboard" or page == "Welcome & Overview":
                 <div style="font-family: 'Outfit', sans-serif; width: 220px; color: #2c3e50;">
                     <h4 style="margin: 0 0 5px 0; color: #2980b9;">Bahagian {div_name}</h4>
                     <div style="font-size: 1.3rem; font-weight: 800; color: {marker_color}; margin-bottom: 5px;">
-                        Indeks STTB: {index_display}
+                        Indeks Kepercayaan = {index_display}
                     </div>
                     <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 10px;">
-                        Tahap Kepercayaan: {level_str} <br>
-                        Saiz Sampel (N): {stats['count']}
+                        Tahap Kepercayaan = {level_str} <br>
+                        Responden = {stats['count']}
                     </div>
                     <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
                     <table style="width: 100%; font-size: 0.8rem;">
@@ -1560,11 +1560,11 @@ elif page == "Dashboard" or page == "Welcome & Overview":
                 <div style="font-family: 'Outfit', sans-serif; width: 220px; color: #2c3e50;">
                     <h4 style="margin: 0 0 5px 0; color: #2980b9;">{div_name} Division</h4>
                     <div style="font-size: 1.3rem; font-weight: 800; color: {marker_color}; margin-bottom: 5px;">
-                        STTB Index: {index_display}
+                        Trust Index = {index_display}
                     </div>
                     <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 10px;">
-                        Trust Level: {level_str} <br>
-                        Sample Size (N): {stats['count']}
+                        Trust Level = {level_str} <br>
+                        Respondent = {stats['count']}
                     </div>
                     <hr style="border: 0; border-top: 1px solid #ddd; margin: 8px 0;">
                     <table style="width: 100%; font-size: 0.8rem;">
@@ -1578,9 +1578,9 @@ elif page == "Dashboard" or page == "Welcome & Overview":
                 """
             
             if lang == "Bahasa Melayu":
-                tooltip_str = f"Bahagian {div_name}: Indeks = {index_display} ({stats['count']} Responden)"
+                tooltip_str = f"Bahagian {div_name}\nResponden = {stats['count']}\nIndeks Kepercayaan = {index_display}"
             else:
-                tooltip_str = f"{div_name} Division: Index = {index_display} ({stats['count']} Respondents)"
+                tooltip_str = f"{div_name} Division\nRespondent = {stats['count']}\nTrust Index = {index_display}"
             
             folium.CircleMarker(
                 location=[coords["lat"], coords["lon"]],
