@@ -1577,6 +1577,11 @@ elif page == "Dashboard" or page == "Welcome & Overview":
                 </div>
                 """
             
+            if lang == "Bahasa Melayu":
+                tooltip_str = f"Bahagian {div_name}: Indeks = {index_display} ({stats['count']} Responden)"
+            else:
+                tooltip_str = f"{div_name} Division: Index = {index_display} ({stats['count']} Respondents)"
+            
             folium.CircleMarker(
                 location=[coords["lat"], coords["lon"]],
                 radius=12 + (stats["count"] * 0.1),
@@ -1585,7 +1590,7 @@ elif page == "Dashboard" or page == "Welcome & Overview":
                 fill=True,
                 fill_color=marker_color,
                 fill_opacity=0.6,
-                tooltip=f"{div_name}: Index = {index_display}"
+                tooltip=tooltip_str
             ).add_to(m)
             
         st_folium(m, height=360, use_container_width=True, key="dashboard_trust_map")
